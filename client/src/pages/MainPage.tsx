@@ -13,9 +13,11 @@ interface MainPageProps {
 }
 
 type MobileTab = "quiz" | "scores" | "chat";
+type InfoTab = "categories" | "difficulty";
 
 export default function MainPage({ sessionId, name, onLogout }: MainPageProps) {
   const [mobileTab, setMobileTab] = useState<MobileTab>("quiz");
+  const [infoTab, setInfoTab] = useState<InfoTab>("categories");
 
   const handleInvite = async () => {
     const url = window.location.origin;
@@ -90,23 +92,68 @@ export default function MainPage({ sessionId, name, onLogout }: MainPageProps) {
               <div className="w-96 shrink-0 h-72">
                 <Chat sessionId={sessionId} name={name} />
               </div>
-              <div className="flex-1 flex flex-col gap-3">
-                <div className="bg-[#232323] border border-[#333] rounded-xl p-4">
-                  <h4 className="text-xs font-semibold text-zinc-400 mb-2 uppercase tracking-wide">Topics</h4>
-                  <p className="text-xs text-zinc-500 leading-relaxed">
-                    Agentic Architecture &middot; Claude Code Config &middot; Context & Reliability &middot; Prompt Engineering &middot; Tool Design & MCP
-                  </p>
-                  <p className="text-xs text-zinc-600 mt-2">Use the category bubbles above to filter by topic. Difficulty auto-increases after 3 correct in a row.</p>
+              <div className="flex-1 bg-[#232323] border border-[#333] rounded-xl overflow-hidden h-72 flex flex-col">
+                {/* Tabs */}
+                <div className="flex border-b border-[#333]">
+                  <button
+                    onClick={() => setInfoTab("categories")}
+                    className={`flex-1 py-2.5 text-xs font-medium transition-colors cursor-pointer ${
+                      infoTab === "categories" ? "text-[#D97757] border-b-2 border-[#D97757]" : "text-zinc-500 hover:text-zinc-300"
+                    }`}
+                  >
+                    Categories
+                  </button>
+                  <button
+                    onClick={() => setInfoTab("difficulty")}
+                    className={`flex-1 py-2.5 text-xs font-medium transition-colors cursor-pointer ${
+                      infoTab === "difficulty" ? "text-[#D97757] border-b-2 border-[#D97757]" : "text-zinc-500 hover:text-zinc-300"
+                    }`}
+                  >
+                    Difficulty
+                  </button>
                 </div>
-                <div className="bg-[#232323] border border-[#333] rounded-xl p-4">
-                  <h4 className="text-xs font-semibold text-zinc-400 mb-2 uppercase tracking-wide">Difficulty Levels</h4>
-                  <div className="space-y-1">
-                    <p className="text-xs"><span className="text-emerald-400 font-medium">1</span> <span className="text-zinc-500">What is this?</span></p>
-                    <p className="text-xs"><span className="text-sky-400 font-medium">2</span> <span className="text-zinc-500">How does it work?</span></p>
-                    <p className="text-xs"><span className="text-yellow-400 font-medium">3</span> <span className="text-zinc-500">What's wrong here?</span></p>
-                    <p className="text-xs"><span className="text-orange-400 font-medium">4</span> <span className="text-zinc-500">Why did it break?</span></p>
-                    <p className="text-xs"><span className="text-red-400 font-medium">5</span> <span className="text-zinc-500">Architect it</span></p>
-                  </div>
+
+                {/* Tab content */}
+                <div className="flex-1 overflow-y-auto p-4">
+                  {infoTab === "categories" ? (
+                    <div className="space-y-3">
+                      {[
+                        { name: "Agentic Architecture", icon: "🤖", desc: "Loops, multi-agent orchestration, subagents, workflows, SDK hooks" },
+                        { name: "Tool Design & MCP", icon: "🔧", desc: "Tool interfaces, error responses, tool_choice, MCP servers, built-in tools" },
+                        { name: "Claude Code Config", icon: "⚙️", desc: "CLAUDE.md hierarchy, slash commands, path rules, plan mode, CI/CD" },
+                        { name: "Prompt Engineering", icon: "📝", desc: "Explicit criteria, few-shot, structured output, validation loops, batch" },
+                        { name: "Context & Reliability", icon: "🧠", desc: "Preservation, escalation, error propagation, codebase exploration, provenance" },
+                      ].map((cat) => (
+                        <div key={cat.name} className="flex items-start gap-2.5">
+                          <span className="text-base mt-0.5">{cat.icon}</span>
+                          <div>
+                            <p className="text-xs font-medium text-zinc-200">{cat.name}</p>
+                            <p className="text-[10px] text-zinc-500 leading-relaxed">{cat.desc}</p>
+                          </div>
+                        </div>
+                      ))}
+                      <p className="text-[10px] text-zinc-600 mt-2 pt-2 border-t border-[#333]">Use the category bubbles above the question to filter.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {[
+                        { level: 1, label: "What is this?", color: "text-emerald-400", desc: "Basic concept recognition" },
+                        { level: 2, label: "How does it work?", color: "text-sky-400", desc: "Understanding mechanisms" },
+                        { level: 3, label: "What's wrong here?", color: "text-yellow-400", desc: "Identifying issues in code" },
+                        { level: 4, label: "Why did it break?", color: "text-orange-400", desc: "Root cause analysis" },
+                        { level: 5, label: "Architect it", color: "text-red-400", desc: "System design decisions" },
+                      ].map((d) => (
+                        <div key={d.level} className="flex items-start gap-2.5">
+                          <span className={`text-sm font-bold w-5 text-center mt-0.5 ${d.color}`}>{d.level}</span>
+                          <div>
+                            <p className={`text-xs font-medium ${d.color}`}>{d.label}</p>
+                            <p className="text-[10px] text-zinc-500">{d.desc}</p>
+                          </div>
+                        </div>
+                      ))}
+                      <p className="text-[10px] text-zinc-600 mt-2 pt-2 border-t border-[#333]">Difficulty auto-increases after 3 correct answers in a row.</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

@@ -69,7 +69,7 @@ export default function GlossaryText({ text, className = "" }: GlossaryTextProps
         seg.definition ? (
           <span key={i} className="glossary-term group relative inline">
             <span className="border-b border-dotted border-[#D97757]/50 text-[#E8956F] cursor-help hover:text-[#D97757] hover:border-[#D97757] transition-colors">
-              {seg.text}
+              {seg.text}<sup className="text-[8px] text-[#D97757]/60 ml-0.5 select-none">?</sup>
             </span>
             <span className="glossary-tooltip pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-[#1a1a1a] border border-[#D97757]/30 rounded-lg text-xs text-zinc-300 leading-relaxed w-64 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-50 shadow-xl">
               <span className="font-semibold text-[#D97757] block mb-0.5">{seg.term}</span>
