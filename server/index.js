@@ -6,10 +6,8 @@ require('dotenv').config();
 
 const app = express();
 
-const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:5173';
-
 // Middleware
-app.use(cors({ origin: CORS_ORIGIN }));
+app.use(cors());
 app.use(express.json());
 
 app.set('trust proxy', true); // For IP detection behind load balancers
