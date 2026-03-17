@@ -85,11 +85,28 @@ export default function MainPage({ sessionId, name, onLogout }: MainPageProps) {
         <main className="flex-1 flex flex-col overflow-hidden">
           <div className="flex-1 overflow-y-auto">
             <Quiz sessionId={sessionId} />
-            {/* Bottom row: Chat left, empty right */}
-            <div className="px-4 lg:px-6 pb-6">
-              <div className="max-w-2xl">
-                <div className="h-72">
-                  <Chat sessionId={sessionId} name={name} />
+            {/* Bottom row: Chat left, info right */}
+            <div className="flex gap-4 px-4 lg:px-6 pb-6">
+              <div className="w-96 shrink-0 h-72">
+                <Chat sessionId={sessionId} name={name} />
+              </div>
+              <div className="flex-1 flex flex-col gap-3">
+                <div className="bg-[#232323] border border-[#333] rounded-xl p-4">
+                  <h4 className="text-xs font-semibold text-zinc-400 mb-2 uppercase tracking-wide">Topics</h4>
+                  <p className="text-xs text-zinc-500 leading-relaxed">
+                    Agentic Architecture &middot; Claude Code Config &middot; Context & Reliability &middot; Prompt Engineering &middot; Tool Design & MCP
+                  </p>
+                  <p className="text-xs text-zinc-600 mt-2">Use the category bubbles above to filter by topic. Difficulty auto-increases after 3 correct in a row.</p>
+                </div>
+                <div className="bg-[#232323] border border-[#333] rounded-xl p-4">
+                  <h4 className="text-xs font-semibold text-zinc-400 mb-2 uppercase tracking-wide">Difficulty Levels</h4>
+                  <div className="space-y-1">
+                    <p className="text-xs"><span className="text-emerald-400 font-medium">1</span> <span className="text-zinc-500">What is this?</span></p>
+                    <p className="text-xs"><span className="text-sky-400 font-medium">2</span> <span className="text-zinc-500">How does it work?</span></p>
+                    <p className="text-xs"><span className="text-yellow-400 font-medium">3</span> <span className="text-zinc-500">What's wrong here?</span></p>
+                    <p className="text-xs"><span className="text-orange-400 font-medium">4</span> <span className="text-zinc-500">Why did it break?</span></p>
+                    <p className="text-xs"><span className="text-red-400 font-medium">5</span> <span className="text-zinc-500">Architect it</span></p>
+                  </div>
                 </div>
               </div>
             </div>
