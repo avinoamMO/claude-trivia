@@ -81,14 +81,16 @@ export default function MainPage({ sessionId, name, onLogout }: MainPageProps) {
           </div>
         </aside>
 
-        {/* Center: Quiz + Chat below */}
+        {/* Center: Quiz + bottom row (Chat left, controls right) */}
         <main className="flex-1 flex flex-col overflow-hidden">
           <div className="flex-1 overflow-y-auto">
             <Quiz sessionId={sessionId} />
-            {/* Chat centered below quiz */}
-            <div className="max-w-xl mx-auto px-4 pb-6">
-              <div className="h-64">
-                <Chat sessionId={sessionId} name={name} />
+            {/* Bottom row: Chat left, empty right */}
+            <div className="px-4 lg:px-6 pb-6">
+              <div className="max-w-2xl">
+                <div className="h-72">
+                  <Chat sessionId={sessionId} name={name} />
+                </div>
               </div>
             </div>
           </div>
