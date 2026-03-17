@@ -18,7 +18,5 @@ COPY --from=builder /app/client/dist ./client/dist
 COPY questions/ ./questions/
 
 ENV NODE_ENV=production
-ENV PORT=3001
-EXPOSE 3001
 WORKDIR /app/server
 CMD ["node", "index.js"]
