@@ -90,7 +90,7 @@ export default function MainPage({ sessionId, name, onLogout }: MainPageProps) {
         {/* Center: Quiz + bottom row (Chat left, controls right) */}
         <main className="flex-1 flex flex-col overflow-hidden">
           <div className="flex-1 overflow-y-auto">
-            <Quiz sessionId={sessionId} selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} selectedDifficulty={selectedDifficulty} setSelectedDifficulty={setSelectedDifficulty} />
+            <Quiz sessionId={sessionId} selectedCategory={selectedCategory} selectedDifficulty={selectedDifficulty} setSelectedDifficulty={setSelectedDifficulty} />
             {/* Bottom row: Chat left, info right */}
             <div className="flex gap-4 px-4 lg:px-6 pb-6">
               <div className="w-96 shrink-0 h-72">
@@ -136,7 +136,7 @@ export default function MainPage({ sessionId, name, onLogout }: MainPageProps) {
         <div className="flex-1 overflow-hidden">
           {mobileTab === "quiz" && (
             <div className="h-full overflow-y-auto">
-              <Quiz sessionId={sessionId} selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} selectedDifficulty={selectedDifficulty} setSelectedDifficulty={setSelectedDifficulty} />
+              <Quiz sessionId={sessionId} selectedCategory={selectedCategory} selectedDifficulty={selectedDifficulty} setSelectedDifficulty={setSelectedDifficulty} />
             </div>
           )}
           {mobileTab === "scores" && (

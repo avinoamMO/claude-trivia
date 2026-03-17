@@ -8,7 +8,6 @@ import GlossaryText from "./GlossaryText";
 interface QuizProps {
   sessionId: string;
   selectedCategory: string;
-  setSelectedCategory: (cat: string) => void;
   selectedDifficulty: number | undefined;
   setSelectedDifficulty: (d: number | undefined | ((prev: number | undefined) => number | undefined)) => void;
 }
@@ -17,7 +16,7 @@ function fireConfetti() {
   confetti({ particleCount: 80, spread: 60, origin: { y: 0.7 }, colors: ["#D97757", "#E8956F", "#22c55e", "#3b82f6", "#fbbf24"] });
 }
 
-export default function Quiz({ sessionId, selectedCategory, setSelectedCategory, selectedDifficulty, setSelectedDifficulty }: QuizProps) {
+export default function Quiz({ sessionId, selectedCategory, selectedDifficulty, setSelectedDifficulty }: QuizProps) {
   const [question, setQuestion] = useState<Question | null>(null);
   const [result, setResult] = useState<AnswerResult | null>(null);
   const [picked, setPicked] = useState<number | null>(null);
