@@ -55,13 +55,15 @@ export default function MainPage({ sessionId, name, onLogout }: MainPageProps) {
       {/* Desktop layout */}
       <div className="flex-1 hidden lg:flex overflow-hidden">
         {/* Left sidebar — scoreboard & stats first, achievements lower */}
-        <aside className="w-72 border-r border-[#333] p-4 space-y-4 overflow-y-auto">
-          <Scoreboard sessionId={sessionId} />
-          <CategoryStats sessionId={sessionId} />
-          <Achievements sessionId={sessionId} />
+        <aside className="w-72 border-r border-[#333] flex flex-col">
+          <div className="flex-1 p-4 space-y-4 overflow-y-auto">
+            <Scoreboard sessionId={sessionId} />
+            <CategoryStats sessionId={sessionId} />
+            <Achievements sessionId={sessionId} />
+          </div>
 
-          {/* Disclaimer — bottom of sidebar */}
-          <div className="pt-2">
+          {/* Disclaimer — sticky bottom of sidebar */}
+          <div className="px-4 py-3 border-t border-[#333] bg-[#1a1a1a]">
             <p className="text-zinc-600 text-[10px] leading-relaxed">
               Not affiliated with Anthropic.
               {" "}Open source by{" "}
@@ -71,7 +73,7 @@ export default function MainPage({ sessionId, name, onLogout }: MainPageProps) {
                 <Github className="w-2.5 h-2.5" /> GitHub
               </a>
             </p>
-            <p className="text-zinc-400 text-sm mt-2 font-medium">
+            <p className="text-zinc-300 text-base mt-1.5 font-semibold">
               Made with Love in{" "}
               <span className="font-bold bg-gradient-to-r from-blue-400 via-white to-blue-400 bg-clip-text text-transparent">Israel</span>
               {" "}🇮🇱
@@ -79,15 +81,18 @@ export default function MainPage({ sessionId, name, onLogout }: MainPageProps) {
           </div>
         </aside>
 
-        {/* Center: Quiz */}
+        {/* Center: Quiz + Chat below */}
         <main className="flex-1 flex flex-col overflow-hidden">
-          <Quiz sessionId={sessionId} />
+          <div className="flex-1 overflow-y-auto">
+            <Quiz sessionId={sessionId} />
+            {/* Chat centered below quiz */}
+            <div className="max-w-xl mx-auto px-4 pb-6">
+              <div className="h-64">
+                <Chat sessionId={sessionId} name={name} />
+              </div>
+            </div>
+          </div>
         </main>
-
-        {/* Right sidebar */}
-        <aside className="w-80 border-l border-[#333] flex flex-col">
-          <Chat sessionId={sessionId} name={name} />
-        </aside>
       </div>
 
       {/* Mobile layout */}
