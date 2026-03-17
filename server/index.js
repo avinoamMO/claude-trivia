@@ -1,5 +1,6 @@
 const express = require('express');
 const http = require('http');
+const path = require('path');
 const { Server } = require('socket.io');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -8,19 +9,22 @@ require('dotenv').config();
 const app = express();
 const server = http.createServer(app);
 
+const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:5173';
+
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:5173',
+    origin: CORS_ORIGIN,
     methods: ['GET', 'POST'],
   },
 });
 
 // Middleware
-app.use(cors({ origin: 'http://localhost:5173' }));
+app.use(cors({ origin: CORS_ORIGIN }));
 app.use(express.json());
 
 // Make io accessible to routes
 app.set('io', io);
+app.set('trust proxy', true); // For IP detection behind load balancers
 
 // Routes
 app.use('/api/users', require('./routes/users'));
@@ -33,6 +37,15 @@ app.use('/api/chat', require('./routes/chat'));
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
+
+// In production, serve the built client
+if (process.env.NODE_ENV === 'production') {
+  const clientDist = path.join(__dirname, '..', 'client', 'dist');
+  app.use(express.static(clientDist));
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(clientDist, 'index.html'));
+  });
+}
 
 // Socket.io handlers
 const setupSocketHandlers = require('./socket/handlers');
