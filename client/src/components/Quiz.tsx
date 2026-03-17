@@ -90,7 +90,17 @@ export default function Quiz({ sessionId }: QuizProps) {
       setSessionTotal(prev => prev + 1);
       if (res.correct) {
         setSessionCorrect(prev => prev + 1);
-        setStreak(prev => prev + 1);
+        setStreak(prev => {
+          const newStreak = prev + 1;
+          // Auto-increase difficulty after 3 correct in a row
+          if (newStreak > 0 && newStreak % 3 === 0) {
+            setSelectedDifficulty(curr => {
+              if (curr === undefined) return 2;
+              return curr < 5 ? curr + 1 : curr;
+            });
+          }
+          return newStreak;
+        });
         fireConfetti();
       } else {
         setStreak(0);
@@ -179,14 +189,14 @@ export default function Quiz({ sessionId }: QuizProps) {
         )}
         <div className="flex-1" />
         {/* Difficulty toggle */}
-        <div className="flex items-center gap-1">
-          <span className="text-[10px] text-zinc-600 mr-1">Level</span>
+        <div className="flex items-center gap-1.5">
+          <span className="text-xs text-zinc-500 mr-1">Level</span>
           {[1, 2, 3, 4, 5].map(d => (
             <button
               key={d}
               onClick={() => setSelectedDifficulty(selectedDifficulty === d ? undefined : d)}
-              className={`w-6 h-6 rounded text-xs font-bold transition-colors cursor-pointer ${
-                selectedDifficulty === d ? `${difficultyColor(d)} bg-white/10` : "text-zinc-600 hover:text-zinc-400"
+              className={`w-8 h-8 rounded-lg text-sm font-bold transition-all cursor-pointer ${
+                selectedDifficulty === d ? `${difficultyColor(d)} bg-white/10 ring-1 ring-current` : "text-zinc-600 hover:text-zinc-400 hover:bg-white/5"
               }`}
               title={difficultyLabel(d)}
             >
