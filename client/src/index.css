@@ -58,8 +58,21 @@ body {
   animation: toast-out 0.3s ease-in forwards;
 }
 
-/* Subtopic visual banner */
-.subtopic-banner {
-  background: linear-gradient(135deg, rgba(217, 119, 87, 0.15) 0%, rgba(217, 119, 87, 0.05) 100%);
-  border: 1px solid rgba(217, 119, 87, 0.2);
+/* Glossary tooltip positioning fix */
+.glossary-term {
+  position: relative;
+  z-index: 1;
+}
+
+.glossary-term:hover {
+  z-index: 50;
+}
+
+.glossary-tooltip {
+  pointer-events: none;
+  white-space: normal;
+  text-align: left;
+  font-weight: normal;
+  font-size: 0.75rem;
+  line-height: 1.5;
 }

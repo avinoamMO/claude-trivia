@@ -3,6 +3,7 @@ import { Check, X, ChevronRight, Loader2, Flame, RotateCcw } from "lucide-react"
 import confetti from "canvas-confetti";
 import { getNextQuestion, submitAnswer, getCategories, getCategoryStats } from "../lib/api";
 import type { Question, AnswerResult, Achievement, CategoryStat } from "../lib/types";
+import GlossaryText from "./GlossaryText";
 
 interface QuizProps {
   sessionId: string;
@@ -252,9 +253,13 @@ export default function Quiz({ sessionId }: QuizProps) {
 
       {/* Question card */}
       <div className="bg-[#232323] border border-[#333] rounded-xl p-6 mb-4">
-        <h2 className="text-xl font-semibold text-white mb-3">{question.question}</h2>
+        <h2 className="text-xl font-semibold text-white mb-3">
+          <GlossaryText text={question.question} />
+        </h2>
         {question.explanation && (
-          <p className="text-zinc-400 text-sm leading-relaxed mb-5">{question.explanation}</p>
+          <p className="text-zinc-400 text-sm leading-relaxed mb-5">
+            <GlossaryText text={question.explanation} />
+          </p>
         )}
 
         {/* Options with inline feedback */}
@@ -289,7 +294,7 @@ export default function Quiz({ sessionId }: QuizProps) {
                     <span className="shrink-0 w-7 h-7 rounded-lg bg-[#2a2a2a] flex items-center justify-center text-xs font-mono font-medium">
                       {String.fromCharCode(65 + idx)}
                     </span>
-                    <span className="flex-1 text-sm">{option}</span>
+                    <span className="flex-1 text-sm"><GlossaryText text={option} /></span>
                     {result && idx === result.correctIndex && <Check className="w-5 h-5 text-emerald-400 shrink-0" />}
                     {result && idx === picked && !result.correct && idx !== result.correctIndex && <X className="w-5 h-5 text-red-400 shrink-0" />}
                   </div>
@@ -300,7 +305,7 @@ export default function Quiz({ sessionId }: QuizProps) {
                   }`}>
                     {feedbackType === "correct" && <span className="text-emerald-400 font-medium text-xs block mb-1">Correct!</span>}
                     {feedbackType === "wrong" && <span className="text-red-400 font-medium text-xs block mb-1">Not quite...</span>}
-                    {feedbackText}
+                    <GlossaryText text={feedbackText} />
                   </div>
                 )}
               </div>
