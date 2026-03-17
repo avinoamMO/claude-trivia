@@ -71,9 +71,9 @@ export default function MainPage({ sessionId, name, onLogout }: MainPageProps) {
                 <Github className="w-2.5 h-2.5" /> GitHub
               </a>
             </p>
-            <p className="text-zinc-600 text-[10px] mt-1">
+            <p className="text-zinc-400 text-sm mt-2 font-medium">
               Made with Love in{" "}
-              <span className="font-semibold bg-gradient-to-r from-blue-400 via-white to-blue-400 bg-clip-text text-transparent">Israel</span>
+              <span className="font-bold bg-gradient-to-r from-blue-400 via-white to-blue-400 bg-clip-text text-transparent">Israel</span>
               {" "}🇮🇱
             </p>
           </div>

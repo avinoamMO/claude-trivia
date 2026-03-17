@@ -33,31 +33,31 @@ export default function Achievements({ sessionId }: AchievementsProps) {
 
   return (
     <div className="bg-[#232323] border border-[#333] rounded-xl overflow-hidden">
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-[#333]">
-        <Trophy className="w-4 h-4 text-[#D97757]" />
-        <h3 className="text-sm font-semibold text-white">Achievements</h3>
-        <span className="ml-auto text-xs text-zinc-500">{earned.length}/{all.length}</span>
+      <div className="flex items-center gap-2 px-3 py-2 border-b border-[#333]">
+        <Trophy className="w-3.5 h-3.5 text-[#D97757]" />
+        <h3 className="text-xs font-semibold text-white">Achievements</h3>
+        <span className="ml-auto text-[10px] text-zinc-500">{earned.length}/{all.length}</span>
       </div>
 
-      <div className="p-3">
+      <div className="p-2">
         {loading ? (
           <div className="text-center text-zinc-500 text-sm py-4">Loading...</div>
         ) : (
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-5 gap-1.5">
             {all.map((achievement) => {
               const isEarned = earnedIds.has(achievement.id);
               return (
                 <div
                   key={achievement.id}
                   title={`${achievement.name}: ${achievement.description}`}
-                  className={`flex flex-col items-center justify-center py-2 rounded-lg transition-all ${
+                  className={`flex flex-col items-center justify-center py-1 rounded-md transition-all ${
                     isEarned
                       ? "bg-[#D97757]/10 border border-[#D97757]/30"
                       : "bg-[#1a1a1a] border border-transparent opacity-30"
                   }`}
                 >
-                  <span className="text-xl">{achievement.icon}</span>
-                  <span className={`text-[9px] mt-1 text-center leading-tight px-1 ${
+                  <span className="text-sm">{achievement.icon}</span>
+                  <span className={`text-[8px] mt-0.5 text-center leading-tight px-0.5 ${
                     isEarned ? "text-zinc-300" : "text-zinc-600"
                   }`}>
                     {achievement.name}

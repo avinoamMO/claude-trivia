@@ -185,7 +185,7 @@ export default function Quiz({ sessionId }: QuizProps) {
             <button
               key={d}
               onClick={() => setSelectedDifficulty(selectedDifficulty === d ? undefined : d)}
-              className={`w-5 h-5 rounded text-[10px] font-bold transition-colors cursor-pointer ${
+              className={`w-6 h-6 rounded text-xs font-bold transition-colors cursor-pointer ${
                 selectedDifficulty === d ? `${difficultyColor(d)} bg-white/10` : "text-zinc-600 hover:text-zinc-400"
               }`}
               title={difficultyLabel(d)}
