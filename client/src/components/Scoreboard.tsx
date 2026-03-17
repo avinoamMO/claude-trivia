@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Trophy } from "lucide-react";
 import { getLeaderboard } from "../lib/api";
-import { socket } from "../lib/socket";
 import type { LeaderboardEntry } from "../lib/types";
 
 interface ScoreboardProps {
@@ -29,10 +28,11 @@ export default function Scoreboard({ sessionId }: ScoreboardProps) {
   }, [period]);
 
   useEffect(() => { fetchLeaderboard(); }, [fetchLeaderboard]);
+
+  // Poll leaderboard every 10 seconds
   useEffect(() => {
-    const handler = () => fetchLeaderboard();
-    socket.on("leaderboard:update", handler);
-    return () => { socket.off("leaderboard:update", handler); };
+    const interval = setInterval(() => { fetchLeaderboard(); }, 10000);
+    return () => clearInterval(interval);
   }, [fetchLeaderboard]);
 
   return (

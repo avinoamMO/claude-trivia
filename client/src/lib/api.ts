@@ -92,3 +92,10 @@ export function getSubtopicStats(sessionId: string) {
 export function getRecentChat() {
   return request<ChatMessage[]>("/chat/recent");
 }
+
+export function sendChat(data: { sessionId: string; name: string; text: string }): Promise<ChatMessage> {
+  return request<ChatMessage>("/chat", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}

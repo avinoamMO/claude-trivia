@@ -1,29 +1,17 @@
 const express = require('express');
-const http = require('http');
 const path = require('path');
-const { Server } = require('socket.io');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
-const server = http.createServer(app);
 
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:5173';
-
-const io = new Server(server, {
-  cors: {
-    origin: CORS_ORIGIN,
-    methods: ['GET', 'POST'],
-  },
-});
 
 // Middleware
 app.use(cors({ origin: CORS_ORIGIN }));
 app.use(express.json());
 
-// Make io accessible to routes
-app.set('io', io);
 app.set('trust proxy', true); // For IP detection behind load balancers
 
 // Routes
@@ -47,10 +35,6 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-// Socket.io handlers
-const setupSocketHandlers = require('./socket/handlers');
-setupSocketHandlers(io);
-
 // Connect to MongoDB and start server
 const PORT = process.env.PORT || 3001;
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/claude-trivia';
@@ -59,7 +43,7 @@ mongoose
   .connect(MONGODB_URI)
   .then(() => {
     console.log('Connected to MongoDB');
-    server.listen(PORT, () => {
+    app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
   })

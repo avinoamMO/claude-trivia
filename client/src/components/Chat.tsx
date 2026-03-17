@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, type FormEvent } from "react";
 import { MessageCircle, Send } from "lucide-react";
-import { getRecentChat } from "../lib/api";
-import { socket } from "../lib/socket";
+import { getRecentChat, sendChat } from "../lib/api";
 import type { ChatMessage } from "../lib/types";
 
 interface ChatProps {
@@ -25,21 +24,43 @@ export default function Chat({ sessionId, name }: ChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
+  const latestIdRef = useRef<string | null>(null);
 
+  // Initial fetch
   useEffect(() => { getRecentChat().then(setMessages).catch(() => {}); }, []);
+
+  // Poll for new messages every 3 seconds
   useEffect(() => {
-    const handler = (msg: ChatMessage) => setMessages((prev) => [...prev, msg]);
-    socket.on("chat:message", handler);
-    return () => { socket.off("chat:message", handler); };
+    const interval = setInterval(async () => {
+      try {
+        const fresh = await getRecentChat();
+        const lastKnown = latestIdRef.current;
+        if (fresh.length > 0 && fresh[fresh.length - 1]._id !== lastKnown) {
+          setMessages(fresh);
+        }
+      } catch { /* silent */ }
+    }, 3000);
+    return () => clearInterval(interval);
   }, []);
+
+  // Track latest message ID to avoid unnecessary re-renders
+  useEffect(() => {
+    if (messages.length > 0) {
+      latestIdRef.current = messages[messages.length - 1]._id;
+    }
+  }, [messages]);
+
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
 
-  const handleSend = (e: FormEvent) => {
+  const handleSend = async (e: FormEvent) => {
     e.preventDefault();
     const trimmed = input.trim();
     if (!trimmed) return;
-    socket.emit("chat:message", { sessionId, name, text: trimmed });
     setInput("");
+    try {
+      const msg = await sendChat({ sessionId, name, text: trimmed });
+      setMessages((prev) => [...prev, msg]);
+    } catch { /* silent */ }
   };
 
   return (

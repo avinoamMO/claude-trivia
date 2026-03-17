@@ -45,12 +45,6 @@ router.post('/', async (req, res) => {
       text: text.trim(),
     });
 
-    // Broadcast via socket
-    const io = req.app.get('io');
-    if (io) {
-      io.emit('chat:message', message);
-    }
-
     res.json(message);
   } catch (err) {
     console.error('POST /api/chat error:', err);
