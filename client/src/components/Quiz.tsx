@@ -1,51 +1,28 @@
 import { useState, useEffect, useCallback } from "react";
 import { Check, X, ChevronRight, Loader2, Flame, RotateCcw } from "lucide-react";
 import confetti from "canvas-confetti";
-import { getNextQuestion, submitAnswer, getCategories, getCategoryStats } from "../lib/api";
-import type { Question, AnswerResult, Achievement, CategoryStat } from "../lib/types";
+import { getNextQuestion, submitAnswer } from "../lib/api";
+import type { Question, AnswerResult, Achievement } from "../lib/types";
 import GlossaryText from "./GlossaryText";
 
 interface QuizProps {
   sessionId: string;
+  selectedCategory: string;
+  setSelectedCategory: (cat: string) => void;
+  selectedDifficulty: number | undefined;
+  setSelectedDifficulty: (d: number | undefined | ((prev: number | undefined) => number | undefined)) => void;
 }
-
-const difficultyLabel = (d: number) => {
-  const labels: Record<number, string> = { 1: "What is this?", 2: "How does it work?", 3: "What's wrong here?", 4: "Why did it break?", 5: "Architect it" };
-  return labels[d] || "Unknown";
-};
-
-const difficultyColor = (d: number) => {
-  const colors: Record<number, string> = { 1: "text-emerald-400", 2: "text-sky-400", 3: "text-yellow-400", 4: "text-orange-400", 5: "text-red-400" };
-  return colors[d] || "text-zinc-400";
-};
-
-const subtopicEmoji: Record<string, string> = {
-  "1.1 Agentic Loops": "🔄", "1.2 Multi-Agent Orchestration": "🎭", "1.3 Subagent Invocation & Context": "🧩",
-  "1.4 Workflow Enforcement & Handoff": "📋", "1.5 Agent SDK Hooks": "🪝", "1.6 Task Decomposition": "🔨",
-  "1.7 Session State & Resumption": "💾", "2.1 Tool Interface Design": "🔧", "2.2 Structured Error Responses": "⚠️",
-  "2.3 Tool Distribution & tool_choice": "📦", "2.4 MCP Server Integration": "🌐", "2.5 Built-in Tools": "🛠️",
-  "3.1 CLAUDE.md Hierarchy": "📄", "3.2 Custom Slash Commands & Skills": "⌨️", "3.3 Path-Specific Rules": "📁",
-  "3.4 Plan Mode vs Direct Execution": "📐", "3.5 Iterative Refinement": "🔁", "3.6 CI/CD Integration": "🚀",
-  "4.1 Explicit Criteria": "✅", "4.2 Few-Shot Prompting": "📝", "4.3 Structured Output with tool_use": "📊",
-  "4.4 Validation-Retry Loops": "🔄", "4.5 Batch Processing": "📦", "4.6 Multi-Instance Review": "👥",
-  "5.1 Context Preservation": "🧠", "5.2 Escalation & Ambiguity": "❓", "5.3 Error Propagation": "💥",
-  "5.4 Codebase Exploration": "🔍", "5.5 Human Review & Confidence": "👤", "5.6 Information Provenance": "📌",
-};
 
 function fireConfetti() {
   confetti({ particleCount: 80, spread: 60, origin: { y: 0.7 }, colors: ["#D97757", "#E8956F", "#22c55e", "#3b82f6", "#fbbf24"] });
 }
 
-export default function Quiz({ sessionId }: QuizProps) {
+export default function Quiz({ sessionId, selectedCategory, setSelectedCategory, selectedDifficulty, setSelectedDifficulty }: QuizProps) {
   const [question, setQuestion] = useState<Question | null>(null);
   const [result, setResult] = useState<AnswerResult | null>(null);
   const [picked, setPicked] = useState<number | null>(null);
   const [loadingQuestion, setLoadingQuestion] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [categories, setCategories] = useState<string[]>([]);
-  const [categoryStats, setCategoryStats] = useState<CategoryStat[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [selectedDifficulty, setSelectedDifficulty] = useState<number | undefined>(undefined);
   const [reviewMode, setReviewMode] = useState(false);
   const [toast, setToast] = useState<Achievement | null>(null);
   const [toastExiting, setToastExiting] = useState(false);
@@ -73,12 +50,6 @@ export default function Quiz({ sessionId }: QuizProps) {
   }, [sessionId, selectedCategory, selectedDifficulty, reviewMode]);
 
   useEffect(() => { fetchQuestion(); }, [fetchQuestion]);
-  useEffect(() => {
-    getCategories().then(setCategories).catch(() => {});
-    getCategoryStats(sessionId).then(setCategoryStats).catch(() => {});
-  }, [sessionId]);
-
-  const refreshStats = () => getCategoryStats(sessionId).then(setCategoryStats).catch(() => {});
 
   const handleAnswer = async (index: number) => {
     if (result || !question || submitting) return;
@@ -105,15 +76,9 @@ export default function Quiz({ sessionId }: QuizProps) {
       } else {
         setStreak(0);
       }
-      refreshStats();
       if (res.newAchievements && res.newAchievements.length > 0) showToast(res.newAchievements[0]);
     } catch { setPicked(null); }
     finally { setSubmitting(false); }
-  };
-
-  const getCategoryProgress = (cat: string) => {
-    const stat = categoryStats.find(s => s.category === cat);
-    return stat ? stat.accuracy : 0;
   };
 
   const sessionAccuracy = sessionTotal > 0 ? Math.round((sessionCorrect / sessionTotal) * 100) : 0;
@@ -150,10 +115,8 @@ export default function Quiz({ sessionId }: QuizProps) {
     );
   }
 
-  const emoji = question.subtopic ? subtopicEmoji[question.subtopic] || "📖" : "📖";
-
   return (
-    <div className="flex-1 flex flex-col p-4 lg:p-6 overflow-y-auto relative">
+    <div className="flex-1 flex flex-col p-4 lg:p-8 overflow-y-auto relative max-w-4xl mx-auto w-full">
       {/* Achievement toast */}
       {toast && (
         <div className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 ${toastExiting ? 'toast-exit' : 'toast-enter'}`}>
@@ -188,22 +151,6 @@ export default function Quiz({ sessionId }: QuizProps) {
           <span className="text-xs bg-red-500/15 text-red-400 px-2 py-0.5 rounded-full font-medium">Reviewing Mistakes</span>
         )}
         <div className="flex-1" />
-        {/* Difficulty toggle */}
-        <div className="flex items-center gap-1.5">
-          <span className="text-xs text-zinc-500 mr-1">Level</span>
-          {[1, 2, 3, 4, 5].map(d => (
-            <button
-              key={d}
-              onClick={() => setSelectedDifficulty(selectedDifficulty === d ? undefined : d)}
-              className={`w-8 h-8 rounded-lg text-sm font-bold transition-all cursor-pointer ${
-                selectedDifficulty === d ? `${difficultyColor(d)} bg-white/10 ring-1 ring-current` : "text-zinc-600 hover:text-zinc-400 hover:bg-white/5"
-              }`}
-              title={difficultyLabel(d)}
-            >
-              {d}
-            </button>
-          ))}
-        </div>
         {/* Review mistakes button */}
         <button
           onClick={() => setReviewMode(!reviewMode)}
@@ -217,53 +164,9 @@ export default function Quiz({ sessionId }: QuizProps) {
         </button>
       </div>
 
-      {/* Category filter — progress-filled bubbles */}
-      <div className="flex gap-2 mb-3 flex-wrap">
-        <button
-          onClick={() => setSelectedCategory("")}
-          className={`px-3 py-1 rounded-full text-xs font-medium transition-colors cursor-pointer ${
-            selectedCategory === "" ? "bg-[#D97757] text-white" : "bg-[#2a2a2a] text-zinc-400 hover:text-white"
-          }`}
-        >
-          All
-        </button>
-        {categories.map((cat) => {
-          const progress = getCategoryProgress(cat);
-          const isSelected = selectedCategory === cat;
-          return (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`relative px-3 py-1 rounded-full text-xs font-medium transition-colors cursor-pointer overflow-hidden ${
-                isSelected ? "text-white" : "text-zinc-400 hover:text-white"
-              }`}
-              style={{ background: isSelected ? '#D97757' : '#2a2a2a' }}
-            >
-              {!isSelected && progress > 0 && (
-                <div className="absolute inset-y-0 left-0 bg-[#D97757]/20 rounded-full" style={{ width: `${progress}%` }} />
-              )}
-              <span className="relative">{cat}</span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Compact subtopic + difficulty bar */}
-      <div className="flex items-center gap-2 mb-3 px-1">
-        <span className="text-lg">{emoji}</span>
-        <span className="text-xs text-zinc-500">{question.category}</span>
-        <span className="text-zinc-700">&middot;</span>
-        <span className="text-xs text-zinc-400">{question.subtopic}</span>
-        <span className="ml-auto">
-          <span className={`text-xs font-medium ${difficultyColor(question.difficulty)}`}>
-            {difficultyLabel(question.difficulty)} {"*".repeat(question.difficulty)}
-          </span>
-        </span>
-      </div>
-
       {/* Question card */}
       <div className="bg-[#232323] border border-[#333] rounded-xl p-6 mb-4">
-        <h2 className="text-xl font-semibold text-white mb-3">
+        <h2 className="text-2xl font-semibold text-white mb-3">
           <GlossaryText text={question.question} />
         </h2>
         {question.explanation && (
