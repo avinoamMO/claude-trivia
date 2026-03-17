@@ -60,15 +60,13 @@ export default function MainPage({ sessionId, name, onLogout }: MainPageProps) {
 
       {/* Desktop layout */}
       <div className="flex-1 hidden lg:flex overflow-hidden">
-        {/* Left sidebar — scoreboard & stats first, achievements lower */}
-        <aside className="w-72 border-r border-[#333] flex flex-col">
+        {/* Left sidebar — scoreboard & stats */}
+        <aside className="w-64 border-r border-[#333] flex flex-col">
           <div className="flex-1 p-4 space-y-4 overflow-y-auto">
             <Scoreboard sessionId={sessionId} />
             <CategoryStats sessionId={sessionId} />
             <Achievements sessionId={sessionId} />
           </div>
-
-          {/* Disclaimer — sticky bottom of sidebar */}
           <div className="px-4 py-3 border-t border-[#333] bg-[#1a1a1a]">
             <p className="text-zinc-600 text-[10px] leading-relaxed">
               Not affiliated with Anthropic.
@@ -87,48 +85,50 @@ export default function MainPage({ sessionId, name, onLogout }: MainPageProps) {
           </div>
         </aside>
 
-        {/* Center: Quiz + bottom row (Chat left, controls right) */}
+        {/* Center: Quiz */}
         <main className="flex-1 flex flex-col overflow-hidden">
           <div className="flex-1 overflow-y-auto">
             <Quiz sessionId={sessionId} selectedCategory={selectedCategory} selectedDifficulty={selectedDifficulty} setSelectedDifficulty={setSelectedDifficulty} />
-            {/* Bottom row: Chat left, info right */}
-            <div className="flex gap-4 px-4 lg:px-6 pb-6">
-              <div className="w-96 shrink-0 h-72">
-                <Chat sessionId={sessionId} name={name} />
-              </div>
-              <div className="flex-1 flex flex-col gap-3 h-72">
-                {/* Category selector */}
-                <div className="bg-[#232323] border border-[#333] rounded-xl p-3">
-                  <h4 className="text-[10px] font-semibold text-zinc-500 mb-2 uppercase tracking-wide">Category</h4>
-                  <div className="flex flex-wrap gap-1.5">
-                    <button onClick={() => setSelectedCategory("")} className={`px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors cursor-pointer ${selectedCategory === "" ? "bg-[#D97757] text-white" : "bg-[#1a1a1a] text-zinc-400 hover:text-white"}`}>All</button>
-                    {categories.map((cat) => (
-                      <button key={cat} onClick={() => setSelectedCategory(cat)} className={`px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors cursor-pointer ${selectedCategory === cat ? "bg-[#D97757] text-white" : "bg-[#1a1a1a] text-zinc-400 hover:text-white"}`}>{cat}</button>
-                    ))}
-                  </div>
-                </div>
-                {/* Difficulty selector */}
-                <div className="bg-[#232323] border border-[#333] rounded-xl p-3">
-                  <h4 className="text-[10px] font-semibold text-zinc-500 mb-2 uppercase tracking-wide">Difficulty</h4>
-                  <div className="flex gap-2">
-                    {[
-                      { d: 1, label: "Basics", color: "text-emerald-400" },
-                      { d: 2, label: "How?", color: "text-sky-400" },
-                      { d: 3, label: "Debug", color: "text-yellow-400" },
-                      { d: 4, label: "Why?", color: "text-orange-400" },
-                      { d: 5, label: "Architect", color: "text-red-400" },
-                    ].map(({ d, label, color }) => (
-                      <button key={d} onClick={() => setSelectedDifficulty(selectedDifficulty === d ? undefined : d)} className={`flex-1 py-2 rounded-lg text-center transition-all cursor-pointer ${selectedDifficulty === d ? `${color} bg-white/10 ring-1 ring-current` : "text-zinc-600 hover:text-zinc-400 hover:bg-white/5"}`}>
-                        <span className="text-sm font-bold block">{d}</span>
-                        <span className="text-[9px] block mt-0.5">{label}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </main>
+
+        {/* Right sidebar — Controls + Chat */}
+        <aside className="w-80 border-l border-[#333] flex flex-col overflow-y-auto">
+          {/* Category selector */}
+          <div className="p-4 border-b border-[#333]">
+            <h4 className="text-[10px] font-semibold text-zinc-500 mb-3 uppercase tracking-wide">Category</h4>
+            <div className="flex flex-wrap gap-1.5">
+              <button onClick={() => setSelectedCategory("")} className={`px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors cursor-pointer ${selectedCategory === "" ? "bg-[#D97757] text-white" : "bg-[#2a2a2a] text-zinc-400 hover:text-white"}`}>All</button>
+              {categories.map((cat) => (
+                <button key={cat} onClick={() => setSelectedCategory(cat)} className={`px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors cursor-pointer ${selectedCategory === cat ? "bg-[#D97757] text-white" : "bg-[#2a2a2a] text-zinc-400 hover:text-white"}`}>{cat}</button>
+              ))}
+            </div>
+          </div>
+
+          {/* Difficulty selector */}
+          <div className="p-4 border-b border-[#333]">
+            <h4 className="text-[10px] font-semibold text-zinc-500 mb-3 uppercase tracking-wide">Difficulty</h4>
+            <div className="flex gap-1.5">
+              {[
+                { d: 1, label: "Basics", color: "text-emerald-400" },
+                { d: 2, label: "How?", color: "text-sky-400" },
+                { d: 3, label: "Debug", color: "text-yellow-400" },
+                { d: 4, label: "Why?", color: "text-orange-400" },
+                { d: 5, label: "Architect", color: "text-red-400" },
+              ].map(({ d, label, color }) => (
+                <button key={d} onClick={() => setSelectedDifficulty(selectedDifficulty === d ? undefined : d)} className={`flex-1 py-2 rounded-lg text-center transition-all cursor-pointer ${selectedDifficulty === d ? `${color} bg-white/10 ring-1 ring-current` : "text-zinc-600 hover:text-zinc-400 hover:bg-white/5"}`}>
+                  <span className="text-sm font-bold block">{d}</span>
+                  <span className="text-[9px] block mt-0.5">{label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Chat */}
+          <div className="flex-1 min-h-0">
+            <Chat sessionId={sessionId} name={name} />
+          </div>
+        </aside>
       </div>
 
       {/* Mobile layout */}
