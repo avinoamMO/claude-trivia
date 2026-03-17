@@ -14,9 +14,6 @@ interface Segment {
 
 function segmentText(text: string): Segment[] {
   const segments: Segment[] = [];
-  let remaining = text;
-  const matched = new Set<number>(); // track character positions already matched
-
   // Build a flat array of all matches with positions
   const allMatches: { start: number; end: number; term: string; definition: string }[] = [];
 
