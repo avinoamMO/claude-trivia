@@ -1,0 +1,1433 @@
+[
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.1 Tool Interface Design",
+    "difficulty": 1,
+    "question": "What is the primary purpose of a tool's description field in the Claude API?",
+    "explanation": "A new developer is building their first integration with Claude. They've defined a tool with a name and parameters, but left the description field as an empty string. When Claude tries to use the tool, it consistently passes wrong parameters and calls it at inappropriate times.",
+    "photoUrl": null,
+    "options": [
+      "It serves as documentation for human developers reading the code",
+      "It's displayed to end users in the chat interface",
+      "It acts as the prompt that teaches Claude when and how to use the tool",
+      "It's used for API billing categorization"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "The tool description is arguably the most important field in your tool definition. Claude treats it as instructions \u2014 it's literally the prompt for tool use. Teams that invest in writing detailed, example-rich descriptions see dramatically fewer misuse errors than those who treat it as optional documentation.",
+    "wrongExplanations": {
+      "0": "While descriptions help human developers too, their primary runtime purpose is guiding Claude's behavior \u2014 not just serving as code docs.",
+      "1": "Tool descriptions are never shown to end users. They're part of the system-level configuration that Claude processes internally.",
+      "2": "",
+      "3": "Billing is based on token usage, not tool metadata. The description field has no impact on pricing or categorization."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.1 Tool Interface Design",
+    "difficulty": 1,
+    "question": "When designing tools for Claude, what does 'atomic operations' mean?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Operations that use atomic-level CPU instructions for speed",
+      "Operations that are encrypted and tamper-proof",
+      "Operations that must complete within a single API call",
+      "Each tool does one specific, well-defined thing"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "Atomic tools give Claude flexibility to compose them in different orders based on the situation. A monolithic 'handle_customer' tool forces a rigid sequence \u2014 but what if the customer just wants order status without a refund? Atomic tools also make error handling cleaner: if the refund fails, you don't lose the lookup results.",
+    "wrongExplanations": {
+      "0": "This confuses 'atomic' in the CPU/concurrency sense with the tool design principle. Atomic tool design is about scope and responsibility, not hardware instructions.",
+      "1": "Atomic operations in tool design have nothing to do with encryption or security. It's about each tool having a single, clear responsibility.",
+      "2": "While tools do execute within API calls, 'atomic' refers to the scope of what the tool does, not timing constraints on completion.",
+      "3": ""
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.1 Tool Interface Design",
+    "difficulty": 1,
+    "question": "Why should tool parameters have clear, descriptive names and descriptions?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Descriptive names reduce the token count in API calls",
+      "The API rejects parameters without descriptions",
+      "Claude uses parameter names and descriptions to understand what values to pass",
+      "Descriptive names make the tool run faster on the server"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "Think of parameter descriptions as micro-prompts. Claude reads 'query: The search term to look up' very differently from 'q: string'. Production teams often add examples directly in parameter descriptions \u2014 e.g., 'date_range: ISO 8601 format like 2024-01-15. Must be within the last 90 days.' This dramatically reduces parameter errors.",
+    "wrongExplanations": {
+      "0": "Descriptive names are actually longer and use more tokens, not fewer. The benefit is accuracy of tool use, not token efficiency.",
+      "1": "The API does not reject tools with missing descriptions \u2014 they're technically optional. But omitting them leads to poor tool usage by Claude.",
+      "2": "",
+      "3": "Parameter naming has zero impact on server-side execution performance. The benefit is entirely about Claude understanding what to pass."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.1 Tool Interface Design",
+    "difficulty": 2,
+    "question": "When should you combine multiple operations into a single tool instead of keeping them separate?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Never \u2014 tools should always be as granular as possible",
+      "Only when the API rate limit is being hit",
+      "Whenever the total number of tools exceeds 10",
+      "When operations are almost always performed together and splitting them adds unnecessary round trips"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "The sweet spot is pragmatic atomicity. 'create_document' that accepts title, body, and tags as optional parameters is better than 4 separate tools that are always called together. But keep 'delete_document' separate \u2014 that's a different intent. A good heuristic: if operation B only makes sense after operation A, and they share the same entity, consider combining them.",
+    "wrongExplanations": {
+      "0": "Extreme granularity creates its own problems: more round trips, higher latency, and Claude may sequence them incorrectly. The goal is useful atomicity, not maximum decomposition.",
+      "1": "Rate limits are a separate concern handled by backoff/retry logic. Tool design should be driven by semantic relationships between operations, not infrastructure constraints.",
+      "2": "While tool count matters for performance, the decision to combine should be based on logical coupling of operations, not an arbitrary numerical threshold.",
+      "3": ""
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.1 Tool Interface Design",
+    "difficulty": 2,
+    "question": "What's the recommended approach for tool return values when Claude needs to process the results?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Return structured data with relevant fields, plus a human-readable summary for context",
+      "Return only plain text summaries to minimize token usage",
+      "Always return raw database rows so Claude has complete data",
+      "Return base64-encoded data to reduce payload size"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "The ideal return shape gives Claude both structured data it can reason about programmatically AND enough context to explain results naturally. Returning all 47 fields wastes context window on irrelevant data. A pattern that works well: return the 5-8 fields Claude actually needs, plus a 'summary' field with a natural language description of what was found.",
+    "wrongExplanations": {
+      "0": "",
+      "1": "Plain text summaries lose the structure Claude needs for precise reasoning. If the user asks 'what's the customer's email?', Claude needs the actual field, not a paragraph to parse.",
+      "2": "Returning all 47 fields floods Claude's context with irrelevant data, degrading response quality and wasting tokens. Filter to what's needed for the task.",
+      "3": "Claude cannot process base64-encoded data meaningfully. It needs readable text or structured JSON to reason about results."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.1 Tool Interface Design",
+    "difficulty": 2,
+    "question": "How should you handle optional vs required parameters in tool schemas?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Mark essential parameters as required and provide sensible defaults for optional ones, documented in descriptions",
+      "Make all parameters optional and handle missing values with defaults on the server",
+      "Make all parameters required to prevent Claude from skipping any",
+      "Use a single 'params' object parameter and let Claude decide the structure"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "The required/optional distinction is a signal to Claude about what matters. When 'query' is required, Claude knows it must extract or ask for a search term. When 'sort_order' is optional with a documented default of 'relevance', Claude can skip it unless the user specifically wants sorting. Document defaults in the description: 'sort_order: How to sort results. Options: relevance, price_asc, price_desc. Default: relevance.'",
+    "wrongExplanations": {
+      "0": "",
+      "1": "Making everything optional means Claude has no guidance about what's essential. It might call search_products with zero parameters, getting random results.",
+      "2": "Making everything required forces Claude to invent values for parameters the user never mentioned. If sort_order is required, Claude might hallucinate 'price_asc' when the user just wanted to search.",
+      "3": "A freeform 'params' object gives Claude no schema guidance at all. Without knowing the available parameters, Claude can't reliably construct valid requests."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.1 Tool Interface Design",
+    "difficulty": 3,
+    "question": "What's the anti-pattern in this tool design?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "The tool names are too descriptive",
+      "The parameter types are too strict",
+      "Having too many tools in total",
+      "Using 'god tools' that multiplex many operations behind an action parameter instead of separate, focused tools"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "God tools are the #1 tool design anti-pattern. When 'manage_order' can do 6 different things, Claude has to reason about which action string to use AND which parameters apply to that action. Splitting into 'create_order', 'get_order', 'refund_order' etc. makes each tool's purpose unambiguous. The parameter schema for 'refund_order(order_id, reason)' is clearer than 'manage_order(action: refund, order_id, data: {reason})'.",
+    "wrongExplanations": {
+      "0": "The names are actually not descriptive enough \u2014 'manage_user' tells Claude nothing about what specific operation will happen. More specific names like 'create_user' would be better.",
+      "1": "The parameter types are actually too loose \u2014 'data?: object' gives Claude no schema guidance. Stricter, more specific parameter definitions would help.",
+      "2": "Three tools is a very small count. The issue isn't quantity \u2014 it's that each tool is overloaded with too many responsibilities, making it hard for Claude to use correctly.",
+      "3": ""
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.1 Tool Interface Design",
+    "difficulty": 3,
+    "question": "What design flaw would cause this behavior?",
+    "explanation": "An enterprise team notices that Claude keeps calling their 'search_knowledge_base' tool even when users ask simple questions like 'What's 2+2?' or 'Tell me a joke.' The tool description reads: 'Search the knowledge base for information. Use this tool to find answers to questions.' They've tried adjusting the system prompt but Claude still reaches for the tool first.",
+    "photoUrl": null,
+    "options": [
+      "The system prompt is overriding the tool description",
+      "Claude always prefers tool use over direct responses",
+      "The tool's description is too broad, making Claude think it should be used for any question",
+      "The tool_choice parameter is set to 'any'"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "Tool descriptions that say 'use this to find answers to questions' are essentially telling Claude 'use this for everything.' A better description: 'Search the internal product knowledge base for company-specific information about products, policies, and procedures. Do NOT use for general knowledge, math, or conversational requests.' Negative instructions in tool descriptions are surprisingly effective at preventing over-use.",
+    "wrongExplanations": {
+      "0": "System prompts and tool descriptions work together \u2014 the system prompt doesn't override tool descriptions. The issue is in the description itself being too broad.",
+      "1": "Claude does not inherently prefer tool use. With well-described tools and tool_choice set to 'auto', Claude will answer directly when it can. The bias here comes from the overly broad description.",
+      "2": "",
+      "3": "If tool_choice were 'any', Claude would be forced to use SOME tool, but it could pick any tool. The problem described is specifically about always picking the search tool, suggesting the description is the issue."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.1 Tool Interface Design",
+    "difficulty": 4,
+    "question": "What is the most likely root cause?",
+    "explanation": "A team's Claude-powered agent has a 'transfer_funds(from_account, to_account, amount, currency)' tool. In production, they discover that Claude sometimes calls it with amount as a string like '$500' instead of a numeric 500, causing the backend to crash. The JSON schema specifies 'type: number' for the amount field. This happens roughly 15% of the time, always when the user mentions a dollar sign in their message.",
+    "photoUrl": null,
+    "options": [
+      "Claude's tokenizer can't distinguish numbers from strings",
+      "The schema validation is not being enforced by the API, and the description doesn't clarify the expected format",
+      "The model is hallucinating incorrect types",
+      "JSON schemas don't support numeric types"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "While the API does attempt to enforce JSON schema types, edge cases slip through \u2014 especially when the user's input strongly suggests a format like '$500'. The fix is defense in depth: schema type enforcement PLUS a description that says 'amount: Numeric value without currency symbols. Example: 500.00, not \"$500\"'. Server-side validation should also coerce or reject invalid types rather than crashing.",
+    "wrongExplanations": {
+      "0": "The tokenizer handles numbers fine. The issue is about how Claude formats the value in the tool call output, not how it tokenizes input.",
+      "1": "",
+      "2": "'Hallucination' implies Claude is generating random content. This is actually a systematic pattern \u2014 it happens specifically when users include dollar signs, suggesting Claude is copying the user's format rather than hallucinating.",
+      "3": "JSON Schema absolutely supports numeric types ('type: number' and 'type: integer'). The issue is about enforcement and description clarity, not schema capability."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.1 Tool Interface Design",
+    "difficulty": 4,
+    "question": "What is the root cause of this degradation?",
+    "explanation": "A code assistant has 45 tools covering file operations, git, testing, deployment, monitoring, and database management. Users report that Claude's tool selection accuracy has dropped from 95% to 72% over the last month as new tools were added. Interestingly, the original 15 tools still work accurately \u2014 it's the newer tools that get confused with each other.",
+    "photoUrl": null,
+    "options": [
+      "The newer tools were built with a different API version",
+      "The model was fine-tuned on the original 15 tools but not the new ones",
+      "Claude has a hard limit of 30 tools",
+      "Tool count overload combined with overlapping descriptions among the newer tools"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "Research shows tool selection accuracy degrades as tool count increases, especially past 20-30 tools. But count alone isn't the full story \u2014 overlapping descriptions cause the real confusion. If 'deploy_staging' and 'push_to_staging' have similar descriptions, Claude can't reliably distinguish them. Mitigation strategies: group tools into namespaces, use tool filtering to only expose relevant tools per conversation, and ensure every tool's description clearly differentiates it from similar tools.",
+    "wrongExplanations": {
+      "0": "API version doesn't affect tool selection behavior. All tools are processed the same way regardless of when they were added to the configuration.",
+      "1": "Claude is not fine-tuned on specific tool definitions. It processes tools from their descriptions at inference time. The issue is about description quality and count, not training data.",
+      "2": "There's no hard limit at 30 tools \u2014 the API accepts many more. The degradation is a soft quality issue from cognitive overload, not a hard technical limit.",
+      "3": ""
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.1 Tool Interface Design",
+    "difficulty": 5,
+    "question": "How should you architect the tool layer?",
+    "explanation": "You're designing an AI assistant for a hospital that needs to handle patient records, appointment scheduling, medication management, lab results, billing, and staff coordination. Each domain has 8-12 operations. The system must be reliable (medical context), have audit trails, and different staff roles should only see relevant tools. You need to serve nurses, doctors, billing staff, and administrators \u2014 each with different workflows.",
+    "photoUrl": null,
+    "options": [
+      "Create all 60+ tools and let Claude figure out which ones to use based on the user's role",
+      "Use role-based tool filtering to expose only 10-15 relevant tools per session, with clear domain prefixes and audit-logging wrappers",
+      "Create one mega-tool per domain (e.g., 'patient_management') with an action parameter for each operation",
+      "Create 6 separate Claude instances, one per domain, and route messages to the right one"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Role-based tool filtering is the production pattern for complex systems. A nurse sees 'patient_lookup', 'vitals_record', 'medication_schedule' \u2014 not billing tools. This keeps tool count manageable (~15 per role), prevents unauthorized access, and improves accuracy. The audit wrapper pattern: every tool call passes through a middleware that logs who, what, when, and the full request/response before forwarding to the actual handler. Domain prefixes (patient_, appt_, med_) help Claude disambiguate similar operations.",
+    "wrongExplanations": {
+      "0": "60+ tools would severely degrade selection accuracy, and exposing billing tools to nurses or medication tools to billing staff is a security and compliance risk in a medical context.",
+      "1": "",
+      "2": "God tools with action parameters are an anti-pattern in any context, but especially dangerous in healthcare where calling the wrong action (e.g., 'delete' instead of 'read' on a patient record) has serious consequences.",
+      "3": "Six separate instances create a routing nightmare and lose conversational context. A doctor asking about a patient's billing status would require cross-instance communication, adding complexity without solving the core problem."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.1 Tool Interface Design",
+    "difficulty": 5,
+    "question": "Which approach best solves this design challenge?",
+    "explanation": "You're building a data pipeline tool for Claude that needs to handle CSV files from 200 to 2 million rows. For small files, Claude should see the data directly to reason about it. For large files, Claude can't fit the data in context. The tool needs to support filtering, aggregation, column selection, and joining datasets. Users range from analysts who speak SQL to marketers who say 'show me last month's sales by region.'",
+    "photoUrl": null,
+    "options": [
+      "Two tools: 'preview_data' (returns schema + sample rows + row count) and 'query_data' (accepts structured filters/aggregations, returns results or summary stats based on size)",
+      "A single 'query_data' tool that accepts natural language and converts it to SQL internally, returning paginated results with metadata",
+      "Load all data into context and let Claude process it directly",
+      "Give Claude direct SQL access and let it write its own queries"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "The two-tool pattern (preview + query) mirrors how humans explore data: first understand the shape, then ask specific questions. 'preview_data' returns column names/types, 5 sample rows, row count, and basic stats \u2014 enough for Claude to understand the dataset without loading it. 'query_data' then accepts structured operations that the server executes efficiently. For large results, the server returns summary stats instead of raw rows. This pattern scales from 200 to 2M rows because the heavy lifting happens server-side, and Claude always gets a manageable amount of data.",
+    "wrongExplanations": {
+      "0": "",
+      "1": "Natural language to SQL is brittle and hard to debug. When the query produces wrong results, neither Claude nor the user can see what SQL was generated. Structured filters are more reliable and inspectable.",
+      "2": "2 million rows would be hundreds of megabytes of text \u2014 far exceeding any context window. This approach only works for trivially small datasets.",
+      "3": "Direct SQL access is a security risk (SQL injection, data exfiltration) and requires Claude to know the exact schema. A structured query interface is safer and more reliable."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.2 Structured Error Responses",
+    "difficulty": 1,
+    "question": "What is the key difference between a tool that 'failed' and a tool that 'succeeded but found a problem'?",
+    "explanation": "A developer is building a user lookup tool. When searching for a username that doesn't exist, they're unsure whether to throw an exception (tool failure) or return a structured response saying 'user not found' (tool success). Their colleague says 'just throw an error either way \u2014 Claude will figure it out.'",
+    "photoUrl": null,
+    "options": [
+      "There's no difference \u2014 Claude handles both the same way",
+      "The difference is only important for logging, not for Claude's behavior",
+      "Tool failures are always retried; successful responses are never retried",
+      "A tool failure means the tool itself broke (network error, crash); a successful tool returning 'not found' means the tool worked correctly but the data doesn't exist"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "This distinction fundamentally changes Claude's next action. When a tool FAILS (is_error: true), Claude knows something went wrong with the infrastructure and might retry or apologize. When a tool SUCCEEDS with 'user not found', Claude knows the search worked fine \u2014 that user simply doesn't exist, and Claude should tell the user or try a different search. Confusing these leads to Claude apologizing for 'errors' that are actually valid empty results.",
+    "wrongExplanations": {
+      "0": "Claude handles these very differently. A tool error triggers error-recovery behavior (retry, apologize), while a successful 'not found' response triggers next-step reasoning (inform user, try alternative).",
+      "1": "The difference directly impacts Claude's reasoning and response. A tool error makes Claude think the system is broken; a 'not found' result makes Claude think the query returned no matches.",
+      "2": "Retry behavior depends on the error type and configuration, not simply on whether it was a tool failure. And 'not found' results might prompt Claude to try a different search \u2014 a form of retry at the semantic level.",
+      "3": ""
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.2 Structured Error Responses",
+    "difficulty": 1,
+    "question": "What should a well-structured tool error response include?",
+    "explanation": "A junior developer's tool returns this when it fails: 'Error'. That's it \u2014 just the word 'Error'. Claude then tells the user 'Something went wrong' with no additional context. The senior developer asks them to improve the error response so Claude can actually help the user recover.",
+    "photoUrl": null,
+    "options": [
+      "Just the HTTP status code",
+      "An error code, human-readable message, and recovery hint",
+      "A full stack trace so Claude can debug it",
+      "The word 'FAIL' in uppercase so Claude recognizes it"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "A good error response pattern: {error_code: 'RATE_LIMITED', message: 'API rate limit exceeded (60/min)', recovery_hint: 'Wait 30 seconds and retry, or reduce batch size'}. This gives Claude everything it needs: the code for programmatic handling, the message for explaining to users, and the hint for deciding what to do next. Some teams add a 'retryable: true/false' field so Claude knows whether retrying is even worth attempting.",
+    "wrongExplanations": {
+      "0": "An HTTP status code alone (like 429) gives Claude minimal context. It doesn't know why the error happened or how to help the user recover.",
+      "1": "",
+      "2": "Stack traces are for developers debugging server code, not for Claude. They contain implementation details that waste context tokens and don't help Claude decide what to tell the user.",
+      "3": "Claude doesn't need special formatting or uppercase keywords to recognize errors. It needs structured information about what went wrong and what to do about it."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.2 Structured Error Responses",
+    "difficulty": 1,
+    "question": "When should a tool use the 'is_error' flag in its response?",
+    "explanation": "A developer is implementing a file reading tool for Claude. They're configuring the tool result's 'is_error' field. They set is_error to true whenever the file has no content, when the path is a directory instead of a file, and when the file system returns a permission denied error. Their tech lead says one of these cases is wrong.",
+    "photoUrl": null,
+    "options": [
+      "For every response that isn't perfectly successful",
+      "Never \u2014 always return success and include error info in the response body",
+      "Only for infrastructure/execution failures where the tool itself couldn't function, not for valid 'empty' or 'not applicable' results",
+      "Only for authentication failures"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "The 'is_error: true' flag signals to Claude that the tool itself malfunctioned. 'Permission denied' is a real error \u2014 the tool couldn't do its job. But 'file is empty' is a valid result \u2014 the tool worked fine, the file just has no content. Setting is_error for empty files would make Claude think the file system is broken when it's not. The rule: is_error means 'the tool couldn't complete its operation', not 'the result isn't what the user hoped for.'",
+    "wrongExplanations": {
+      "0": "Marking every imperfect result as an error floods Claude with false failure signals. An empty file or a 'not found' result isn't an error \u2014 it's valid information Claude can act on.",
+      "1": "Never using is_error means Claude can't distinguish between 'the tool returned empty results' and 'the tool crashed.' This distinction matters for deciding whether to retry or move on.",
+      "2": "",
+      "3": "Authentication failures are just one type of error. Network timeouts, server crashes, and permission errors are also legitimate is_error cases."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.2 Structured Error Responses",
+    "difficulty": 2,
+    "question": "How should a tool communicate whether an error is retryable?",
+    "explanation": "A CI/CD tool sometimes fails because the build server is temporarily overloaded (retryable) and sometimes because the code has syntax errors (not retryable). Claude keeps retrying syntax errors 3-4 times, wasting API calls and user patience. The developer wants Claude to distinguish between these cases.",
+    "photoUrl": null,
+    "options": [
+      "Use different HTTP status codes and hope Claude knows which are retryable",
+      "Include a 'retryable' boolean field in the error response",
+      "Always make Claude retry exactly once regardless of error type",
+      "Put 'DO NOT RETRY' in the error message text"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "An explicit 'retryable' field removes all ambiguity: {error_code: 'SYNTAX_ERROR', message: 'Line 42: unexpected token', retryable: false, details: 'Fix the code before rebuilding'}. For transient errors: {error_code: 'SERVER_OVERLOADED', message: 'Build server at capacity', retryable: true, retry_after_seconds: 30}. Some teams also include a 'suggested_action' field for non-retryable errors to guide Claude toward the right next step.",
+    "wrongExplanations": {
+      "0": "Claude doesn't have a built-in mapping of HTTP status codes to retry behavior. And many retryable vs non-retryable errors share the same status code (both return 500). Explicit fields are more reliable.",
+      "1": "",
+      "2": "Blanket retry-once policies waste a call on syntax errors (which will never self-resolve) and may not be enough for transient errors (which might need a longer wait).",
+      "3": "While Claude can read text instructions in error messages, a structured boolean field is more reliable for programmatic behavior than hoping Claude parses natural language instructions correctly."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.2 Structured Error Responses",
+    "difficulty": 2,
+    "question": "What's the best way to return partial results when a tool partially succeeds?",
+    "explanation": "A batch email-sending tool is asked to send 10 emails. 7 succeed and 3 fail (invalid addresses). The developer debates: should the tool return an error (since it didn't fully succeed) or success (since most emails sent)? Either way, Claude needs to report accurate results to the user.",
+    "photoUrl": null,
+    "options": [
+      "Return success with only the 7 successful results, silently dropping the failures",
+      "Return an error with only the 3 failure details, losing the success information",
+      "Return an error and make Claude re-send all 10 emails",
+      "Return success with a structured response containing both the successful results and the individual failures with reasons"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "The partial success pattern: {status: 'partial', succeeded: [{email: 'a@b.com', status: 'sent'}, ...], failed: [{email: 'bad@', error: 'invalid_address', message: 'Missing domain'}], summary: '7 of 10 sent, 3 failed'}. This is returned as a successful tool result (is_error: false) because the tool functioned correctly \u2014 some inputs were just invalid. Claude can then report: 'I sent 7 emails successfully. 3 couldn't be delivered because of invalid addresses: ...'",
+    "wrongExplanations": {
+      "0": "Silently dropping failures means Claude will tell the user 'all 10 emails sent successfully' \u2014 a lie that erodes trust. Users need to know about failures to fix the addresses.",
+      "1": "Losing the success information means Claude can't tell the user which emails were sent. The user might think zero emails went out and re-send all 10, causing duplicates.",
+      "2": "Re-sending all 10 would duplicate the 7 that already succeeded. And the 3 invalid addresses would fail again for the same reason. This wastes resources and annoys recipients.",
+      "3": ""
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.2 Structured Error Responses",
+    "difficulty": 2,
+    "question": "How does Claude's behavior differ when it receives an error response vs a successful 'no results' response from a search tool?",
+    "explanation": "A product search tool is used by an e-commerce assistant. When a user asks for 'quantum flux capacitors' (a product that doesn't exist), the developer is choosing between throwing an error with message 'Product not found' versus returning success with an empty results array.",
+    "photoUrl": null,
+    "options": [
+      "Claude behaves identically in both cases",
+      "With an error, Claude may apologize and try to recover or retry; with empty results, Claude confidently tells the user no matching products exist",
+      "With an error, Claude stops the conversation; with empty results, Claude continues",
+      "With empty results, Claude always asks the user to rephrase; with an error, Claude doesn't"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "This is one of the most common tool design mistakes in production. When 'no results' is returned as an error, Claude's internal reasoning shifts to 'something broke' mode \u2014 it may apologize, suggest the system is having issues, or retry with slightly different parameters. With a successful empty result, Claude's reasoning is 'the search worked, nothing matches' \u2014 leading to a confident 'We don't carry that product. Can I help you find something similar?' response. The user experience difference is dramatic.",
+    "wrongExplanations": {
+      "0": "Claude absolutely handles these differently. Tool errors trigger uncertainty and recovery behavior, while empty successful results trigger confident informational responses.",
+      "1": "",
+      "2": "Claude doesn't stop conversations on errors \u2014 it tries to recover. The distinction is about Claude's confidence level and reasoning strategy, not whether the conversation continues.",
+      "3": "Claude's behavior depends on the overall context, not a fixed rule about rephrasing. The key difference is Claude's confidence: uncertain with errors, confident with empty results."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.2 Structured Error Responses",
+    "difficulty": 3,
+    "question": "What's the anti-pattern in this error handling design?",
+    "explanation": "A team's tool error responses look like this: all errors return {is_error: true, content: 'An error occurred. Please try again later.'}. Whether it's a rate limit, invalid input, missing permissions, or a server crash \u2014 the same message. The team notices Claude gives the same unhelpful response to users regardless of the error type, and retries errors that will never succeed.",
+    "photoUrl": null,
+    "options": [
+      "Using is_error: true instead of throwing exceptions",
+      "Returning errors as content strings instead of structured objects",
+      "Generic, undifferentiated error messages that give Claude no information to reason about the failure type or appropriate recovery action",
+      "Not including a stack trace in the error response"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "Generic errors turn Claude into a generic apologizer. When every error says 'try again later', Claude can't distinguish between 'your API key expired' (tell the user to update credentials) and 'server is restarting' (actually wait and retry). The fix: differentiated errors with codes, specific messages, and recovery guidance. Rate limit: {code: 'RATE_LIMITED', retry_after: 30}. Invalid input: {code: 'INVALID_INPUT', field: 'email', reason: 'missing @ symbol'}. Each gives Claude a different action path.",
+    "wrongExplanations": {
+      "0": "Using is_error: true is perfectly valid \u2014 it's the standard way to signal tool failures. The problem is what's INSIDE the error, not the mechanism used to flag it.",
+      "1": "While structured objects are better than strings, a detailed string like 'Rate limited: 60 requests/min exceeded. Retry after 30s' is far better than a generic structured message. The issue is specificity, not format.",
+      "2": "",
+      "3": "Stack traces are for server-side debugging, not for Claude. Including them would waste tokens without helping Claude make better decisions."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.2 Structured Error Responses",
+    "difficulty": 3,
+    "question": "What anti-pattern does this error handling strategy exhibit?",
+    "explanation": "A developer configures their tools to catch ALL exceptions and convert them to successful responses with an 'error' field in the JSON: {success: false, error: 'Connection timeout'}. They never set is_error to true, reasoning that 'Claude can read the success: false field.' In testing, Claude sometimes proceeds as if the tool call succeeded, using data from a previous successful call instead of acknowledging the failure.",
+    "photoUrl": null,
+    "options": [
+      "Masking real errors as successful tool responses, preventing Claude from triggering proper error-handling reasoning",
+      "Not using try-catch blocks",
+      "Using JSON instead of plain text for errors",
+      "Including too much detail in error messages"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "When is_error is false, Claude's default assumption is 'this tool call worked.' It then looks at the response content \u2014 but it may not always correctly interpret a {success: false} field as a real failure, especially in longer conversations with many tool calls. The is_error flag exists specifically to put Claude into error-handling mode at the architectural level. Without it, Claude may treat the error message as informational content rather than a signal to change its approach.",
+    "wrongExplanations": {
+      "0": "",
+      "1": "The developer IS catching exceptions \u2014 that's the problem. They're catching them and converting them to fake successes instead of propagating them as proper tool errors.",
+      "2": "JSON is actually a great format for error responses. The issue isn't the format \u2014 it's that the error is being returned as a 'successful' tool result.",
+      "3": "The error messages actually have too LITTLE detail here. 'Connection timeout' could benefit from retry information and more context."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.2 Structured Error Responses",
+    "difficulty": 4,
+    "question": "What is the most likely root cause and fix?",
+    "explanation": "A financial analysis tool returns detailed error responses with codes and recovery hints. But a strange pattern emerges: when Claude gets a 'STALE_DATA' error (data older than 15 minutes), it correctly retries once. But if the retry also returns 'STALE_DATA', Claude enters a retry loop \u2014 calling the tool 8-9 times before giving up. The error response includes {retryable: true, retry_after_seconds: 5}. The data staleness issue typically resolves in 2-3 minutes, not 5 seconds.",
+    "photoUrl": null,
+    "options": [
+      "Claude has a bug in its retry logic",
+      "The retry_after_seconds is too short, causing rapid retries before the issue resolves, and there's no max_retries field to bound the loop",
+      "The error code 'STALE_DATA' is confusing Claude",
+      "Financial data tools shouldn't be retryable"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "This is a real production pattern. When retryable: true has no bounds, and retry_after is shorter than the actual recovery time, you get rapid retry loops that waste tokens and frustrate users. The fix is multi-layered: 1) Set retry_after_seconds to match actual recovery time (120-180s here), 2) Add max_retries: 2, 3) Include an escalation hint: 'If still stale after 2 retries, inform user that real-time data is temporarily delayed and offer to use cached data.' This gives Claude a clear exit path.",
+    "wrongExplanations": {
+      "0": "This isn't a Claude bug \u2014 Claude is correctly following the tool's guidance. The tool says 'retryable: true, wait 5 seconds' and Claude does exactly that. The problem is the tool's guidance is wrong.",
+      "1": "",
+      "2": "The error code is perfectly clear and descriptive. The issue isn't Claude's understanding of WHAT happened, but the tool's guidance on what to DO about it.",
+      "3": "Stale data errors should absolutely be retryable \u2014 the data feed will usually recover. The issue is about setting appropriate retry parameters, not removing retryability."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.2 Structured Error Responses",
+    "difficulty": 4,
+    "question": "What's the root cause of this confusing behavior?",
+    "explanation": "A support ticket tool returns errors like {error: 'Access denied', code: 403, message: 'You do not have permission to view this ticket'}. Claude correctly tells the user about the permission issue. But for a different error \u2014 {error: 'Ticket archived', code: 410, message: 'This ticket has been archived and is read-only'} \u2014 Claude treats it as a hard failure and says 'I cannot access this ticket.' The tool sets is_error: true for both. But 'archived' isn't really an error \u2014 the ticket exists and the info is accessible, just read-only.",
+    "photoUrl": null,
+    "options": [
+      "Claude doesn't understand HTTP status code 410",
+      "The error messages are too similar",
+      "The archived ticket state is incorrectly flagged as a tool error (is_error: true) when it should be a successful response with status information",
+      "Claude can't handle multiple error types from the same tool"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "This is the 'tool failed' vs 'tool found a problem' distinction in practice. 'Access denied' is a real error \u2014 the tool couldn't do its job. But 'ticket archived' means the tool successfully looked up the ticket and found it's archived. Return it as: {status: 'archived', ticket: {id, title, ...}, read_only: true, message: 'This ticket is archived. Data is available but no modifications can be made.'}. Claude then says 'This ticket is archived, but here's the information...' \u2014 much better UX.",
+    "wrongExplanations": {
+      "0": "Claude doesn't make decisions based on HTTP status codes in tool responses. It reads the error message and the is_error flag. The status code is largely irrelevant to Claude's behavior.",
+      "1": "The error messages are actually quite different ('Access denied' vs 'Ticket archived'). The issue isn't message similarity \u2014 it's that both are wrapped in the is_error flag, triggering the same failure reasoning in Claude.",
+      "2": "",
+      "3": "Claude handles multiple error types from the same tool just fine when they're properly differentiated. The issue is that both cases use is_error: true when only one should."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.2 Structured Error Responses",
+    "difficulty": 5,
+    "question": "Design the optimal error handling architecture for this system.",
+    "explanation": "You're building a multi-tool agent for infrastructure management that talks to AWS, GCP, and Azure. Operations include deploying services, scaling instances, checking health, and managing DNS. Errors range from transient (network blips, rate limits) to permanent (invalid config, insufficient permissions) to dangerous (accidentally scaling to 1000 instances). You need Claude to handle each error type appropriately without human intervention for transient issues, but ALWAYS stop for dangerous operations.",
+    "photoUrl": null,
+    "options": [
+      "Return all errors as is_error: true with detailed messages and let Claude figure out severity",
+      "Use tool_choice: 'none' after any error to prevent Claude from making additional tool calls",
+      "Never return errors \u2014 handle all retries server-side before responding to Claude",
+      "Three-tier error classification: 'transient' (auto-retryable with backoff), 'permanent' (stop and explain), 'critical' (stop, warn user, require explicit confirmation before any further infrastructure changes)"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "The three-tier pattern maps directly to action severity. Example responses: Transient: {severity: 'transient', retryable: true, max_retries: 3, backoff: 'exponential', message: 'AWS API throttled'}. Permanent: {severity: 'permanent', retryable: false, message: 'IAM role lacks ec2:ScaleInstances permission', user_action: 'Contact admin to update IAM policy'}. Critical: {severity: 'critical', retryable: false, message: 'Requested scale-out to 1000 instances would cost ~$50K/month', requires_confirmation: true, safe_maximum: 10}. The critical tier is what prevents Claude from casually approving a $50K/month change.",
+    "wrongExplanations": {
+      "0": "Leaving severity classification to Claude is dangerous for infrastructure management. Claude might retry a permission error (wasting time) or casually proceed after a near-disaster. Severity must be server-determined.",
+      "1": "tool_choice: 'none' prevents ALL tool use, not just dangerous operations. After a DNS error, Claude should still be able to check health or read configs. Blanket tool blocking is too coarse.",
+      "2": "Server-side retry hides information from Claude. If all retries fail, Claude has no context about what was tried. And for critical errors, you WANT Claude to stop and inform the user immediately, not retry silently.",
+      "3": ""
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.2 Structured Error Responses",
+    "difficulty": 5,
+    "question": "How should errors propagate in this multi-tool workflow?",
+    "explanation": "You're designing error handling for a Claude agent that orchestrates complex workflows: tool A's output feeds into tool B, which feeds into tool C. For example: fetch_customer \u2192 calculate_discount \u2192 apply_discount. If fetch_customer fails, the whole chain should stop. If calculate_discount returns 0% discount (valid but unexpected), Claude should proceed but note it. If apply_discount partially succeeds (discount applied but confirmation email failed), the workflow needs nuanced handling.",
+    "photoUrl": null,
+    "options": [
+      "Have each tool catch errors from previous steps internally, so Claude never sees intermediate failures",
+      "Return all intermediate results to Claude and let it manage the workflow logic entirely",
+      "Design tools to return both their result and a 'chain_status' indicating whether downstream tools should proceed, with specific guidance for each failure mode",
+      "Create a single orchestrator tool that handles the entire chain and only returns the final result or error"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "The chain_status pattern gives Claude enough information to orchestrate without micromanaging. fetch_customer: {chain_status: 'proceed', customer: {...}}. calculate_discount: {chain_status: 'proceed_with_note', discount: 0, note: 'Customer has no eligible promotions \u2014 0% is correct'}. apply_discount: {chain_status: 'partial_success', discount_applied: true, email_sent: false, email_error: 'SMTP timeout', suggested_action: 'Discount is applied. Email can be retried independently.'}. Claude sees the full picture and can make intelligent decisions at each step.",
+    "wrongExplanations": {
+      "0": "Hiding intermediate failures from Claude means it can't explain to users what's happening or make intelligent recovery decisions. If the customer fetch failed, Claude needs to know WHY to help the user.",
+      "1": "Dumping all intermediate results into Claude's context without guidance overwhelms it with raw data. Claude needs structured signals about whether to proceed, not raw results to interpret independently at each step.",
+      "2": "",
+      "3": "A monolithic orchestrator loses the flexibility of Claude's reasoning. What if the user wants to check the discount before applying? Or retry just the email? Single-tool orchestration forces a rigid workflow."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.3 Tool Distribution & tool_choice",
+    "difficulty": 1,
+    "question": "What does setting tool_choice to 'auto' mean?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Claude must use a tool for every response",
+      "Claude decides whether to use a tool or respond directly based on the conversation",
+      "Tools are disabled and Claude can only use text responses",
+      "Claude will automatically select and execute all available tools"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "'auto' is the default and most common setting. It gives Claude full discretion: if the user asks 'What's the weather in Paris?' and a weather tool is available, Claude will use it. If they ask 'What's 2+2?', Claude will just respond directly. This is the right choice for most applications because it lets Claude's judgment drive the interaction. The key insight: 'auto' doesn't mean 'automatic tool use' \u2014 it means 'Claude autonomously decides.'",
+    "wrongExplanations": {
+      "0": "That's the behavior of tool_choice: 'any', not 'auto'. With 'auto', Claude can freely choose to respond without using any tool.",
+      "1": "",
+      "2": "Tools aren't disabled with 'auto' \u2014 they're available but optional. Claude can choose to use them or not based on what's most helpful.",
+      "3": "Claude doesn't execute all available tools. It selects the most relevant tool (or none) based on the user's request."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.3 Tool Distribution & tool_choice",
+    "difficulty": 1,
+    "question": "What happens when tool_choice is set to 'any'?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Claude must use at least one tool but can choose which one",
+      "Claude is forced to use a specific tool named 'any'",
+      "Claude can optionally use any tool or respond with text",
+      "All tools are called simultaneously"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "tool_choice: 'any' is perfect for pipeline scenarios where you always need structured output from a tool call. A common pattern: extraction pipelines use 'any' with a single 'extract_data' tool, guaranteeing Claude returns structured JSON via the tool rather than free-form text. But be careful \u2014 if Claude has nothing meaningful to extract, it'll still be forced to call a tool, potentially with empty or hallucinated data.",
+    "wrongExplanations": {
+      "0": "",
+      "1": "'any' is a keyword, not a tool name. It tells Claude it must use one of the available tools, without specifying which one.",
+      "2": "That describes 'auto' behavior, not 'any'. With 'any', Claude MUST use a tool \u2014 a text-only response is not allowed.",
+      "3": "Claude selects and calls one tool at a time (or uses parallel tool calling if appropriate). 'any' means it must pick at least one, not call them all."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.3 Tool Distribution & tool_choice",
+    "difficulty": 1,
+    "question": "What does specifying a specific tool name in tool_choice do?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "It forces Claude to call that specific tool, regardless of context",
+      "It removes all other tools and only makes 'submit_form' available",
+      "It marks 'submit_form' as preferred but Claude can still choose other tools",
+      "It creates a new tool with that name dynamically"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "Forcing a specific tool is useful at workflow checkpoints \u2014 like form submission, final output formatting, or data validation steps. A common pattern: use 'auto' during the conversation, then switch to a forced tool for the final step. But note that forcing a tool doesn't guarantee Claude fills the parameters correctly \u2014 it just guarantees which tool gets called. You still need clear parameter descriptions.",
+    "wrongExplanations": {
+      "0": "",
+      "1": "Other tools aren't removed from Claude's awareness. Claude is simply forced to call the specified tool. The other tools still exist in the configuration.",
+      "2": "Specifying a tool name is a hard constraint, not a preference. Claude MUST call that tool \u2014 it has no option to choose others or respond with text.",
+      "3": "tool_choice references an existing tool by name. It doesn't create new tools. The tool must already be defined in the tools array."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.3 Tool Distribution & tool_choice",
+    "difficulty": 2,
+    "question": "What is the recommended approach when your application has 40+ tools?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Use dynamic tool filtering to only expose relevant tools (10-15) based on conversation context",
+      "Combine tools aggressively until you have fewer than 10",
+      "Upgrade to a larger model that can handle more tools",
+      "Remove tools until you're under 20 and accept reduced functionality"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "Dynamic tool filtering is the production pattern used by most sophisticated Claude deployments. Strategy: use a lightweight classifier (or Claude itself in a pre-processing step) to determine the domain from the user's message, then only pass tools from that domain. HR question? Pass the 8 HR tools. IT issue? Pass the 10 IT tools. This keeps tool count manageable while maintaining full functionality. Some teams use a two-stage approach: first call with a 'route_request' tool to classify, then second call with domain-specific tools.",
+    "wrongExplanations": {
+      "0": "",
+      "1": "Aggressively combining tools creates 'god tools' with action parameters \u2014 an anti-pattern that trades one problem (too many tools) for another (ambiguous multi-purpose tools).",
+      "2": "Larger models help with complex reasoning but don't solve the fundamental issue of tool selection degradation at scale. The problem is cognitive load from too many choices, which affects all model sizes.",
+      "3": "Removing functionality isn't a real solution \u2014 it's a surrender. Dynamic filtering maintains all 45 tools while only showing relevant ones per conversation."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.3 Tool Distribution & tool_choice",
+    "difficulty": 2,
+    "question": "When is tool_choice: 'any' most appropriate?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "The chatbot (feature 1), because it should always search before answering",
+      "The data extraction pipeline (feature 2), because every input must produce structured tool output",
+      "The coding assistant (feature 3), because it has the most tools",
+      "All three features should use tool_choice: 'any' for consistency"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "tool_choice: 'any' shines in pipeline/extraction scenarios where you ALWAYS need structured output. The invoice pipeline must call 'extract_invoice_data' for every input \u2014 a text response would break downstream processing. The chatbot and coding assistant both have valid cases for text-only responses (simple answers, concept discussion), making 'auto' the right choice for them. A subtle pitfall: with 'any' and multiple tools, Claude might pick the wrong tool \u2014 consider pairing it with a single extraction tool for pipelines.",
+    "wrongExplanations": {
+      "0": "The chatbot shouldn't always search \u2014 'Hi, how are you?' doesn't need a knowledge base lookup. Using 'any' here would force unnecessary tool calls for simple conversational exchanges.",
+      "1": "",
+      "2": "The coding assistant often needs to discuss concepts without running code or searching files. Forcing tool use with 'any' would prevent natural conversational responses.",
+      "3": "Each feature has different requirements. Using the same tool_choice for all three would degrade user experience in at least two of them."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.3 Tool Distribution & tool_choice",
+    "difficulty": 2,
+    "question": "How does the number of available tools affect Claude's response quality?",
+    "explanation": "An engineering team benchmarks their Claude application with 5, 15, 30, and 50 tools. They measure tool selection accuracy, response latency, and overall answer quality. The results show a clear trend that surprises the project manager who assumed 'more tools = more capable.'",
+    "photoUrl": null,
+    "options": [
+      "Quality generally degrades as tool count increases, with more selection errors, higher latency, and reduced response coherence",
+      "Tool count has no effect on quality \u2014 only tool descriptions matter",
+      "More tools always improve quality because Claude has more options",
+      "Quality improves up to 100 tools, then drops sharply"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "Empirically, most teams see optimal performance with 10-20 well-designed tools. Beyond that, three things degrade: (1) Selection accuracy \u2014 Claude has more opportunities to pick the wrong tool, (2) Latency \u2014 more tool definitions means more input tokens to process, (3) Response coherence \u2014 Claude spends more 'reasoning budget' on tool selection, leaving less for actual response quality. The relationship isn't perfectly linear \u2014 well-differentiated tools degrade more slowly than overlapping ones.",
+    "wrongExplanations": {
+      "0": "",
+      "1": "While descriptions are critically important, tool count independently affects performance. Even perfectly described tools degrade in accuracy when there are too many to choose from.",
+      "2": "This is a common misconception. More tools create more opportunities for confusion, especially when tools have overlapping purposes. Quality peaks at a moderate tool count.",
+      "3": "There's no magic cliff at 100 tools. Degradation is gradual, typically noticeable past 20-30 tools, and varies based on how distinct the tools are from each other."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.3 Tool Distribution & tool_choice",
+    "difficulty": 3,
+    "question": "What's the anti-pattern in this tool_choice strategy?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Having too few tools",
+      "Using FAQ search as a tool instead of embedding it in the system prompt",
+      "Forcing a specific tool for every request instead of using 'auto' and letting Claude assess the user's intent",
+      "Not having a 'route_request' tool"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "Forced tool_choice removes Claude's judgment about what the user actually needs. When someone says 'I need a human NOW,' the right action is escalate_to_human \u2014 but forced FAQ search overrides Claude's intent recognition. The fix: use 'auto' and encode search-first preference in the system prompt or tool descriptions. You can add to search_faq's description: 'Check this first for common questions, but skip for explicit escalation requests or ticket creation.' This guides without forcing.",
+    "wrongExplanations": {
+      "0": "Three tools is a reasonable count for a focused support agent. The problem isn't quantity \u2014 it's that tool_choice forces FAQ search regardless of user intent.",
+      "1": "FAQ search works well as a tool \u2014 it lets Claude decide when to search based on the question. The issue is FORCING it for every request via tool_choice, not the tool's existence.",
+      "2": "",
+      "3": "A route_request tool adds unnecessary complexity for a 3-tool setup. Claude can easily route between 3 tools with 'auto'. The issue is the forced tool_choice override."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.3 Tool Distribution & tool_choice",
+    "difficulty": 3,
+    "question": "What's wrong with this approach to managing tool sprawl?",
+    "explanation": "An enterprise team has 60 tools. To reduce the count, they create 'meta-tools' that wrap related operations: 'user_operations(action: create|read|update|delete|search|invite|deactivate, ...params)', 'order_operations(action: create|read|update|cancel|refund|ship|track, ...)'. They've reduced from 60 tools to 8 meta-tools. But Claude now frequently calls the wrong action within tools and sometimes hallucinates action names that don't exist.",
+    "photoUrl": null,
+    "options": [
+      "They replaced tool selection clarity with action parameter ambiguity \u2014 the cognitive load moved, it didn't decrease",
+      "8 tools is still too many \u2014 they should combine further",
+      "Meta-tools are always the best approach for tool management",
+      "The action parameter needs better validation"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "This is the 'god tool' anti-pattern disguised as a solution. With 60 separate tools, Claude picks the wrong TOOL 30% of the time. With 8 meta-tools, Claude picks the right tool 90% of the time but the wrong ACTION within the tool 35% of the time \u2014 net accuracy is similar or worse. The real solution is dynamic tool filtering: show Claude only the 10-15 tools relevant to the current context. This maintains clear, atomic tools while keeping the count manageable.",
+    "wrongExplanations": {
+      "0": "",
+      "1": "8 tools is actually a great count for Claude's accuracy. The problem isn't the number \u2014 it's that each tool is overloaded with too many responsibilities hidden behind action parameters.",
+      "2": "Meta-tools are generally an anti-pattern, not a best practice. They trade one form of confusion (too many tools) for another (too many actions per tool).",
+      "3": "Better validation would catch invalid action names at runtime, but it wouldn't prevent Claude from choosing the wrong valid action. The issue is design, not validation."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.3 Tool Distribution & tool_choice",
+    "difficulty": 4,
+    "question": "What caused this production incident?",
+    "explanation": "A multi-step agent uses tool_choice: 'auto' throughout. In production, a pattern emerges: after 6-8 tool calls in a conversation, Claude starts responding with text summaries instead of making the next required tool call. The agent workflow requires 10-12 sequential tool calls to complete. The development team notices this happens more frequently when earlier tool calls return large responses (2000+ tokens each).",
+    "photoUrl": null,
+    "options": [
+      "Claude has a hard limit of 8 tool calls per conversation",
+      "Claude's temperature setting is too high, causing random behavior",
+      "The 'auto' tool_choice degrades after repeated use in the same conversation",
+      "Large tool responses fill the context window, causing Claude to prioritize summarizing what it has over making more tool calls"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "Context window pressure is a real production concern for tool-heavy workflows. Each tool call adds the request AND response to the conversation history. With 8 calls returning 2000+ tokens each, that's 16,000+ tokens of tool history alone \u2014 a significant chunk of context. As context fills, Claude may shift to 'summarization mode' instead of continuing the workflow. Mitigations: (1) return concise tool responses \u2014 only what Claude needs for the next step, (2) use the system prompt to emphasize workflow completion, (3) for long chains, consider compressing earlier tool results.",
+    "wrongExplanations": {
+      "0": "There's no hard limit on tool calls per conversation. Claude can make many more than 8. The issue is context window pressure from accumulated tool results.",
+      "1": "Temperature affects randomness in text generation, not whether Claude decides to use tools. This is a systematic pattern related to context size, not random variation.",
+      "2": "tool_choice: 'auto' doesn't degrade with use. It works the same way on the 1st and 100th turn. The issue is the growing context from large tool responses.",
+      "3": ""
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.3 Tool Distribution & tool_choice",
+    "difficulty": 4,
+    "question": "What's the root cause of this intermittent failure?",
+    "explanation": "An agent has 25 tools. Most of the time it works well, but roughly 10% of conversations show a strange pattern: Claude calls 'search_documents' when it should call 'search_tickets', or vice versa. Both tools have detailed, distinct descriptions. Investigating the failures, the team notices they cluster around conversations where users ask ambiguous questions like 'find my issue from last week.' The tools' descriptions are: search_documents: 'Search company documents and files' and search_tickets: 'Search support tickets and issues.'",
+    "photoUrl": null,
+    "options": [
+      "The model is randomly selecting between tools",
+      "25 tools exceeds Claude's capacity",
+      "The word 'issue' appears in both tool descriptions, and the user's ambiguous phrasing creates a genuine selection conflict that the descriptions don't resolve",
+      "The tools should be combined into one"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "Semantic overlap in tool descriptions is the root cause of most tool selection errors. 'Issues' means support tickets in the tickets context, but 'search_documents' could also contain documents about issues. When the user says 'find my issue', both tools are plausible. The fix: make descriptions mutually exclusive. search_tickets: 'Search support tickets (bug reports, feature requests, customer complaints). Use this when the user references tickets, bugs, cases, or support issues.' search_documents: 'Search company files (PDFs, docs, spreadsheets). Use this for policies, procedures, specifications. NOT for support tickets \u2014 use search_tickets instead.' The negative instruction ('NOT for support tickets') is key.",
+    "wrongExplanations": {
+      "0": "Claude doesn't randomly select tools. It uses the descriptions and context to make a decision. The 10% failure rate corresponds to ambiguous user inputs, not random chance.",
+      "1": "While 25 tools can impact performance, the specific pattern \u2014 confusion between two semantically similar tools \u2014 points to description overlap, not tool count. Reducing to 20 tools wouldn't fix this pair's overlap.",
+      "2": "",
+      "3": "Combining search_documents and search_tickets into one tool would lose the ability to search them independently. The fix is better descriptions, not fewer tools."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.3 Tool Distribution & tool_choice",
+    "difficulty": 5,
+    "question": "Design the optimal tool_choice strategy for this system.",
+    "explanation": "You're architecting a complex agent that handles a 5-stage workflow: (1) gather requirements from user conversation, (2) search for relevant data, (3) analyze data and generate options, (4) present options and get user approval, (5) execute the approved action. Each stage requires different tools. Users sometimes jump between stages ('actually, search for something else' in stage 4). The system must handle both happy-path completion and non-linear navigation.",
+    "photoUrl": null,
+    "options": [
+      "Use dynamic tool_choice: 'auto' for conversation stages (1, 4), 'any' for data stages (2, 3), and forced specific tool for execution (5), with stage-appropriate tool filtering at each step",
+      "Use tool_choice: 'auto' throughout and rely on system prompt instructions for stage management",
+      "Force specific tools at every stage to ensure correct sequence",
+      "Use tool_choice: 'any' throughout to ensure tools are always used"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "This strategy matches tool_choice to each stage's needs. Stage 1 (gather): 'auto' \u2014 Claude needs to ask questions without tool calls. Stage 2 (search): 'any' \u2014 must call a search tool, but which one depends on context. Stage 3 (analyze): 'any' \u2014 must call analysis tool with the data. Stage 4 (present): 'auto' \u2014 Claude presents options and has a natural conversation. Stage 5 (execute): forced 'execute_action' \u2014 the final step must be the specific approved action. Dynamic tool filtering limits each stage's visible tools. For non-linear jumps: detect stage-regression keywords and reset the tool_choice/filter accordingly.",
+    "wrongExplanations": {
+      "0": "",
+      "1": "Relying solely on system prompt instructions for 5 stages is fragile. Claude may drift between stages without structural enforcement. Combining tool_choice modes with filtering gives you both guidance and flexibility.",
+      "2": "Forcing specific tools at every stage breaks when users navigate non-linearly. If the user says 'wait, search for something else' in stage 4, a forced tool prevents Claude from going back to search.",
+      "3": "'any' during conversation stages (1, 4) would force unnecessary tool calls when Claude just needs to ask questions or discuss options with the user."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.3 Tool Distribution & tool_choice",
+    "difficulty": 5,
+    "question": "Which approach best solves this scaling challenge?",
+    "explanation": "You're building a platform where customers define their own custom tools (via webhooks) that Claude can use. Customer A has 5 tools, Customer B has 30, Customer C has 100+. You need consistent Claude performance across all customers. Some customer tools have overlapping purposes. You can't modify customer tool definitions, but you can control how they're presented to Claude.",
+    "photoUrl": null,
+    "options": [
+      "Implement a semantic routing layer: embed all tool descriptions, use similarity search to select the top 10-15 most relevant tools per message, and include a 'meta_tool_search' fallback tool for when the right tool isn't in the initial set",
+      "Set a hard limit of 20 tools per customer and reject additional tools",
+      "Pass all tools to Claude and increase the max_tokens to compensate",
+      "Automatically merge tools with similar descriptions into combined tools"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "The semantic routing pattern is how production platforms handle unbounded tool sets. Process: (1) Embed all tool descriptions at registration time. (2) For each user message, embed it and find the top 10-15 most similar tools. (3) Always include a 'search_more_tools(query)' meta-tool that lets Claude find additional tools if none of the initial set fits. (4) Cache embedding results for repeated query patterns. This gives Customer C with 100+ tools the same performance as Customer A with 5, because Claude always sees a manageable, relevant subset. The meta-tool fallback handles edge cases where semantic similarity misses the right tool.",
+    "wrongExplanations": {
+      "0": "",
+      "1": "A hard limit of 20 tools penalizes power users and limits platform value. Customer C chose 100+ tools for a reason \u2014 they need them for different use cases.",
+      "2": "Increasing max_tokens doesn't solve tool selection degradation. Claude still has to process and choose among 100+ tool descriptions, which degrades accuracy regardless of output length.",
+      "3": "You can't modify customer tool definitions (stated constraint). And automatically merging tools would break customer webhooks and create unpredictable behavior."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.4 MCP Server Integration",
+    "difficulty": 1,
+    "question": "What is the Model Context Protocol (MCP)?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "A protocol for compressing model weights for faster inference",
+      "A security protocol for encrypting API calls to Claude",
+      "A proprietary Anthropic format for fine-tuning Claude models",
+      "An open protocol that standardizes how AI applications connect to external tools and data sources through MCP servers"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "MCP is often called 'the USB-C for AI' \u2014 a universal standard for connecting AI models to tools, data, and services. Instead of building custom integrations for every tool, an MCP server exposes tools in a standard format that any MCP-compatible client (like Claude Code, Claude Desktop, or custom apps) can discover and use. This means a tool provider builds one MCP server, and it works with every MCP client.",
+    "wrongExplanations": {
+      "0": "MCP has nothing to do with model compression or inference optimization. It's a connectivity protocol for tools and data sources, not a model architecture protocol.",
+      "1": "MCP isn't an encryption or security protocol. It's a standardized way for AI applications to discover and interact with external tools and data sources.",
+      "2": "MCP is an open protocol, not proprietary to Anthropic. While Anthropic created it, it's designed to be used by any AI application, not just Claude-specific fine-tuning.",
+      "3": ""
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.4 MCP Server Integration",
+    "difficulty": 1,
+    "question": "What are the two main transport protocols used by MCP servers?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "HTTP and WebSocket",
+      "gRPC and REST",
+      "stdio (standard input/output) and SSE (Server-Sent Events)",
+      "TCP and UDP"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "stdio is the go-to for local MCP servers \u2014 Claude Code launches the server as a subprocess and communicates through stdin/stdout. It's simple, fast, and perfect for tools that run on the developer's machine. SSE (often called 'streamable HTTP' in newer MCP specs) is used for remote MCP servers that Claude connects to over the network. In practice, most Claude Code MCP servers use stdio because they're local development tools. Remote SSE servers are more common for shared team tools or cloud services.",
+    "wrongExplanations": {
+      "0": "While MCP uses HTTP under the hood for the SSE transport, the protocol-level transports are specifically stdio and SSE. WebSocket is not a standard MCP transport.",
+      "1": "gRPC and REST are general API protocols but not the ones MCP uses. MCP has its own protocol format built on JSON-RPC, transported over stdio or SSE.",
+      "2": "",
+      "3": "TCP and UDP are network-layer protocols. MCP operates at a higher level with stdio for local communication and SSE/HTTP for remote communication."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.4 MCP Server Integration",
+    "difficulty": 1,
+    "question": "How does Claude Code discover available tools from an MCP server?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Claude Code queries the MCP server, which advertises its available tools, their schemas, and descriptions automatically",
+      "The developer manually lists each tool in a configuration file",
+      "Claude Code downloads a tool catalog from Anthropic's servers",
+      "The tools are hardcoded in Claude Code's source code"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "This automatic discovery is one of MCP's key advantages over manual tool definitions. When Claude Code connects to an MCP server, it sends a 'tools/list' request. The server responds with all available tools, including their names, descriptions, and parameter schemas \u2014 in exactly the format Claude needs. This means adding a new tool to your MCP server automatically makes it available in Claude Code without changing any client configuration. It's a pull model: the client discovers what's available rather than being told in advance.",
+    "wrongExplanations": {
+      "0": "",
+      "1": "Manual listing would defeat one of MCP's main benefits \u2014 automatic tool discovery. The developer configures the server connection once, and tool discovery is automatic from there.",
+      "2": "Tool definitions come from the MCP server itself, not from Anthropic. Each MCP server advertises its own tools. This decentralized model is what makes MCP extensible.",
+      "3": "Claude Code's built-in tools are in its source code, but MCP tools are dynamically discovered from external servers. That's the whole point of the protocol."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.4 MCP Server Integration",
+    "difficulty": 2,
+    "question": "Where are MCP server configurations typically defined for Claude Code?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "In the Anthropic cloud dashboard under 'MCP Connections'",
+      "In Claude Code settings files \u2014 either project-level (.claude/settings.json) or user-level (~/.claude/settings.json)",
+      "By passing the server URL as a command-line argument when starting Claude Code",
+      "In the system prompt of each conversation"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Claude Code supports MCP configuration at two levels: project-level (.claude/settings.json) for tools specific to a codebase, and user-level (~/.claude/settings.json) for tools you want everywhere. Project-level configs travel with the repo, so team members get the same MCP tools automatically. The configuration specifies the transport type, command to launch the server (for stdio), or URL (for SSE), plus any environment variables the server needs.",
+    "wrongExplanations": {
+      "0": "MCP configuration is local to your Claude Code installation, not managed through a cloud dashboard. This keeps your tool setup under your control and version-controlled with your project.",
+      "1": "",
+      "2": "While some options can be passed via CLI, the standard approach is settings files. This allows persistent configuration across sessions without retyping connection details every time.",
+      "3": "The system prompt is for conversation instructions, not infrastructure configuration. MCP servers are configured at the application level, not per-conversation."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.4 MCP Server Integration",
+    "difficulty": 2,
+    "question": "What's the key difference between Claude Code's built-in tools and MCP-provided tools?",
+    "explanation": "A developer notices that Claude Code has tools like Read, Write, Edit, Bash, and Grep built in, while their MCP server provides tools like query_database and deploy_service. They wonder whether Claude treats these differently during execution.",
+    "photoUrl": null,
+    "options": [
+      "Built-in tools are faster because they're compiled, while MCP tools are interpreted",
+      "Built-in tools are maintained by Anthropic and integrated into Claude Code directly, while MCP tools come from external servers and can be added/removed without changing Claude Code",
+      "Built-in tools can only do file operations, while MCP tools can do anything",
+      "There's no functional difference \u2014 they all work exactly the same way"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "From Claude's perspective during reasoning, both built-in and MCP tools look similar \u2014 they have names, descriptions, and parameter schemas. But the key architectural difference is lifecycle management. Built-in tools ship with Claude Code and are updated with new versions. MCP tools are dynamically loaded from external servers, meaning you can add, remove, or update them without touching Claude Code. Security-wise, built-in tools have been vetted by Anthropic; MCP tools are third-party and may require permission grants.",
+    "wrongExplanations": {
+      "0": "The distinction isn't about compiled vs interpreted. Built-in tools execute within Claude Code's process, while MCP tools communicate via the MCP protocol. Both can be fast or slow depending on what they do.",
+      "1": "",
+      "2": "Built-in tools include Bash (arbitrary commands), WebSearch, and WebFetch \u2014 far more than file operations. The distinction is about who provides and maintains the tools, not what they can do.",
+      "3": "There are meaningful differences in how they're configured, updated, and secured. While Claude uses both similarly during conversation, the operational characteristics differ significantly."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.4 MCP Server Integration",
+    "difficulty": 2,
+    "question": "What security consideration is most important when connecting to third-party MCP servers?",
+    "explanation": "A developer finds an open-source MCP server on GitHub that provides Jira integration. Before adding it to their Claude Code setup \u2014 which has access to their production codebase \u2014 they want to understand the security implications.",
+    "photoUrl": null,
+    "options": [
+      "MCP servers can't access your local files, so there's no security risk",
+      "MCP servers are sandboxed by the operating system and can't cause harm",
+      "The MCP server runs with whatever permissions you grant it, and a malicious server could execute arbitrary commands or exfiltrate data through its tool implementations",
+      "Only MCP servers signed by Anthropic are safe to use"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "MCP servers are executables that run on your machine (for stdio transport) or services you connect to (for SSE). A stdio MCP server launched by Claude Code has access to your file system, environment variables, and network. If a malicious MCP server defines a tool called 'search_jira' that actually reads your SSH keys and sends them to an external server, Claude would have no way to detect this. Best practices: review MCP server source code before installing, run servers with minimal permissions, use environment variable isolation, and prefer well-maintained, widely-used servers.",
+    "wrongExplanations": {
+      "0": "This is dangerously incorrect. stdio MCP servers run as local processes with access to your file system and environment. They absolutely CAN access your local files.",
+      "1": "MCP servers are not sandboxed by default. They run as regular processes with the permissions of the user who launched them. OS-level sandboxing requires explicit configuration.",
+      "2": "",
+      "3": "Anthropic doesn't sign or certify MCP servers. The ecosystem is open, which is both its strength (anyone can build servers) and its risk (no central vetting)."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.4 MCP Server Integration",
+    "difficulty": 3,
+    "question": "What anti-pattern does this MCP configuration exhibit?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Using too many different MCP server implementations",
+      "Tool explosion from connecting too many MCP servers without dynamic filtering, overwhelming Claude with choices",
+      "MCP servers should only be used one at a time",
+      "The servers should all be combined into a single MCP server"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Each MCP server compounds the tool count problem. The convenience of 'just add another server' masks the performance cost. Solutions: (1) Use Claude Code's tool filtering to only enable relevant MCP servers per task, (2) Configure MCP servers at different scopes \u2014 put Kubernetes tools in a DevOps-specific settings file, not the global project config, (3) Create a curated 'essential tools' config for daily use and a 'full toolkit' config for specialized tasks. Some teams build MCP 'router' servers that expose a subset of tools based on context.",
+    "wrongExplanations": {
+      "0": "Using different server implementations is fine \u2014 that's MCP's design. The issue is the cumulative tool count, not the diversity of server implementations.",
+      "1": "",
+      "2": "MCP is designed for multiple simultaneous servers. The issue isn't having multiple servers \u2014 it's not managing the cumulative tool count they produce.",
+      "3": "Combining into one server would reduce connection overhead but not tool count. 75 tools in one server is just as overwhelming as 75 tools across 8 servers."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.4 MCP Server Integration",
+    "difficulty": 3,
+    "question": "What's wrong with this MCP server's tool design?",
+    "explanation": "A developer builds an MCP server for database operations. It exposes one tool: 'database(sql: string)' with the description 'Execute any SQL query against the database.' Claude Code starts using it, and during a debugging session, Claude runs 'DROP TABLE users;' while trying to help fix a data issue.",
+    "photoUrl": null,
+    "options": [
+      "The SQL parameter should be a number, not a string",
+      "MCP servers shouldn't provide database tools",
+      "The tool exposes unrestricted database access without safety constraints, allowing destructive operations",
+      "The tool description is too short"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "Unrestricted SQL execution via MCP is one of the most dangerous patterns in tool design. Instead of a raw SQL tool, provide constrained operations: 'query_table(table, columns, where_clause)' for reads, 'insert_row' for writes, with no DROP/DELETE/TRUNCATE support. If you must allow arbitrary queries, add safety layers: (1) read-only mode by default, (2) require explicit confirmation for any DDL, (3) transaction wrapping with rollback capability, (4) query allowlisting. The MCP server is the security boundary \u2014 Claude will use whatever access you give it.",
+    "wrongExplanations": {
+      "0": "SQL queries are strings by nature. The parameter type is correct \u2014 the problem is that any SQL string is accepted, including destructive ones.",
+      "1": "Database tools via MCP are valuable and common. The issue is the design of THIS tool (unrestricted access), not the concept of database MCP tools.",
+      "2": "",
+      "3": "While a longer description could help, even the most detailed description won't prevent Claude from running a DROP TABLE when it thinks it's helpful. The constraint must be enforced in code, not documentation."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.4 MCP Server Integration",
+    "difficulty": 4,
+    "question": "What is the most likely root cause?",
+    "explanation": "A team's MCP server works perfectly during development but fails in CI/CD. The server uses stdio transport and reads from a local config file at ~/.config/mytools/settings.json. In CI, Claude Code connects to the MCP server but every tool call returns 'Configuration file not found.' The CI pipeline runs in a Docker container with the MCP server binary installed.",
+    "photoUrl": null,
+    "options": [
+      "Docker containers can't use stdio transport",
+      "The Docker container needs a GPU to run MCP servers",
+      "MCP servers don't work in CI environments",
+      "The MCP server relies on a user-specific file path (~/) that doesn't exist in the CI container's filesystem, and the server lacks fallback configuration handling"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "Environment portability is a common MCP server failure point. The ~ path expands to the CI user's home directory, which doesn't have the config file. Robust MCP servers should: (1) accept config paths via environment variables (MCP_CONFIG_PATH), (2) check multiple locations with fallbacks, (3) provide clear error messages about missing config, (4) support inline configuration via the MCP settings that launched the server. In the Claude Code MCP config, you can pass environment variables to the server: {\"env\": {\"MCP_CONFIG_PATH\": \"/ci/config/settings.json\"}}.",
+    "wrongExplanations": {
+      "0": "Docker containers work fine with stdio transport. Claude Code (or the CI agent) launches the MCP server process inside the container and communicates via stdin/stdout like any other process.",
+      "1": "MCP servers are typically lightweight processes that process JSON messages. They don't need GPUs or specialized hardware.",
+      "2": "MCP servers work in any environment that can run the server process and communicate via the chosen transport. CI environments fully support this.",
+      "3": ""
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.4 MCP Server Integration",
+    "difficulty": 4,
+    "question": "What's causing this intermittent MCP failure?",
+    "explanation": "An MCP server provides a 'search_codebase' tool that works 80% of the time but sometimes returns results from a completely different project. The team discovers the MCP server maintains an in-memory index of the codebase, initialized when the server starts. Claude Code is configured to use this server across multiple project directories. The server was designed for single-project use.",
+    "photoUrl": null,
+    "options": [
+      "Claude Code has a bug in how it routes MCP requests",
+      "The MCP server's in-memory index retains state from the first project it indexed, and when Claude Code switches projects, the server still returns results from the stale index",
+      "MCP servers can't handle file system operations",
+      "The search algorithm is non-deterministic"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Stateful MCP servers create subtle bugs when used across different contexts. The server indexed project A's codebase at startup and never re-indexed. When Claude Code works in project B, the same server returns project A's files. Fixes: (1) Make the server accept a 'root_path' parameter per tool call and re-index if it changes, (2) Configure separate MCP server instances per project (project-level settings), (3) Implement a 'refresh_index' tool that Claude can call when switching contexts, (4) Use the MCP 'roots' capability to let the client tell the server which directories are relevant.",
+    "wrongExplanations": {
+      "0": "Claude Code correctly routes MCP requests to the configured server. The issue is the server's internal state management, not the client's routing.",
+      "1": "",
+      "2": "MCP servers can absolutely handle file system operations \u2014 many are designed specifically for this. The issue is stateful indexing across different project contexts.",
+      "3": "The search returns wrong results consistently (always from the old project), not randomly. This is a deterministic state management issue, not algorithmic non-determinism."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.4 MCP Server Integration",
+    "difficulty": 5,
+    "question": "How should you architect this MCP infrastructure?",
+    "explanation": "You're building an enterprise MCP platform for a company with 200 developers. Requirements: each team needs team-specific tools (their repos, their databases), all teams need shared tools (Jira, Slack, docs), some tools need different permissions per team (billing team can read financial DB, engineering can't), tools must be versioned, and a new tool should be deployable to all 200 developers without each person updating their config.",
+    "photoUrl": null,
+    "options": [
+      "Give every developer the same static MCP configuration with all tools",
+      "Build a centralized MCP registry server that developers connect to, which dynamically serves team-appropriate tools based on authentication, manages versions centrally, and uses role-based access control to filter tool exposure",
+      "Have each team run their own MCP servers independently with no coordination",
+      "Use only Claude Code's built-in tools and skip MCP entirely"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "The registry pattern is how enterprises scale MCP. Architecture: (1) A central SSE-based MCP registry that all Claude Code instances connect to. (2) Developer authenticates with SSO. (3) Registry resolves their team membership and role. (4) 'tools/list' response is dynamically filtered: shared tools + team tools + role-permitted tools. (5) Tool implementations proxy to actual backend services with the developer's permissions. (6) Central versioning means updating a tool definition is instant for all users. (7) Audit logging at the registry captures who called what tool. This gives you governance without friction \u2014 developers just connect to one server and get exactly the tools they should have.",
+    "wrongExplanations": {
+      "0": "Static config with all tools exposes every tool to every developer regardless of permissions. The billing database tool shouldn't be visible to the frontend team. Plus, 200 static configs to update per tool change is unmanageable.",
+      "1": "",
+      "2": "Independent team servers without coordination means no shared tools, no centralized versioning, no cross-team governance, and 200 developers managing their own infrastructure.",
+      "3": "Built-in tools can't cover company-specific needs like Jira integration, team databases, or custom deployment pipelines. MCP exists precisely for this extensibility."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.4 MCP Server Integration",
+    "difficulty": 5,
+    "question": "What's the best architecture for this real-time MCP challenge?",
+    "explanation": "You need to build an MCP server that provides Claude Code with live monitoring data: server metrics, error rates, deployment status, and incident alerts. The challenge: (1) some data changes every second (CPU metrics), (2) some data changes rarely (deployment status), (3) Claude shouldn't poll constantly, (4) but Claude needs to be alerted to critical incidents immediately, (5) the context window shouldn't be flooded with repeated metric snapshots.",
+    "explanation_type": "scenario",
+    "photoUrl": null,
+    "options": [
+      "Have Claude poll all metrics every 5 seconds using a tool call",
+      "Stream all metrics continuously into Claude's context",
+      "Design three tool types: on-demand query tools for current metrics, subscription-based notifications (using MCP notifications) for critical alerts, and summary tools that aggregate time-series data into digestible snapshots \u2014 with aggressive data compression in return values",
+      "Only provide historical data, never real-time data"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "This pattern separates monitoring concerns. On-demand: 'get_server_metrics(server, time_range)' returns a compressed summary ('CPU: avg 45%, peak 92% at 14:32, trend: rising'). Subscriptions: MCP's notification capability pushes alerts only when thresholds breach ('CRITICAL: error rate spike to 15%, started 2 min ago'). Summaries: 'get_health_overview()' aggregates all services into a dashboard-like view. The key insight is data compression \u2014 instead of returning 3600 metric points for the last hour, return statistics that Claude can reason about. A 5-number summary (min, p25, median, p75, max) plus trend direction is far more useful than raw data.",
+    "wrongExplanations": {
+      "0": "Polling every 5 seconds would flood the context with repetitive metric snapshots (12 tool calls per minute) and waste API tokens on data that mostly hasn't changed.",
+      "1": "Continuous streaming would exhaust the context window in minutes with raw metric data. Claude would lose sight of the actual conversation under a flood of numbers.",
+      "2": "",
+      "3": "Historical-only data means Claude can't help with active incidents, which is the primary use case for monitoring. Real-time alerting for critical issues is essential."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.5 Built-in Tools",
+    "difficulty": 1,
+    "question": "What is the recommended way to read a file's contents in Claude Code?",
+    "explanation": "A new Claude Code user needs to examine the contents of a configuration file at /etc/nginx/nginx.conf. They're used to using 'cat' in the terminal and wonder whether to use the Bash tool with 'cat' or something else.",
+    "photoUrl": null,
+    "options": [
+      "Use the Bash tool to run 'cat /etc/nginx/nginx.conf'",
+      "Use the Edit tool in read-only mode",
+      "Use the Grep tool to search for all lines in the file",
+      "Use the Read tool with the file path"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "Claude Code's Read tool is purpose-built for viewing files. It provides line numbers (cat -n format), supports pagination for large files with offset/limit, can read images and PDFs, and provides a better experience for reviewing the output. Using 'cat' via Bash works technically but loses these benefits. The Read tool is also more trustworthy \u2014 Claude Code's instructions explicitly say to prefer Read over cat/head/tail.",
+    "wrongExplanations": {
+      "0": "While 'cat' via Bash works, Claude Code's guidelines explicitly state to use the Read tool instead. The Read tool provides line numbers, pagination, and a better review experience.",
+      "1": "The Edit tool is for making changes to files, not for reading them. It doesn't have a read-only mode.",
+      "2": "The Grep tool is for searching within file contents, not for reading entire files. Using it to 'read' a file would be a misuse of the tool's purpose.",
+      "3": ""
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.5 Built-in Tools",
+    "difficulty": 1,
+    "question": "Which built-in tool should you use to find files by name pattern?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Bash with 'find . -name \"*.test.ts\"'",
+      "Grep with a search pattern",
+      "Read with a directory path",
+      "Glob with the pattern '**/*.test.ts'"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "The Glob tool is Claude Code's dedicated file-finding tool. It supports glob patterns like '**/*.ts' (recursive), 'src/**/*.test.ts' (scoped), and returns results sorted by modification time. It's optimized for any codebase size and provides a better experience than running 'find' via Bash. Claude Code's guidelines explicitly state: 'File search: Use Glob (NOT find or ls).'",
+    "wrongExplanations": {
+      "0": "While 'find' works, Claude Code explicitly says to use Glob instead of find or ls. Glob is optimized for file pattern matching and provides sorted, formatted results.",
+      "1": "Grep searches file CONTENTS, not file names. It would find files containing the text '*.test.ts', not files named that way.",
+      "2": "The Read tool reads file contents and cannot read directories. It's not designed for file discovery.",
+      "3": ""
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.5 Built-in Tools",
+    "difficulty": 1,
+    "question": "What is the Grep tool's search backend in Claude Code?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "GNU grep",
+      "The 'ag' (Silver Searcher) tool",
+      "ripgrep (rg)",
+      "A custom search engine built by Anthropic"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "Claude Code's Grep tool is built on ripgrep, which is renowned for its speed (often 2-5x faster than alternatives on large codebases), smart defaults (respects .gitignore, skips binary files), and full regex support. This means you get ripgrep's features through the Grep tool: file type filtering (--type), glob patterns (--glob), and multiline matching. Knowing it's ripgrep helps when crafting patterns \u2014 for example, literal braces need escaping (use 'interface\\{\\}' to find 'interface{}' in Go code).",
+    "wrongExplanations": {
+      "0": "GNU grep is the traditional Unix tool but isn't what Claude Code uses. ripgrep is significantly faster and has smarter defaults for code searching.",
+      "1": "The Silver Searcher (ag) is a popular code search tool but not what powers Claude Code's Grep. ripgrep is the backend.",
+      "2": "",
+      "3": "Anthropic didn't build a custom search engine. They integrated ripgrep, which is an established, high-performance search tool maintained by the open-source community."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.5 Built-in Tools",
+    "difficulty": 2,
+    "question": "When should you use the Edit tool versus the Write tool for modifying a file?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Use Edit for targeted changes to existing files (it sends only the diff); use Write only for creating new files or complete rewrites",
+      "Always use Write because it's simpler",
+      "Use Write for small files and Edit for large files",
+      "Use Edit only for single-line changes and Write for multi-line changes"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "The Edit tool performs exact string replacement \u2014 you specify the old text and the new text, and only the diff is transmitted. For a rename across a 500-line file, Edit with replace_all: true is perfect: it sends just the old and new function names rather than the entire 500-line file. Write would resend all 500 lines. This matters for efficiency, reviewability (the user sees exactly what changed), and safety (less chance of accidentally modifying unrelated code). The Edit tool also requires that the old_string be unique in the file unless replace_all is true.",
+    "wrongExplanations": {
+      "0": "",
+      "1": "Write rewrites the entire file, which is risky for modifications \u2014 you might accidentally change or lose content. Edit is specifically designed for modifications and is always preferred for existing files.",
+      "2": "File size isn't the deciding factor. Edit is preferred for ANY modification to an existing file because it's precise and only sends the change. Write is for new files or complete overhauls.",
+      "3": "Edit handles multi-line changes just fine. You can replace entire blocks of code. The distinction is about targeted changes vs complete file replacement, not about line count."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.5 Built-in Tools",
+    "difficulty": 2,
+    "question": "What is the key requirement before using the Edit tool on a file?",
+    "explanation": "Claude Code attempts to edit a configuration file but gets an error: 'You must use your Read tool at least once in the conversation before editing.' The developer is confused because they told Claude exactly what change to make.",
+    "photoUrl": null,
+    "options": [
+      "The file must have been read with the Read tool earlier in the conversation",
+      "The file must be smaller than 1MB",
+      "The file must be in a git repository",
+      "The file must have write permissions set to 777"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "This requirement exists to prevent blind edits. Without reading the file first, Claude is guessing about the file's contents, indentation, and context \u2014 leading to failed matches or incorrect edits. The Read-before-Edit pattern ensures Claude knows the exact current state of the file. This is especially important because Edit requires the old_string to exactly match the file's content, including whitespace. Reading first means Claude can copy the exact text that needs to be replaced.",
+    "wrongExplanations": {
+      "0": "",
+      "1": "There's no size limit for the Edit tool. The requirement is about having read the file first, not about file size.",
+      "2": "The Edit tool works on any file regardless of version control status. The requirement is about reading the file in the conversation, not about git.",
+      "3": "Standard file write permissions are sufficient. The requirement is about Claude having read the file's contents in the current conversation, not about Unix permissions."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.5 Built-in Tools",
+    "difficulty": 2,
+    "question": "What is the Agent (subagent) tool used for in Claude Code?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Running automated test suites in parallel",
+      "Deploying code to production servers",
+      "Spawning a separate Claude instance for focused tasks like research or exploration, keeping the main conversation context clean",
+      "Managing git branches and merge conflicts"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "The Agent tool creates a sandboxed sub-conversation with its own context window. Perfect use case: spawn an 'Explore' agent to trace how a function is used across 50 files, getting back a summary \u2014 instead of loading all 50 files into your main conversation and losing context on your actual edits. Key principle: one focused task per subagent. Don't ask a subagent to both research AND implement. And subagents should not spawn their own subagents (no recursive spawning).",
+    "wrongExplanations": {
+      "0": "While you could use Bash to run tests, the Agent tool isn't specifically for test execution. It's for spawning focused Claude sub-conversations for research, exploration, and parallel analysis.",
+      "1": "Deployment is done through Bash commands or CI/CD tools, not through the Agent tool. The Agent tool creates Claude sub-conversations, not deployment pipelines.",
+      "2": "",
+      "3": "Git operations are handled through the Bash tool. The Agent tool is for delegating Claude reasoning tasks, not for git operations."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.5 Built-in Tools",
+    "difficulty": 3,
+    "question": "What's the anti-pattern in this tool usage?",
+    "explanation": "A developer's Claude Code session shows this sequence: Bash('grep -r \"TODO\" src/'), Bash('cat src/config.ts'), Bash('find . -name \"*.test.ts\"'), Bash('sed -i \"s/oldFunc/newFunc/g\" src/utils.ts'). Everything works, but the session feels slow and the developer can't easily review what changed.",
+    "photoUrl": null,
+    "options": [
+      "Using too many tool calls in sequence",
+      "Working in too many files at once",
+      "Not using the Agent tool to parallelize operations",
+      "Using Bash for operations that have dedicated built-in tools (Grep, Read, Glob, Edit) which provide better UX and reviewability"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "Each Bash command has a purpose-built alternative: grep -r \u2192 Grep tool (ripgrep backend, structured output modes), cat \u2192 Read tool (line numbers, pagination, image support), find \u2192 Glob tool (sorted by modification time), sed \u2192 Edit tool (reviewable diffs, exact match safety). The built-in tools aren't just wrappers \u2014 they provide structured output that's easier for both Claude and the user to work with. The Edit tool's exact-match requirement catches mistakes that sed would silently ignore.",
+    "wrongExplanations": {
+      "0": "Sequential tool calls are sometimes necessary. The issue isn't the sequence \u2014 it's that each call uses Bash when a specialized built-in tool exists for that exact operation.",
+      "1": "Working across multiple files is normal in development. The anti-pattern is HOW the files are being accessed, not how many.",
+      "2": "These operations are sequential by nature (search, then read, then find, then edit). Parallelization isn't the issue \u2014 tool choice is.",
+      "3": ""
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.5 Built-in Tools",
+    "difficulty": 3,
+    "question": "What's wrong with this approach to searching code?",
+    "explanation": "A developer asks Claude Code to find all files that import a specific module. Claude uses Bash('grep -rl \"import.*MyModule\" --include=\"*.ts\" .') and gets results. But when the developer asks to find a Go interface definition, Claude uses the same approach: Bash('grep -r \"interface{}\" --include=\"*.go\" .')  and gets unexpected results because the braces need different escaping.",
+    "photoUrl": null,
+    "options": [
+      "The search patterns are too broad",
+      "Using Bash grep instead of the Grep tool, which handles ripgrep syntax consistently and documents its escaping requirements (literal braces need escaping as \\{\\})",
+      "The developer should use Glob instead of Grep for this task",
+      "Go doesn't use the keyword 'interface'"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "The Grep tool's documentation explicitly notes: 'literal braces need escaping (use `interface\\\\{\\\\}` to find `interface{}` in Go code).' This is because ripgrep uses regex by default where {} has special meaning. The Grep tool also offers file type filtering (type: 'go' instead of --include='*.go'), output modes (files_with_matches, content, count), and context lines \u2014 all without remembering grep flags. Consistency in escaping rules is a major advantage over raw grep in Bash.",
+    "wrongExplanations": {
+      "0": "The patterns themselves are reasonable for what the developer wants to find. The issue is the tool choice and how it handles regex special characters.",
+      "1": "",
+      "2": "Glob finds files by NAME pattern. The developer needs to search file CONTENTS for import statements. Grep is the correct tool type \u2014 just the built-in Grep, not bash grep.",
+      "3": "Go absolutely uses the 'interface' keyword. 'interface{}' (empty interface) is the Go equivalent of 'any' type in older Go versions."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.5 Built-in Tools",
+    "difficulty": 4,
+    "question": "What caused this Edit tool failure and how should it be fixed?",
+    "explanation": "Claude Code reads a Python file and sees (via the Read tool) line 45 contains '    def process_data(self, data):'. Claude then attempts Edit with old_string='    def process_data(self, data):' but gets the error 'old_string not found in file.' The developer is confused \u2014 the text looks identical. Upon closer inspection, the Read tool output showed '    45\\tdef process_data(self, data):' and Claude included some of the line number formatting in the match.",
+    "photoUrl": null,
+    "options": [
+      "The file was modified between the Read and Edit calls",
+      "The indentation uses tabs but Claude passed spaces",
+      "The Edit tool doesn't work on Python files",
+      "Claude accidentally included the line number prefix from the Read tool's output in the old_string, and the actual file doesn't contain those numbers"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "The Read tool uses 'cat -n' format where each line has a prefix of spaces + line number + tab. Everything AFTER the tab is the actual file content. When copying text from Read output to Edit's old_string, it's critical to strip the line number prefix. Claude Code's Edit tool documentation explicitly warns: 'Never include any part of the line number prefix in the old_string or new_string.' This is a common error, especially with indented code where the line number prefix can visually blend with the code's indentation.",
+    "wrongExplanations": {
+      "0": "While concurrent modification is possible, the error description specifically points to the line number prefix issue. The file content didn't change \u2014 Claude's match string was wrong.",
+      "1": "While tab/space confusion can cause Edit failures, the scenario specifically describes a line number prefix issue \u2014 Claude included formatting from the Read output that isn't in the actual file.",
+      "2": "The Edit tool works on any text file regardless of language. Python files are fully supported.",
+      "3": ""
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.5 Built-in Tools",
+    "difficulty": 4,
+    "question": "Why did this Bash command cause problems and what's the correct approach?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "The regex pattern 'TODO' is too complex",
+      "The Grep tool (ripgrep backend) should be used instead \u2014 it respects .gitignore, skips binary files, and is 2-5x faster than grep on large codebases, with built-in timeout handling",
+      "The developer should manually list which directories to search",
+      "Bash has a 30-second hard timeout that can't be extended"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "ripgrep's speed advantage on large repos comes from three key features: (1) it respects .gitignore by default, skipping node_modules, build outputs, and vendored code that grep -r would wade through, (2) it automatically skips binary files, (3) it uses memory-mapped I/O and parallelism for faster file reading. On a 500K-file monorepo, these optimizations can mean the difference between 3 minutes and 5 seconds. The Grep tool also has a configurable head_limit parameter to stop after finding enough matches, preventing unbounded searches.",
+    "wrongExplanations": {
+      "0": "'TODO' is a simple literal string, not a complex regex. The performance issue is about the search tool and codebase size, not pattern complexity.",
+      "1": "",
+      "2": "Manually scoping directories is a workaround, not a solution. The Grep tool with ripgrep handles the full repo efficiently by respecting .gitignore and using parallel I/O.",
+      "3": "Bash's timeout in Claude Code defaults to 120,000ms (2 minutes) and can be set up to 600,000ms (10 minutes). There's no 30-second hard limit."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.5 Built-in Tools",
+    "difficulty": 5,
+    "question": "Design the optimal tool usage strategy for this complex task.",
+    "explanation": "You need to refactor a large TypeScript project: rename a core type from 'UserProfile' to 'Account' across 150+ files, update all imports, fix any type references, run the type checker, and ensure tests pass. The type is defined in src/types/user.ts and imported throughout the codebase. Some files use 'UserProfile' in string literals (test fixtures, documentation strings) that should NOT be renamed.",
+    "photoUrl": null,
+    "options": [
+      "Use Bash('sed -i \"s/UserProfile/Account/g\"') on every file for speed",
+      "Read every file, then Edit each one manually for precision",
+      "Use a subagent to handle the entire refactoring in one shot",
+      "Use Grep to find all files containing 'UserProfile', then use Glob to identify test fixtures, then use Read on the type definition, then use Edit with replace_all on source files while excluding fixture files, then use Bash to run typecheck and tests"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "This approach uses each built-in tool for its strength: Grep (find affected files fast), Glob (identify test fixtures by pattern like '*.fixture.ts'), Read (understand the type definition's structure), Edit with replace_all (precise renaming in source files), Bash (run tsc and vitest for verification). The key insight is excluding test fixtures \u2014 a blanket sed would rename 'UserProfile' in test data strings where the old name might be intentionally preserved. The Edit tool's replace_all is safer than sed because it requires reading the file first, ensuring Claude knows the context before making changes.",
+    "wrongExplanations": {
+      "0": "Blanket sed replacement would change 'UserProfile' in test fixtures and documentation strings too, breaking test data that should keep the old name. It also provides no review opportunity.",
+      "1": "Reading 150+ files individually would fill the context window many times over. You need to use search tools to identify which files need changes, not read them all.",
+      "2": "A single subagent for 150+ file changes would exhaust its context. This task needs a structured approach with multiple tool types working in stages, not a single delegated operation.",
+      "3": ""
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.5 Built-in Tools",
+    "difficulty": 5,
+    "question": "Which approach best addresses this multi-tool coordination challenge?",
+    "explanation": "You're debugging a production issue where an API endpoint returns stale data. You need to: (1) find where the endpoint is defined, (2) trace the data flow from handler to database query, (3) check if caching is involved, (4) examine recent git changes to this code path, (5) verify the database query directly, and (6) propose a fix. The codebase has 2000+ files across 15 microservices.",
+    "photoUrl": null,
+    "options": [
+      "Use Grep to find the endpoint definition, Read the handler file, spawn a subagent (Explore type) to trace the data flow and caching layer, use Bash for git log on affected files and database query, then synthesize findings in the main context for the fix",
+      "Spawn a single research subagent to investigate everything at once",
+      "Use only Bash to grep, git log, and query the database in sequence",
+      "Read every file in the suspected microservice directory"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "This strategy preserves main context while leveraging each tool's strength. Grep narrows 2000+ files to the exact endpoint (seconds, not minutes). Read gives you the handler's full code with line numbers for precise analysis. The Explore subagent traces cross-file data flow without cluttering main context \u2014 it returns a summary of the cache\u2192DB flow. Bash handles git log (specialized command) and direct DB query (requires shell). The fix is synthesized in the main context where you have the architectural overview. Key principle: the main context stays focused on decision-making while subagents handle exploration.",
+    "wrongExplanations": {
+      "0": "",
+      "1": "A single subagent for 5 different investigation types would likely exhaust its context or lose focus. Breaking the work into 'trace data flow' (subagent) and 'check specifics' (main context tools) is more reliable.",
+      "2": "All-Bash misses the structured output of Grep (file type filtering, output modes) and Read (line numbers for precise reference). It also loads all exploration into the main context, reducing space for reasoning.",
+      "3": "Reading an entire microservice directory (potentially hundreds of files) would overwhelm the context window. Targeted search with Grep is orders of magnitude more efficient."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.1 Tool Interface Design",
+    "difficulty": 4,
+    "question": "What's the most likely cause of this tool misuse pattern?",
+    "explanation": "A code review tool has two similar tools: 'get_file_diff(file_path, commit_sha)' which shows changes in a specific commit, and 'compare_branches(base_branch, head_branch, file_path)' which shows differences between branches. Claude consistently uses get_file_diff when users ask 'what changed in this file' even when they clearly mean between branches, not in a specific commit. Both tool descriptions are detailed and accurate.",
+    "photoUrl": null,
+    "options": [
+      "Claude prefers tools with fewer parameters",
+      "The tool names are identical",
+      "The phrasing 'what changed' maps more naturally to 'diff' in get_file_diff, and the descriptions don't include negative guidance about when NOT to use each tool",
+      "Claude can't distinguish between commits and branches"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "When two tools have overlapping semantic domains, positive descriptions alone aren't enough. Adding negative guidance is surprisingly effective: 'get_file_diff: Shows changes made in a SINGLE COMMIT. Do NOT use for comparing branches \u2014 use compare_branches instead.' This mutual exclusion pattern in descriptions dramatically reduces cross-tool confusion. Think of it as tool descriptions having both a 'when to use' and 'when NOT to use' section.",
+    "wrongExplanations": {
+      "0": "Claude doesn't inherently prefer tools with fewer parameters. It selects based on description match to user intent. The 2-parameter tool just happens to have a name that better matches the user's phrasing.",
+      "1": "The tool names are different (get_file_diff vs compare_branches). The issue is semantic overlap in their domains, not naming.",
+      "2": "",
+      "3": "Claude understands git concepts including commits and branches. The issue is that the user's phrasing 'what changed' is ambiguous, and the tool descriptions don't help resolve the ambiguity."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.2 Structured Error Responses",
+    "difficulty": 3,
+    "question": "What's the anti-pattern in how this tool reports validation errors?",
+    "explanation": "A form submission tool validates 5 fields before submitting. When validation fails, it returns: {is_error: true, message: 'Validation failed: email is invalid, phone is too short, zip code is wrong format, name is required, date is in the past'}. Claude then tells the user about all 5 issues. But the user only typed the email wrong \u2014 the other 4 fields were left empty because the user was filling out the form in stages, asking Claude to submit after each field.",
+    "photoUrl": null,
+    "options": [
+      "Returning all validation errors at once instead of distinguishing between 'invalid input' and 'missing input that hasn't been provided yet'",
+      "Using is_error: true for validation failures",
+      "Having too many required fields",
+      "The error message is too long"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "Context-aware validation is crucial for multi-step interactions. Instead of treating all empty fields as errors, the tool should distinguish: {validation_errors: [{field: 'email', type: 'invalid', message: 'Invalid format'}], missing_fields: ['phone', 'zip', 'name', 'date'], message: '1 field has an error. 4 fields are not yet filled.'}. This lets Claude say 'Your email format is wrong \u2014 the other fields still need to be filled in' rather than overwhelming the user with 5 'errors' when they only made 1 mistake.",
+    "wrongExplanations": {
+      "0": "",
+      "1": "Using is_error for validation failures is actually debatable \u2014 some teams prefer returning validation as a successful result with error details. But that's not the core issue here, which is about distinguishing error types.",
+      "2": "Having required fields is normal. The issue is how the tool reports the state of unfilled fields versus actually invalid fields.",
+      "3": "Message length isn't the issue \u2014 sometimes you need to report multiple problems. The problem is that the tool doesn't distinguish between 'this is wrong' and 'this hasn't been filled yet.'"
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.3 Tool Distribution & tool_choice",
+    "difficulty": 4,
+    "question": "What's causing this inconsistent behavior across users?",
+    "explanation": "An AI assistant app serves two user segments: power users who ask precise technical questions and casual users who ask vague questions. The app has 20 well-designed tools. Power users report 95% accuracy. Casual users report 60% accuracy. The team suspects a model issue, but switching models doesn't change the pattern. The same 20 tools are exposed to both segments.",
+    "photoUrl": null,
+    "options": [
+      "Casual users have lower expectations and rate accuracy more harshly",
+      "The model performs differently based on user account type",
+      "Vague queries from casual users create ambiguous tool selection contexts \u2014 the same tool set needs different system prompt guidance or a conversational clarification step for ambiguous requests",
+      "20 tools is too many for casual users but fine for power users"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "This is a tool UX segmentation problem. Power users say 'query the orders table for customer 12345's last 3 purchases' \u2014 unambiguous tool selection. Casual users say 'what did I buy recently?' \u2014 could be order_history, search_products, or account_summary. Solutions: (1) Add a clarification tool that Claude calls when intent is ambiguous, (2) Use different system prompts per segment ('For vague requests, ask one clarifying question before using tools'), (3) Reduce visible tools for casual users to the 8 most common ones. The model isn't the variable \u2014 the input ambiguity is.",
+    "wrongExplanations": {
+      "0": "The accuracy measurement is based on whether Claude calls the correct tool, not subjective ratings. 60% means Claude picks the wrong tool 40% of the time for casual users.",
+      "1": "Claude doesn't change behavior based on account metadata. It processes the same tools and messages regardless of user segment. The input quality differs, not the model's processing.",
+      "2": "While system prompt guidance and clarification steps help, the core issue is that 20 tools is too many choices for ambiguous inputs. Reducing the visible tool count for casual users directly addresses the selection accuracy problem.",
+      "3": ""
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.4 MCP Server Integration",
+    "difficulty": 2,
+    "question": "What is the role of an MCP server in the overall architecture?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "MCP servers replace the Claude API entirely",
+      "MCP servers act as tool providers that expose capabilities through a standardized protocol, allowing any MCP-compatible client to discover and use them",
+      "MCP servers are required for all Claude API tool use",
+      "MCP servers only work with Claude Desktop, not the API"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Think of MCP servers as specialized microservices for AI tools. A GitHub MCP server provides repo/PR/issue tools. A database MCP server provides query tools. Each server is independent and reusable \u2014 the same GitHub MCP server works with Claude Code, Claude Desktop, or any custom MCP client. The tradeoff vs direct API integration: MCP adds a protocol layer but gives you portability and discoverability. For one-off tools, direct API integration is simpler. For tools you'll reuse across projects or share with a team, MCP is worth the setup cost.",
+    "wrongExplanations": {
+      "0": "MCP servers complement the Claude API, they don't replace it. Claude still processes messages and reasons through the API \u2014 MCP just provides additional tools Claude can use.",
+      "1": "",
+      "2": "MCP is entirely optional. You can define tools directly in your API calls without any MCP server. MCP adds standardization and discoverability but isn't required.",
+      "3": "MCP works with Claude Code, Claude Desktop, and any application that implements the MCP client protocol. It's not limited to any single client."
+    }
+  },
+  {
+    "category": "Tool Design & MCP",
+    "subtopic": "2.5 Built-in Tools",
+    "difficulty": 3,
+    "question": "What's the problem with this approach to parallel tool usage?",
+    "explanation": "A developer asks Claude Code to 'check if the API server is running and also look at the recent error logs.' Claude makes two parallel Bash calls: Bash('curl localhost:3000/health') and Bash('tail -100 /var/log/api/error.log'). The health check fails with 'connection refused' but the log read succeeds. The developer is surprised that Claude doesn't use the Read tool for the log file.",
+    "photoUrl": null,
+    "options": [
+      "Claude shouldn't make parallel tool calls",
+      "Both operations should use the Read tool",
+      "The log file should use the Read tool (better UX than tail via Bash), while the health check correctly uses Bash since curl isn't available as a built-in tool \u2014 the parallel execution itself is fine",
+      "The health check should use the WebFetch tool instead of Bash curl"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "Claude Code has a WebFetch built-in tool for HTTP requests, which should be preferred over Bash curl. For the log file, Read provides line numbers and pagination that 'tail' via Bash doesn't. The parallel execution pattern is actually good \u2014 these are independent operations that can run simultaneously. The issue is tool selection within each parallel call. Best approach: parallel Read('/var/log/api/error.log', limit=100) + WebFetch('http://localhost:3000/health'). Each uses the purpose-built tool for its operation type.",
+    "wrongExplanations": {
+      "0": "Parallel tool calls are explicitly encouraged in Claude Code when operations are independent. Running a health check and reading logs are independent operations that benefit from parallelism.",
+      "1": "The Read tool is for reading files from the filesystem. A health check is an HTTP request, not a file read. Read is correct for the log file but not for the health check endpoint.",
+      "2": "While Read is correct for the log file, this answer misses that Bash curl should also be replaced \u2014 Claude Code has WebFetch as a built-in tool for HTTP requests, which provides a better experience than raw curl commands.",
+      "3": ""
+    }
+  }
+]

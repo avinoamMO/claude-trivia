@@ -1,0 +1,1718 @@
+[
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.1 Context Preservation",
+    "difficulty": 1,
+    "question": "What happens to older messages in a long Claude Code conversation?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "They are automatically compressed to save context window space",
+      "They are permanently deleted after 50 messages",
+      "They are stored in a database and retrieved on demand",
+      "They remain fully intact with no changes"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "Claude Code uses automatic compression for older messages to fit within the context window. This is why critical instructions should be stored in CLAUDE.md or written to files \u2014 they persist regardless of compression. The compression is lossy: details get summarized, exact code snippets may be lost.",
+    "wrongExplanations": {
+      "0": "",
+      "1": "Messages aren't hard-deleted at a fixed count. Compression is gradual and lossy, not a sharp cutoff.",
+      "2": "There's no external database retrieval system. Everything lives in the context window or in files on disk.",
+      "3": "Context windows have finite capacity. Without compression, long conversations would simply fail when the window fills up."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.1 Context Preservation",
+    "difficulty": 1,
+    "question": "What is the primary purpose of CLAUDE.md in the context of preserving information?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "It serves as a changelog for the project",
+      "It stores API keys and environment variables",
+      "It configures which Claude model to use",
+      "It provides persistent instructions that survive context compression"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "CLAUDE.md is loaded at the start of every conversation and remains pinned in context. Think of it as a map, not an encyclopedia \u2014 keep it focused with pointers to deeper sources. If everything is marked 'important,' nothing is. Progressive disclosure: start with a stable entry point, teach Claude where to look next.",
+    "wrongExplanations": {
+      "0": "Changelogs track version history. CLAUDE.md is for active instructions and conventions, not historical records.",
+      "1": "Storing secrets in CLAUDE.md would be a security risk since it's typically version-controlled. Use .env files for secrets.",
+      "2": "Model selection is handled by the CLI configuration, not by CLAUDE.md content.",
+      "3": ""
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.1 Context Preservation",
+    "difficulty": 1,
+    "question": "What is a 'context window' in the context of Claude Code?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "A UI panel showing conversation history",
+      "The maximum amount of text Claude can process in a single conversation",
+      "A browser window where Claude renders code previews",
+      "The number of files Claude can have open simultaneously"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "The context window is measured in tokens (roughly 4 characters per token). Opus has a 200K token window. Every message, file read, and tool output consumes tokens. When the window fills up, older content gets compressed. This is why writing key findings to files every 2 actions is critical \u2014 files on disk never get compressed away.",
+    "wrongExplanations": {
+      "0": "The context window isn't a visual element \u2014 it's the model's working memory capacity for the entire conversation.",
+      "1": "",
+      "2": "There's no browser-based preview window. The context window is an internal capacity limit on conversation length.",
+      "3": "File access isn't limited by a fixed count. The constraint is on total tokens across all conversation content."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.1 Context Preservation",
+    "difficulty": 2,
+    "question": "A developer is doing extensive web research during a Claude Code session. After 6 browser searches and 3 image analyses, the findings from the first searches seem lost. What practice would have prevented this?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Using a faster internet connection to reduce latency",
+      "Writing key findings to a file after every 2 browser or search operations",
+      "Repeating each search query three times for redundancy",
+      "Switching to a model with a larger context window"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "This is the '2-Action Rule': after every 2 browser/search/image operations, immediately save key findings to a file. Visual and multimodal content doesn't persist well in context. The pattern is: Search, Search, Write findings, Continue. This comes from real production experience where agents lost critical research mid-session.",
+    "wrongExplanations": {
+      "0": "Network speed doesn't affect context retention. The issue is that older search results get compressed out of the context window.",
+      "1": "",
+      "2": "Repeating searches wastes tokens and makes the problem worse \u2014 you're filling the context window faster with duplicate content.",
+      "3": "Even larger context windows eventually fill up during research-heavy sessions. The file-based approach works regardless of window size."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.1 Context Preservation",
+    "difficulty": 2,
+    "question": "When resuming work on a project after a break, what should Claude Code do before proceeding?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Immediately start coding from the last known file",
+      "Delete all cached files and start from scratch",
+      "Run the 5-Question Reboot Test to verify orientation",
+      "Ask the user to re-explain the entire project"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "The 5 questions are: Where am I? (current phase/task), Where am I going? (remaining work), What's the goal? (end state), What have I learned? (key findings), What have I done? (progress). If any answer is unclear, re-read task files before proceeding. Combined with a session handoff template in MEMORY.md, this reduces ramp-up from minutes to seconds.",
+    "wrongExplanations": {
+      "0": "Jumping straight into code without orientation is how you introduce bugs in the wrong file or redo work that's already complete.",
+      "1": "Deleting cached files destroys the session handoff context that was specifically preserved for continuity.",
+      "2": "",
+      "3": "Asking the user to re-explain everything is wasteful if proper session handoff notes were written. The agent should self-orient first."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.1 Context Preservation",
+    "difficulty": 2,
+    "question": "What is the recommended approach for CLAUDE.md content density?",
+    "explanation": "A tech lead has been adding every lesson learned, every coding convention, and every architectural decision directly into CLAUDE.md. The file is now 2,000 lines long and Claude seems to be ignoring parts of it.",
+    "photoUrl": null,
+    "options": [
+      "Use CLAUDE.md as a comprehensive encyclopedia of all project knowledge",
+      "Keep CLAUDE.md minimal \u2014 only the most critical 10 rules",
+      "Use CLAUDE.md as a map with pointers to deeper sources of truth",
+      "Split CLAUDE.md into one file per developer on the team"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "CLAUDE.md should be a table of contents, not an encyclopedia. A giant instruction file crowds out the actual task, code, and relevant docs. Use progressive disclosure: agents start with a small stable entry point and are taught where to look next (lessons files, task plans, design docs). When everything is 'important,' nothing is.",
+    "wrongExplanations": {
+      "0": "An encyclopedia-sized CLAUDE.md actually degrades performance \u2014 it consumes precious context tokens and important instructions get lost in the noise.",
+      "1": "Being minimal is better than being bloated, but the key insight is structure: CLAUDE.md should point to where detailed knowledge lives, not just be short.",
+      "2": "",
+      "3": "Per-developer files don't solve the density problem. The issue is organizational structure, not audience segmentation."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.1 Context Preservation",
+    "difficulty": 3,
+    "question": "A developer notices that Claude Code consistently forgets a custom linting rule mid-session despite it being documented. The rule is in CLAUDE.md but in a section 800 lines down. What's the anti-pattern?",
+    "explanation": "The team has a rule that all database queries must use parameterized statements. This is documented in CLAUDE.md under a 'Security' heading that appears after 50 other sections. Claude keeps generating raw SQL string concatenation.",
+    "photoUrl": null,
+    "options": [
+      "The rule should be enforced mechanically via a linter, not just documented in prose",
+      "CLAUDE.md should be encrypted so Claude pays more attention to it",
+      "The rule should be repeated every 10 lines in CLAUDE.md",
+      "Claude Code doesn't support custom linting rules"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "This reflects the 'golden principles = mechanical enforcement' rule from the Harness methodology. Prose rots \u2014 rules compound. When something keeps going wrong, don't just document it, make the wrong thing fail a check. A SQL injection linter rule that fails CI catches every violation automatically, while a CLAUDE.md instruction buried in line 800 gets compressed away in long sessions.",
+    "wrongExplanations": {
+      "0": "",
+      "1": "Encryption has nothing to do with attention or context retention. The problem is structural \u2014 important rules buried deep get less attention.",
+      "2": "Repetition wastes tokens and makes the bloat problem worse. The solution is to either elevate the rule to the top or enforce it mechanically.",
+      "3": "Claude Code absolutely supports working with linting rules. The recommendation is to encode preferences as linter configs, structural tests, or CI checks."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.1 Context Preservation",
+    "difficulty": 3,
+    "question": "A session handoff note says 'Working on the auth feature, almost done.' The next session picks up and introduces a bug. What's wrong with this handoff?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "The handoff should have been written in a different file format",
+      "Handoff notes should be encrypted for security",
+      "The handoff lacks specifics: files modified, next steps, key decisions, and blockers",
+      "Session handoffs are unreliable and should never be used"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "A proper session handoff template includes: Project name and path, Status (what's done, % complete), Current task, Files modified this session, Next 3 concrete steps, Key decisions made, and Blockers. 'Almost done' tells the next session nothing actionable. Good handoffs reduce ramp-up from minutes of re-reading to seconds of scanning.",
+    "wrongExplanations": {
+      "0": "File format is irrelevant \u2014 Markdown, plain text, or JSON all work. The problem is insufficient content, not wrong format.",
+      "1": "Encryption serves no purpose here. The issue is that the note lacks the concrete details needed for continuity.",
+      "2": "",
+      "3": "Session handoffs are one of the most effective practices for multi-session work. The problem was the quality of this specific handoff, not the practice itself."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.1 Context Preservation",
+    "difficulty": 4,
+    "question": "A multi-agent pipeline consistently produces incorrect results on step 3, but only when the total conversation exceeds ~150K tokens. Steps 1-2 work perfectly in isolation. What is the most likely root cause?",
+    "explanation": "An enterprise team built a 5-step data processing pipeline using Claude Code agents. In testing with small datasets, everything works. In production with large datasets, step 3 starts hallucinating field names that don't exist in the schema.",
+    "photoUrl": null,
+    "options": [
+      "The model has a bug that triggers at exactly 150K tokens",
+      "The dataset is too large for Claude to process",
+      "Step 3's critical schema information from earlier in the conversation is being compressed away",
+      "Network latency is causing data corruption at high token counts"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "This is a classic context compression casualty. As conversations grow, the automatic compression algorithm summarizes older content, and specific details like exact field names get lost. The fix is to write critical schema information to a file that step 3 reads directly, rather than relying on it surviving in conversation context. Each agent in a pipeline should have its critical inputs passed explicitly, not assumed from conversation history.",
+    "wrongExplanations": {
+      "0": "There's no token-count-specific bug. The behavior is caused by gradual compression of older context as the window fills up \u2014 it's a design characteristic, not a bug.",
+      "1": "Dataset size affects processing time but not field name accuracy. The agent is hallucinating names because it lost the schema from context, not because the data is too big.",
+      "2": "",
+      "3": "Network issues would cause connection failures, not schema hallucination. The model generates field names from context, and corrupted context leads to invented names."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.1 Context Preservation",
+    "difficulty": 5,
+    "question": "You're architecting a system where Claude Code agents perform 8-hour continuous analysis jobs. Each job involves reading ~500 files and producing a final report. How would you design context preservation?",
+    "explanation": "A compliance team needs Claude Code to audit an entire codebase for security vulnerabilities, reading every file, tracking findings, and producing a comprehensive report. The task far exceeds any single context window.",
+    "photoUrl": null,
+    "options": [
+      "Use a single long conversation and rely on automatic compression to handle it",
+      "Break into phases with file-based state: each phase reads the previous phase's output file, writes its own findings to disk, and a final agent synthesizes all files",
+      "Run 500 parallel agents, one per file, with no coordination",
+      "Increase the context window size via API configuration to 10 million tokens"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "File-based state is the only reliable bridge across context boundaries. Each phase writes structured findings (JSON or Markdown) to disk. The next phase reads those files fresh \u2014 no compression, no loss. The final synthesis agent reads all phase outputs. This pattern mirrors how the 2-Action Rule works at scale: never trust conversation context for anything you can't afford to lose.",
+    "wrongExplanations": {
+      "0": "A single conversation analyzing 500 files would catastrophically compress early findings. By file 100, the first 50 files' details would be summarized beyond usefulness.",
+      "1": "",
+      "2": "500 uncoordinated agents would produce redundant findings, miss cross-file patterns, and create an impossible-to-merge output. Coordination is essential for audit work.",
+      "3": "Context window sizes are model-level constraints, not configurable per-API-call. Even if they were, 10M tokens would still face compression issues with 500 files."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.2 Escalation & Ambiguity",
+    "difficulty": 1,
+    "question": "What is the recommended response when Claude Code encounters something unclear in the codebase?",
+    "explanation": "While investigating a bug, Claude Code finds a function with an ambiguous name and no documentation. It's not sure whether the function validates input or transforms it.",
+    "photoUrl": null,
+    "options": [
+      "Guess based on the function name and proceed",
+      "Say 'It probably validates input' and continue",
+      "Say 'Unclear; need to inspect the function body and its callers'",
+      "Skip the function entirely and work around it"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "This is the Uncertainty Protocol: never guess. When unclear, state what needs to be inspected rather than making probabilistic claims. 'Unclear; need to inspect X' is always better than 'It probably does Y.' False confidence in AI agents can cascade into real bugs that are hard to trace because the original assumption was stated as fact.",
+    "wrongExplanations": {
+      "0": "Function names can be misleading, especially in legacy code. Guessing based on names leads to false confidence and downstream bugs.",
+      "1": "The word 'probably' is a red flag in the uncertainty protocol. Hedged guesses are still guesses \u2014 they create false confidence with plausible deniability.",
+      "2": "",
+      "3": "Working around unclear code creates technical debt and may miss the actual root cause of the bug being investigated."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.2 Escalation & Ambiguity",
+    "difficulty": 1,
+    "question": "What is the difference between low-risk and high-risk ambiguity in Claude Code workflows?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Low-risk: make a reasonable assumption and flag it. High-risk: stop and ask before proceeding.",
+      "Low-risk: ignore it. High-risk: guess and hope for the best.",
+      "There is no distinction \u2014 always stop and ask the user.",
+      "Low-risk: ask the user. High-risk: make the call yourself to save time."
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "The key is calibrating the cost of being wrong. Choosing between equivalent CSS names? Low-risk \u2014 pick one, note it, move on. Deleting a database column? High-risk \u2014 getting that wrong could cause data loss or break production. The framework saves the user from constant interruptions on trivial choices while protecting them from silent catastrophic decisions.",
+    "wrongExplanations": {
+      "0": "",
+      "1": "Ignoring ambiguity at any level is dangerous. Even low-risk assumptions should be flagged so the user can course-correct if needed.",
+      "2": "Always stopping wastes the user's time on trivial decisions and creates 'question fatigue' where they start rubber-stamping everything \u2014 including high-risk choices.",
+      "3": "This is backwards. High-risk decisions should never be made autonomously. The cost of false confidence on a destructive action far exceeds the time saved."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.2 Escalation & Ambiguity",
+    "difficulty": 1,
+    "question": "Why is 'It probably does Y' considered a bad response pattern for Claude Code?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Because 'probably' is grammatically incorrect in technical writing",
+      "Because hedged guesses create false confidence \u2014 the user may act on an unverified assumption",
+      "Because Claude Code should never express any opinion about code",
+      "Because the word 'probably' triggers a security filter"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "The danger of 'probably' is that it sounds informed while being uninformed. A user reading 'probably handles authentication' might skip verifying it themselves, trusting Claude's assessment. If Claude instead said 'Unclear \u2014 need to trace the auth flow through this function,' the user knows verification is needed. Correct guesses reinforce bad habits; the next guess might be catastrophically wrong.",
+    "wrongExplanations": {
+      "0": "Grammar isn't the issue. 'Probably' is fine in casual language. The problem is epistemic \u2014 it conveys confidence that isn't backed by analysis.",
+      "1": "",
+      "2": "Claude Code should absolutely provide analysis and opinions about code \u2014 but should clearly distinguish verified facts from unverified assumptions.",
+      "3": "There's no security filter for specific words. The rule against 'probably' is a workflow best practice, not a technical constraint."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.2 Escalation & Ambiguity",
+    "difficulty": 2,
+    "question": "A user asks Claude Code to 'clean up the auth module.' Claude isn't sure if this means refactoring for readability, fixing bugs, or removing deprecated code. What should Claude do?",
+    "explanation": "The request came in a Trello card with no additional details. The auth module has known bugs, legacy OAuth1 code that's been replaced by OAuth2, and inconsistent variable naming throughout.",
+    "photoUrl": null,
+    "options": [
+      "Do all three \u2014 refactor, fix bugs, and remove deprecated code",
+      "Pick the most impactful interpretation and proceed without asking",
+      "Ask 2-3 clarifying questions about scope before starting any work",
+      "Refuse to work on ambiguous requests entirely"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "The Plan phase specifically calls for asking at least 2-3 clarifying questions even if the task seems clear. For an ambiguous request like 'clean up,' the questions might be: 'Does clean up mean readability refactoring, bug fixes, or removing the OAuth1 legacy code? Should I preserve backward compatibility? What's the testing expectation?' This takes 30 seconds and can save hours of rework.",
+    "wrongExplanations": {
+      "0": "Doing everything is scope creep. 'Clean up' could mean any one of these, and doing all three without approval could introduce bugs, break integrations, or exceed the time budget.",
+      "1": "This violates the ambiguity protocol. 'Clean up' is high-risk ambiguity because each interpretation has different consequences \u2014 the user must choose.",
+      "2": "",
+      "3": "Refusing to work is an overreaction. The right response is to seek clarification, not to block entirely. Some ambiguity can be resolved with a quick question."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.2 Escalation & Ambiguity",
+    "difficulty": 2,
+    "question": "What is the cost tradeoff that the escalation protocol tries to balance?",
+    "explanation": "A product manager complains that Claude Code asks too many questions. A developer on the same team complains that Claude Code made an incorrect assumption that broke their deploy. The team lead needs to calibrate the escalation threshold.",
+    "photoUrl": null,
+    "options": [
+      "Speed vs. accuracy \u2014 faster responses are always less accurate",
+      "The cost of false confidence vs. the cost of over-asking",
+      "Token usage vs. response quality \u2014 fewer tokens means worse answers",
+      "User satisfaction vs. model capability \u2014 users want more than Claude can do"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "False confidence costs are usually higher than over-asking costs: a wrong assumption that reaches production can cost hours of debugging, while a clarifying question costs 30 seconds. But over-asking has real costs too \u2014 question fatigue leads users to rubber-stamp responses, defeating the purpose. The sweet spot: escalate on anything destructive or irreversible, assume on anything trivially reversible.",
+    "wrongExplanations": {
+      "0": "Speed and accuracy aren't inherently opposed. Asking one good clarifying question is both fast and accuracy-improving. The tradeoff is about when to ask vs. when to decide.",
+      "1": "",
+      "2": "Token usage is a resource concern but isn't the core tradeoff in escalation decisions. The issue is about decision quality, not computational cost.",
+      "3": "This frames it as a capability gap, but the real issue is decision-making authority \u2014 when should the agent decide vs. when should the human decide?"
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.2 Escalation & Ambiguity",
+    "difficulty": 2,
+    "question": "A user says 'remove the old dashboard.' Claude Code finds that the old dashboard component is imported in 12 files and referenced in 3 database tables. What should Claude do?",
+    "explanation": "The team is migrating from a legacy dashboard to a new one. The user's instruction seems straightforward, but the old dashboard has deep tentacles throughout the codebase.",
+    "photoUrl": null,
+    "options": [
+      "Silently keep the component but hide it with CSS display:none",
+      "Delete only the main component file and leave the 12 imports broken",
+      "Map all dependencies and ask the user how to handle the DB references before proceeding",
+      "Delete everything including the database tables without asking"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "This follows the 'delete means delete' rule WITH the escalation protocol. When full removal has consequences like DB references or breaking old data, ASK the user before deciding to keep anything. Never downgrade a deletion to a hide \u2014 that's making a product decision without permission. But also never blindly delete database tables without confirming the user understands the data loss implications.",
+    "wrongExplanations": {
+      "0": "This is the exact anti-pattern the 'delete means delete' rule prohibits. Silently converting a deletion to a hide is making a product decision without permission. Mediocrity accumulates through kept stubs.",
+      "1": "Leaving broken imports is worse than doing nothing. A partial deletion that breaks the build without resolving dependencies is actively harmful.",
+      "2": "",
+      "3": "Deleting database tables without confirmation risks irreversible data loss. This is high-risk ambiguity that requires explicit user approval."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.2 Escalation & Ambiguity",
+    "difficulty": 3,
+    "question": "A developer notices Claude Code escalating on trivial naming choices ('Should I call this variable userList or users?') but silently choosing a database indexing strategy without asking. What calibration error is this?",
+    "explanation": "Over the past week, the developer has been interrupted 15 times for cosmetic decisions but discovered that Claude independently chose a non-optimal database index that caused query timeouts in production.",
+    "photoUrl": null,
+    "options": [
+      "Claude is correctly following the protocol \u2014 naming matters more than indexing",
+      "The risk assessment is inverted \u2014 high-risk decisions are being made silently while low-risk ones generate escalations",
+      "Claude needs more context about databases to know indexing is important",
+      "The developer should disable all escalation to avoid interruptions"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "This is a calibration failure in the low-risk vs. high-risk classification. Variable naming is trivially reversible (low-risk: assume and flag). Database indexing affects production performance and is costly to change (high-risk: stop and ask). The fix is to add explicit examples in CLAUDE.md: 'Naming, formatting, import ordering = low-risk. Database schema, API contracts, auth logic = high-risk, always ask.'",
+    "wrongExplanations": {
+      "0": "No reasonable protocol would prioritize variable naming over database architecture. This is a miscalibration that needs correction.",
+      "1": "",
+      "2": "Claude has sufficient knowledge about databases. The issue isn't knowledge \u2014 it's the decision framework for when to escalate. The agent needs clearer risk classification rules.",
+      "3": "Disabling escalation entirely would mean Claude silently makes ALL decisions, including destructive ones. The fix is better calibration, not removal of the safety mechanism."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.2 Escalation & Ambiguity",
+    "difficulty": 4,
+    "question": "After enabling Claude Code for a team of 8, you notice that developers are rubber-stamping Claude's escalation questions without reading them. One such rubber-stamp led to a production outage. What systemic fix addresses this?",
+    "explanation": "The team adopted Claude Code enthusiastically, but the volume of escalation questions \u2014 averaging 12 per developer per day \u2014 has led to 'approval fatigue.' Developers auto-approve without engaging, which undermines the entire safety mechanism.",
+    "photoUrl": null,
+    "options": [
+      "Reduce escalation frequency by raising the risk threshold, and encode critical checks as automated tests/linters that fail CI rather than relying on human review",
+      "Remove all escalation questions so developers aren't bothered",
+      "Add a CAPTCHA before each approval to force developers to pay attention",
+      "Require two developers to approve each escalation question"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "This is the golden principles = mechanical enforcement insight. When humans are the last line of defense and they're fatigued, the defense fails. The solution is twofold: (1) escalate less often by handling more low-risk decisions autonomously, and (2) move critical checks to CI/linters where they can't be rubber-stamped. A SQL injection linter catches every violation; a human reviewer who's seen 12 questions today might miss it.",
+    "wrongExplanations": {
+      "0": "",
+      "1": "Removing escalation entirely eliminates the safety net. The issue is frequency and fatigue, not the existence of the mechanism.",
+      "2": "CAPTCHAs add friction without improving decision quality. A fatigued developer will still click through without genuinely evaluating the question.",
+      "3": "Double-approval doubles the interruption cost across the team and doesn't solve the root cause \u2014 too many low-risk questions reaching humans in the first place."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.2 Escalation & Ambiguity",
+    "difficulty": 5,
+    "question": "Design an escalation framework for a Claude Code deployment where agents perform autonomous overnight batch processing with no human available. How do you handle high-risk ambiguity?",
+    "explanation": "A fintech company wants Claude Code agents to process overnight reconciliation jobs. The agents encounter ambiguous transaction categories, missing counterparty data, and occasional schema mismatches. No human is available between 11 PM and 7 AM.",
+    "photoUrl": null,
+    "options": [
+      "Disable high-risk operations during overnight runs and queue them for morning human review, while allowing low-risk assumptions to proceed with full audit logging",
+      "Allow agents full autonomy overnight since the work needs to get done on time",
+      "Have agents email the on-call engineer for every ambiguous case at 3 AM",
+      "Only run the batch during business hours when humans are available"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "The pattern is: stratify decisions by risk level, automate what's safe, and queue what isn't. Low-risk ambiguity (e.g., formatting choices) proceeds with assumptions logged to an audit trail. High-risk ambiguity (e.g., ambiguous transaction categorization affecting financial reporting) gets queued in a 'needs human review' table. The morning team processes the queue. This preserves throughput on ~85% of cases while protecting against the catastrophic 15%.",
+    "wrongExplanations": {
+      "0": "",
+      "1": "Full autonomy on financial data is a compliance nightmare. One misclassified transaction could trigger regulatory issues. The cost of false confidence in fintech is measured in fines and audits.",
+      "2": "Waking on-call engineers for routine ambiguity is unsustainable and will lead to the same rubber-stamping problem \u2014 except now with sleep-deprived reviewers making worse decisions.",
+      "3": "This defeats the purpose of automation. The batch exists because it needs to run overnight. The solution should handle autonomy gracefully, not eliminate it."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.3 Error Propagation",
+    "difficulty": 1,
+    "question": "What is a 'silent failure' in the context of multi-agent systems?",
+    "explanation": "A QA engineer is reviewing a pipeline where three Claude Code agents work sequentially: one extracts data, one transforms it, and one loads it into a database. The final data in the database is wrong, but no errors were logged anywhere.",
+    "photoUrl": null,
+    "options": [
+      "A failure that makes no sound on the computer's speakers",
+      "A failure in a function that has no return statement",
+      "A failure that only affects silent/muted users",
+      "A failure that produces no error message but returns incorrect results"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "Silent failures are the most dangerous type in agent pipelines because they're invisible. The data looks plausible but is wrong. For example, an extraction agent that returns an empty array instead of throwing 'no data found' \u2014 downstream agents happily process the empty array and produce a valid-looking but completely wrong report. Loud failures (crashes, error messages) are actually preferable because they're immediately detectable.",
+    "wrongExplanations": {
+      "0": "The term 'silent' refers to the absence of error signals, not audio. It's about failures that don't announce themselves through logs, exceptions, or error codes.",
+      "1": "A missing return statement is a code bug, but 'silent failure' is a broader concept about errors that produce no visible indication of having gone wrong.",
+      "2": "'Silent' has no relation to user audio settings. It describes failures that pass unnoticed through a system without triggering any alerts or error handling.",
+      "3": ""
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.3 Error Propagation",
+    "difficulty": 1,
+    "question": "Why are 'loud failures' generally preferred over 'silent failures' in agent pipelines?",
+    "explanation": "A startup CTO is deciding between two error handling approaches: one where agents crash immediately on unexpected input, and one where agents try to continue with default values when something goes wrong.",
+    "photoUrl": null,
+    "options": [
+      "Loud failures are immediately detectable and stop bad data from propagating further",
+      "Loud failures are faster to execute",
+      "Loud failures use less memory",
+      "Loud failures are required by all programming languages"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "In multi-agent systems, the cost of detecting an error increases exponentially with the number of steps between where it occurred and where it's noticed. A loud failure at step 1 costs minutes to fix. A silent failure at step 1 that's discovered at step 5 requires debugging the entire pipeline backward. 'Fail fast, fail loud' is especially critical in agent pipelines where each step's output becomes the next step's input.",
+    "wrongExplanations": {
+      "0": "",
+      "1": "Loud failures actually stop execution, which is slower than continuing. The benefit isn't speed \u2014 it's preventing bad data from spreading.",
+      "2": "Memory usage isn't related to failure loudness. Error logging uses negligible memory compared to the actual data processing.",
+      "3": "No programming language mandates a specific failure style. Loud vs. silent failure is a design choice made by the developer."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.3 Error Propagation",
+    "difficulty": 1,
+    "question": "What is the 'half-migrated pipeline' anti-pattern?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "A pipeline that only processes half the data",
+      "A database migration that only updates half the rows",
+      "A pipeline that runs at 50% speed",
+      "A state where one part of a system is removed but its replacement isn't fully implemented, causing silent failures"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "This anti-pattern comes from a real production incident: a client-side fetch-og-metadata call was removed from bulk-add because 'all business logic belongs on the backend.' But the server-side equivalent was never wired up. Result: article_text was permanently null, client inference was permanently broken, and no error was thrown because null is a valid value. The test: if you delete a client call, ask 'What server-side mechanism now does this job?' If the answer is 'nothing yet,' don't delete it yet.",
+    "wrongExplanations": {
+      "0": "It's not about data volume. The 'half' refers to the migration state \u2014 old code removed, new code not yet working \u2014 not about processing capacity.",
+      "1": "Database row counts aren't involved. The anti-pattern is about architectural transitions where the old approach is deleted before the new approach is operational.",
+      "2": "Pipeline speed isn't relevant. The anti-pattern is about incomplete transitions where removing old code without implementing the replacement creates a functionality gap.",
+      "3": ""
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.3 Error Propagation",
+    "difficulty": 2,
+    "question": "In a 3-agent pipeline (Extract \u2192 Transform \u2192 Load), Agent 1 returns an empty array instead of raising an error when no data is found. What happens downstream?",
+    "explanation": "The pipeline is designed to fetch news articles, analyze sentiment, and store results. On a holiday when no articles were published, Agent 1 returned [] instead of an error. The pipeline completed 'successfully.'",
+    "photoUrl": null,
+    "options": [
+      "Agent 2 and 3 will crash because they can't handle empty arrays",
+      "Agent 2 will detect the empty array and escalate to a human",
+      "The pipeline will automatically retry until data is found",
+      "Agent 2 transforms nothing, Agent 3 loads nothing, and the pipeline reports success \u2014 masking the fact that no data was processed"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "This is a textbook silent failure cascade. Each agent does its job 'correctly' on the empty input: Transform([]) = [], Load([]) = success. The pipeline reports completion with zero errors. Meanwhile, the dashboard shows no data for the day, and someone might not notice for hours or days. The fix: Agent 1 should distinguish 'no data found' (an informational state that needs handling) from 'successfully returned empty results' by using structured error responses.",
+    "wrongExplanations": {
+      "0": "Most well-written agents handle empty arrays gracefully \u2014 that's the problem. They process nothing without complaint, hiding the fact that something unexpected happened.",
+      "1": "Unless specifically programmed to check for empty inputs, agents won't escalate. They treat an empty array as valid input and process it normally.",
+      "2": "Automatic retry isn't built into generic pipelines. And even if it were, retrying on 'no articles published' would loop forever \u2014 the correct response is to flag the empty state, not retry.",
+      "3": ""
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.3 Error Propagation",
+    "difficulty": 2,
+    "question": "What is a 'structured error response' and why is it important in agent pipelines?",
+    "explanation": "A team is building a multi-agent system where different agents are written by different developers. They need a consistent way for agents to communicate errors to each other.",
+    "photoUrl": null,
+    "options": [
+      "A standardized format (like {status, data, error, metadata}) that agents use to communicate success, failure, and partial results",
+      "An error message written in proper English grammar",
+      "A response that includes the full stack trace of every function called",
+      "A response that automatically fixes the error before returning"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "Structured error responses turn error handling from guesswork into protocol. When every agent returns {status: 'error'|'success'|'partial', data: ..., error: {code, message, context}, metadata: {timestamp, agent, duration}}, downstream agents can make informed decisions. Partial results are especially important \u2014 an agent that found 8 of 10 items should return what it found with a note about what's missing, not throw away all 8.",
+    "wrongExplanations": {
+      "0": "",
+      "1": "Grammar quality doesn't help machines parse errors. Structured responses need machine-readable formats with consistent fields, not well-written prose.",
+      "2": "Full stack traces are verbose and agent-internal. Downstream agents need to know WHAT went wrong (structured code/message), not the implementation details of HOW the code ran.",
+      "3": "Self-healing responses sound ideal but aren't feasible for most errors. The point of structured responses is to communicate failure clearly, not to hide it behind auto-fixes."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.3 Error Propagation",
+    "difficulty": 2,
+    "question": "How does one agent's incorrect assumption become another agent's input in a pipeline?",
+    "explanation": "Agent A is tasked with determining the currency of a transaction. It encounters an ambiguous field and assumes USD. Agent B uses that currency to calculate exchange rates. Agent C generates a financial report based on those rates.",
+    "photoUrl": null,
+    "options": [
+      "Each agent independently verifies the currency, so assumptions can't propagate",
+      "Agent A's assumption becomes a stated fact in its output, which Agent B and C treat as ground truth \u2014 the uncertainty is invisible",
+      "Pipeline frameworks automatically flag assumptions with warning labels",
+      "Agents always ask the user before making any assumption"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "This is the assumption-laundering problem. When Agent A outputs {currency: 'USD'}, there's no metadata saying 'this was an assumption, not a verified fact.' Agents B and C treat it as authoritative data. By the time someone reviews the final report, the USD assumption looks like a fact that was verified three times (because three agents used it). The fix: include confidence metadata in structured responses: {currency: 'USD', confidence: 'assumed', reason: 'field was ambiguous'}.",
+    "wrongExplanations": {
+      "0": "Independent verification would require each agent to redo previous agents' work, defeating the purpose of a pipeline. In practice, each agent trusts its input.",
+      "1": "",
+      "2": "No standard pipeline framework automatically detects and labels assumptions. This must be designed explicitly through structured response formats with confidence metadata.",
+      "3": "Having every agent ask the user about every assumption would make pipelines unusable. The solution is confidence metadata, not human-in-the-loop for every data point."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.3 Error Propagation",
+    "difficulty": 3,
+    "question": "A team removed a client-side supabase.functions.invoke() call as part of a backend migration but didn't verify the server-side replacement was wired up. Three weeks later, users report missing data. What defensive practice would have caught this?",
+    "explanation": "The migration plan said 'move fetch-og-metadata from client to server.' The developer deleted the frontend call and wrote the edge function, but forgot to add the trigger that invokes the edge function during the bulk-add flow.",
+    "photoUrl": null,
+    "options": [
+      "Adding more comments to the code explaining the migration plan",
+      "A pre-deletion test: 'If you delete a client-side call, verify: what server-side mechanism now does this job? If nothing yet, don't delete yet.'",
+      "Keeping both the client and server versions running permanently",
+      "Waiting 6 months before removing any client-side code"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "This test comes from a real production incident (the article_text bug). The rule is simple: before removing any invocation, verify its replacement is operational. Specifically: delete the frontend call, then run the flow end-to-end and check that the data still appears. If it doesn't, the server-side replacement isn't wired up. This should be an acceptance criterion in any migration spec: 'After removal, data field X still populates correctly.'",
+    "wrongExplanations": {
+      "0": "Comments don't execute. A comment saying 'server handles this now' doesn't verify that the server actually does. The issue needs a runtime check, not documentation.",
+      "1": "",
+      "2": "Running both creates a dual-write problem and defeats the purpose of migration. The goal is to remove the client-side code, not keep it as a permanent fallback.",
+      "3": "Arbitrary waiting doesn't help if no one checks during that period. The issue isn't timing \u2014 it's the absence of verification at the moment of deletion."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.3 Error Propagation",
+    "difficulty": 3,
+    "question": "An agent pipeline processes 1,000 items. 997 succeed and 3 fail silently (returning null instead of an error). The final report shows '997 items processed' with no mention of the 3 failures. What design flaw enabled this?",
+    "explanation": "The pipeline counts successful items by checking for non-null results. The 3 failures returned null, so they were simply filtered out. No error count, no failure log, no indication that input and output counts don't match.",
+    "photoUrl": null,
+    "options": [
+      "The pipeline lacks input/output count reconciliation and treats null as 'no result' rather than 'failed result'",
+      "The pipeline should have been run with more memory",
+      "Three failures out of 1,000 is an acceptable loss rate that doesn't need reporting",
+      "The pipeline needs a faster network connection to avoid timeouts"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "Count reconciliation is a fundamental defensive pattern: assert that items_in == items_success + items_failed. If 1,000 went in and only 997 came out, 3 are unaccounted for. Additionally, null should never mean 'no problem' \u2014 it should be an explicit error state. In financial systems, a 0.3% silent failure rate could mean millions of dollars in unreconciled transactions. Always count your inputs and outputs.",
+    "wrongExplanations": {
+      "0": "",
+      "1": "Memory allocation doesn't cause individual items to silently return null. The issue is architectural \u2014 the pipeline's error handling treats failure as absence rather than error.",
+      "2": "In many domains (finance, healthcare, compliance), even one unaccounted-for item is unacceptable. The issue isn't the failure rate \u2014 it's the invisibility of the failures.",
+      "3": "Network issues would typically cause timeouts or connection errors, not silent null returns. The null values indicate an application-level error handling design flaw."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.3 Error Propagation",
+    "difficulty": 4,
+    "question": "A multi-agent system has 5 sequential steps. Each step has a 95% chance of producing correct output. What is the approximate probability that the final output is correct, and what does this imply for pipeline design?",
+    "explanation": "The architecture team is evaluating reliability. Each individual agent performs well in isolation, but the product manager is concerned about end-to-end accuracy for a compliance-critical workflow.",
+    "photoUrl": null,
+    "options": [
+      "95% \u2014 each step is independent so the overall rate equals any single step",
+      "~77% \u2014 error probabilities compound multiplicatively (0.95^5), meaning pipelines need verification checkpoints between steps",
+      "100% \u2014 if each step is above 90%, the pipeline is reliable",
+      "~475% \u2014 the probabilities add up across steps"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "0.95^5 = 0.774, so ~77% end-to-end accuracy. This is the error compounding problem in multi-agent systems: individually excellent agents produce collectively mediocre results. The mitigation is verification checkpoints: after every 1-2 steps, validate the output against known invariants before feeding it to the next step. In compliance-critical workflows, you might even run two independent agents per step and compare results (consensus validation).",
+    "wrongExplanations": {
+      "0": "Steps are NOT independent in terms of correctness \u2014 each step's output feeds the next. An error at step 1 corrupts all downstream steps. The probabilities multiply, not remain constant.",
+      "1": "",
+      "2": "There's no threshold above which reliability is guaranteed. Even 99% per-step accuracy produces ~95% over 5 steps \u2014 and that 5% failure rate may be unacceptable for compliance work.",
+      "3": "Probabilities don't add above 100%. They multiply for sequential independent events: P(all correct) = P(step1) * P(step2) * ... * P(step5)."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.3 Error Propagation",
+    "difficulty": 5,
+    "question": "Design an error handling architecture for a 7-agent pipeline processing financial transactions where silent failures could lead to regulatory violations. What key components are needed?",
+    "explanation": "A fintech startup is building an automated reconciliation pipeline. Regulators require full auditability. The pipeline processes thousands of transactions nightly with agents handling: ingestion, normalization, categorization, matching, reconciliation, exception handling, and reporting.",
+    "photoUrl": null,
+    "options": [
+      "Log errors to a text file and review it monthly",
+      "Have a single human reviewer spot-check 1% of transactions",
+      "Run the pipeline twice and use whichever result looks more complete",
+      "Structured error responses at each step, input/output count reconciliation, confidence metadata on every data point, checkpoint validation between steps, and an immutable audit trail of all agent decisions"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "For regulatory compliance: (1) Structured responses so each agent reports {status, data, errors, confidence}. (2) Count reconciliation: items_in == items_out at every step. (3) Confidence metadata: every derived data point carries its provenance and certainty level. (4) Checkpoint validation: after categorization, verify categories are valid enum values before reconciliation begins. (5) Immutable audit trail: every agent decision logged with timestamp, input, output, and reasoning. Regulators don't just want correct results \u2014 they want provable correctness.",
+    "wrongExplanations": {
+      "0": "Monthly review is far too infrequent for daily transaction processing. Regulatory violations compound daily. Text files lack the structure needed for automated monitoring and alerting.",
+      "1": "1% spot-checking might catch 1% of issues. Regulators expect 100% auditability for financial transactions, not statistical sampling of agent decisions.",
+      "2": "Running twice doesn't help if both runs make the same systematic error. And 'looks more complete' is a subjective criterion that wouldn't survive a regulatory audit.",
+      "3": ""
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.4 Codebase Exploration",
+    "difficulty": 1,
+    "question": "What should Claude Code always do before modifying a file?",
+    "explanation": "A developer asks Claude Code to fix a bug in a utility function. Claude knows the file path from the error message but hasn't looked at the file contents yet.",
+    "photoUrl": null,
+    "options": [
+      "Read the file first to understand its current state",
+      "Delete the file and rewrite it from scratch",
+      "Ask the user to paste the file contents into the chat",
+      "Run the test suite and infer the file contents from test output"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "Reading before modifying is so fundamental that Claude Code's Edit tool will actually refuse to work if you haven't read the file first in the conversation. This prevents blind edits based on assumptions about file contents. In practice, files often contain unexpected code, comments, or structure that affects how a change should be made. The principle is: understand before you act.",
+    "wrongExplanations": {
+      "0": "",
+      "1": "Deleting and rewriting loses existing logic, comments, and edge case handling. Most bug fixes are surgical \u2014 they change a few lines, not the entire file.",
+      "2": "Having the user paste file contents wastes their time when Claude Code can read files directly. The tool is designed to be self-service for file access.",
+      "3": "Test output may reveal symptoms but rarely shows the exact code structure needed for a precise fix. Direct file reading is more reliable and efficient."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.4 Codebase Exploration",
+    "difficulty": 1,
+    "question": "What tool should Claude Code use when searching for files by name pattern?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Glob \u2014 match files by name pattern",
+      "Grep \u2014 search file contents for the pattern",
+      "Read \u2014 read every directory listing manually",
+      "Bash find command \u2014 shell-based file search"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "Glob is optimized for file pattern matching (e.g., '**/*.test.ts', 'src/**/*.tsx'). It returns matching file paths sorted by modification time. Grep is for searching file contents, not names. While 'find' works in Bash, Glob provides a better experience with proper permissions handling and consistent output format. The right tool for the right job: Glob for names, Grep for contents.",
+    "wrongExplanations": {
+      "0": "",
+      "1": "Grep searches inside file contents for text patterns. It's the right tool for 'find all files containing the word ERROR' but wrong for 'find all files named *.test.ts.'",
+      "2": "Manually reading directory listings is extremely slow for large codebases and doesn't support recursive pattern matching. Glob does this in one operation.",
+      "3": "While 'find' works, Claude Code's documentation explicitly recommends Glob over Bash find for file searches. Glob is optimized for the task and handles permissions better."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.4 Codebase Exploration",
+    "difficulty": 1,
+    "question": "What is an 'Explore agent' in the context of codebase exploration?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "An agent with full read-write access that explores by trial and error",
+      "A third-party tool for visualizing codebase structure",
+      "A read-only subagent spawned specifically for research and exploration tasks",
+      "An agent that automatically generates documentation"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "Explore agents are spawned with subagent_type: 'Explore' which gives them only read-only tools \u2014 no edit capabilities. This is a safety constraint: research should never accidentally modify code. One focused task per subagent keeps main context clean. The Explore agent reads files, traces data flow, and reports back findings without any risk of unintended changes.",
+    "wrongExplanations": {
+      "0": "Trial-and-error with write access during exploration is dangerous. Research agents should never be able to modify code \u2014 that's the whole point of the read-only constraint.",
+      "1": "While visualization tools exist, an 'Explore agent' in Claude Code is specifically a read-only subagent, not an external tool.",
+      "2": "",
+      "3": "Documentation generation is a write operation. Explore agents are read-only by design \u2014 they report findings to the parent agent, which decides what to do with them."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.4 Codebase Exploration",
+    "difficulty": 2,
+    "question": "A developer gives Claude Code a file path from a Trello card: 'Fix the bug in src/utils/formatter.ts'. Claude should do what before attempting to read the file?",
+    "explanation": "The task was written by a teammate last week. Since then, the codebase has been restructured and several files were moved to different directories.",
+    "photoUrl": null,
+    "options": [
+      "Immediately try to read the file at the exact path given",
+      "Search the git history to find where the file was before the restructure",
+      "Ask the user to confirm every file path before reading",
+      "Use Glob to verify the file path exists before attempting to read it"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "This is one of the highest-frequency errors in real Claude Code sessions: 26 File Not Found errors were logged across 127 analyzed sessions. File paths from task descriptions, team leads, prior context, or external sources are often stale. A quick Glob verification takes milliseconds and prevents wasted cycles. The rule: always Glob to verify paths exist before attempting to Read. Never assume paths are correct.",
+    "wrongExplanations": {
+      "0": "Immediately reading without verification is the #1 source of wasted cycles in Claude Code sessions. Paths from external sources (Trello, Slack, old docs) are frequently outdated.",
+      "1": "Git history might help find the file, but it's overkill as a first step. A simple Glob check ('**/formatter.ts') will find the file wherever it currently lives.",
+      "2": "Asking the user to confirm every path is excessive for low-risk operations. Glob verification is instant and doesn't require human interaction.",
+      "3": ""
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.4 Codebase Exploration",
+    "difficulty": 2,
+    "question": "When investigating a complex function, what exploration strategy does the 'Slow is Fast' principle recommend?",
+    "explanation": "Claude Code is debugging a data processing function that's producing incorrect output. The function is 200 lines long with multiple conditional branches and calls to three other modules.",
+    "photoUrl": null,
+    "options": [
+      "Read the full function, trace data flow across function boundaries, identify dependencies, then form conclusions",
+      "Skim the first 20 lines and make a quick fix based on the function name",
+      "Only read the lines that the error message points to",
+      "Replace the entire function with a simpler implementation"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "Rushed analysis leads to hallucinated bugs later. The 'Slow is Fast' principle for complex code: (1) Read the full function before concluding. (2) Trace data flow across function boundaries. (3) Identify what earlier code depends on this function. (4) Only then form conclusions. A bug in line 150 might be caused by a subtle state mutation in line 30 that you'd miss if you only read the error location.",
+    "wrongExplanations": {
+      "0": "",
+      "1": "Skimming is the source of most misdiagnosed bugs. A 200-line function with conditional branches requires understanding the full flow, not a surface-level read.",
+      "2": "Error messages point to where the symptom appeared, not where the cause is. A null pointer at line 150 might be caused by a missing initialization at line 30.",
+      "3": "Replacing a 200-line function without understanding it risks losing important edge case handling. The fix should be precise, not a blind rewrite."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.4 Codebase Exploration",
+    "difficulty": 2,
+    "question": "What is the difference between Glob and Grep in Claude Code's exploration toolkit?",
+    "explanation": "A new Claude Code user is confused about when to use which search tool. They need to both find React component files and search for where a specific function is called.",
+    "photoUrl": null,
+    "options": [
+      "Glob and Grep do the same thing \u2014 they're interchangeable",
+      "Glob is faster but less accurate; Grep is slower but more accurate",
+      "Glob is for JavaScript files only; Grep is for Python files only",
+      "Glob matches file names/paths by pattern; Grep searches inside file contents for text patterns"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "Think of it this way: Glob answers 'which files exist?' while Grep answers 'which files contain this text?' To find all React components: Glob('**/*.tsx'). To find where getUserProfile is called: Grep('getUserProfile'). They're complementary tools. A common exploration workflow: Glob to find relevant files by name, then Grep to search within those files for specific patterns.",
+    "wrongExplanations": {
+      "0": "They serve completely different purposes. Using Grep to find files by name or Glob to search file contents would either fail or produce wrong results.",
+      "1": "Speed and accuracy aren't the differentiator. They search different things entirely: Glob matches file paths, Grep matches file contents.",
+      "2": "Both tools work with any file type. They're differentiated by what they search (names vs. contents), not by programming language.",
+      "3": ""
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.4 Codebase Exploration",
+    "difficulty": 3,
+    "question": "A developer asks Claude Code to 'add error handling to the payment module.' Claude jumps straight to editing files without exploration. Three of its edits break existing error handling that was already in place. What went wrong?",
+    "explanation": "The payment module already had try-catch blocks, custom error classes, and a retry mechanism. Claude's new error handling overwrote the retry logic and duplicated the custom error classes with slightly different implementations.",
+    "photoUrl": null,
+    "options": [
+      "Claude should have used a different programming language for error handling",
+      "Claude should have asked the user to write the error handling themselves",
+      "The existing error handling was poorly written and deserved to be overwritten",
+      "Claude violated the principle of reading existing code before suggesting modifications \u2014 it didn't understand what was already there"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "The principle of reading existing code before suggesting modifications exists precisely to prevent this scenario. A proper approach: (1) Glob to find all payment module files. (2) Read each file to map existing error handling patterns. (3) Identify gaps \u2014 what errors aren't handled? (4) Only then propose additions that complement, not duplicate, what exists. Understanding before action prevents the destruction of working code.",
+    "wrongExplanations": {
+      "0": "The programming language is irrelevant. The issue is Claude's workflow (skipping exploration), not its technical approach to error handling.",
+      "1": "Asking the user to write code defeats the purpose of using Claude Code. The correct approach is for Claude to explore first, then propose informed modifications.",
+      "2": "Even if the existing code was imperfect, overwriting working logic without understanding it first is reckless. Any refactoring should be informed by reading the current implementation.",
+      "3": ""
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.4 Codebase Exploration",
+    "difficulty": 4,
+    "question": "You're tasked with understanding how authentication works in an unfamiliar 50,000-line codebase. You have no documentation. Design an exploration strategy.",
+    "explanation": "A contractor just joined a project with zero onboarding documentation. The first task is to add OAuth2 support, which requires understanding the existing auth flow before making changes.",
+    "photoUrl": null,
+    "options": [
+      "Read every file in the project sequentially from top to bottom",
+      "Look only at the test files since they describe the expected behavior",
+      "Ask the user to explain the entire auth system before touching any code",
+      "Start broad with Glob for auth-related filenames, Grep for auth-related function calls, trace the login flow from entry point through middleware to database, then narrow to the specific integration points"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "The exploration funnel: (1) Glob('**/*auth*', '**/*login*', '**/*session*') to find relevant files. (2) Grep for key patterns: 'jwt', 'token', 'passport', 'middleware'. (3) Read entry points (routes/auth.js, middleware/auth.js). (4) Trace data flow: route handler \u2192 middleware \u2192 service \u2192 database. (5) Identify integration points where OAuth2 will connect. This systematic narrowing from broad search to specific trace is how you efficiently map a 50K-line codebase without reading all of it.",
+    "wrongExplanations": {
+      "0": "Sequential reading of 50,000 lines is impossibly slow and unfocused. Most lines are irrelevant to auth. The exploration should be targeted, not exhaustive.",
+      "1": "Tests describe expected behavior but often don't show the full flow or integration points. They're one input, not the entire strategy. You need to trace the actual implementation.",
+      "2": "The user hired a contractor to figure things out, not to be an on-demand documentation service. And the user may not remember all the details themselves. Code is the source of truth.",
+      "3": ""
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.4 Codebase Exploration",
+    "difficulty": 4,
+    "question": "Claude Code is debugging a function where a variable has an unexpected value at line 150. The variable is set at line 20, passed through 4 functions, and transformed twice. Where should exploration focus?",
+    "explanation": "The bug report says 'userBalance is negative at the withdrawal check, but the user's account has $500.' The variable originates from a database query, passes through a formatting function, a currency converter, a fee calculator, and finally the withdrawal validator.",
+    "photoUrl": null,
+    "options": [
+      "Only inspect line 150 where the bug manifests",
+      "Trace the variable's data flow backward from line 150 through each transformation to find where the value diverges from expectations",
+      "Add console.log at every line of the codebase",
+      "Rewrite all 4 functions from scratch to eliminate the bug"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "This is the 5 Whys approach applied to data flow: Why is userBalance negative? \u2192 The fee calculator subtracted twice. Why did it subtract twice? \u2192 It received a pre-fee amount and re-applied fees. Why? \u2192 The currency converter already included fees in its conversion. ROOT CAUSE: Fee calculation is applied at two stages. Tracing data flow across function boundaries \u2014 not just looking at the symptom location \u2014 reveals the actual cause.",
+    "wrongExplanations": {
+      "0": "Line 150 shows the symptom (negative balance), not the cause. The bug could originate in any of the 4 upstream functions. Inspecting only the symptom location is like treating a fever without diagnosing the infection.",
+      "1": "",
+      "2": "Adding console.log everywhere is the brute-force approach. It's slow, pollutes the codebase, and still requires reading through thousands of log lines. Targeted tracing is more efficient.",
+      "3": "Rewriting 4 functions to fix a bug in one of them is disproportionate. Understanding the data flow first identifies the single function that needs a surgical fix."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.4 Codebase Exploration",
+    "difficulty": 5,
+    "question": "You need to understand a microservices architecture with 12 services, 30+ shared libraries, and no architecture diagram. How would you orchestrate multiple Explore agents to map the system efficiently?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "One Explore agent reads every file in all 12 services sequentially",
+      "Ask the previous development team to draw an architecture diagram",
+      "Skip exploration and add distributed tracing to each service independently",
+      "Spawn 12 parallel read-only Explore agents, one per service, each mapping: entry points, external API calls, shared library usage, database connections, and message queue subscriptions. A coordinator agent synthesizes their reports into an architecture map."
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "Parallel Explore agents scale linearly: 12 agents exploring 12 services simultaneously is ~12x faster than sequential exploration. Each agent has a focused task: map one service's boundaries (entry points, outbound calls, shared libs, data stores, message queues). The coordinator agent receives 12 structured reports and synthesizes them into a dependency graph. This matches the 'one focused task per subagent' principle. The architecture map then guides the tracing implementation with full knowledge of communication patterns.",
+    "wrongExplanations": {
+      "0": "Sequential reading of 12 services is prohibitively slow and would overflow a single agent's context window. Parallel exploration with focused agents is the scalable approach.",
+      "1": "The previous team may be unavailable, and even if they are, their knowledge is stale. Code is the source of truth. Architecture diagrams should be generated from actual code analysis.",
+      "2": "Adding tracing without understanding dependencies means you'll miss inter-service calls, use wrong instrumentation libraries, and likely break services whose communication patterns you didn't understand.",
+      "3": ""
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.5 Human Review & Confidence",
+    "difficulty": 1,
+    "question": "What is the 'would a staff engineer approve this?' test?",
+    "explanation": "A developer is using Claude Code to implement a new API endpoint. Before marking the task complete, they want to apply a quality gate to ensure the work is production-ready.",
+    "photoUrl": null,
+    "options": [
+      "A test that only staff-level engineers are allowed to run",
+      "A formal process where a staff engineer must sign off on every change",
+      "A mental quality bar: would an experienced engineer approve this code in a review?",
+      "An automated test suite named after a staff engineer"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "This test is a heuristic for self-review quality. A staff engineer would check: error handling, edge cases, security implications, performance characteristics, code clarity, test coverage, and whether the change is minimal and focused. By asking this question before marking work complete, Claude Code and the developer raise the bar from 'it works' to 'it's production-grade.' It's a mindset, not a process.",
+    "wrongExplanations": {
+      "0": "The test isn't restricted by role. It's a mental model that anyone can apply \u2014 it uses the 'staff engineer' as a proxy for high engineering standards.",
+      "1": "The test doesn't require an actual person to sign off. It's a self-assessment heuristic that encourages thinking critically about code quality before declaring something done.",
+      "2": "",
+      "3": "It's not an automated test suite. It's a qualitative question about code quality that you ask yourself as the final verification step."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.5 Human Review & Confidence",
+    "difficulty": 1,
+    "question": "For which types of tasks should Claude Code express higher confidence?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Architectural decisions and system design choices",
+      "Business logic that affects revenue calculations",
+      "Mechanical tasks like formatting, renaming variables, and applying well-defined patterns",
+      "Security-critical authentication flows"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "Mechanical tasks have objectively correct outcomes: rename X to Y, apply consistent formatting, add a missing import. These are deterministic operations where Claude Code is highly reliable. Architectural decisions, business logic, and security flows involve tradeoffs, domain knowledge, and judgment calls where confidence should be lower. The rule of thumb: the more judgment a task requires, the more human review it needs.",
+    "wrongExplanations": {
+      "0": "Architecture involves tradeoffs that depend on business context, team expertise, and future plans \u2014 areas where AI judgment should be verified, not trusted blindly.",
+      "1": "Revenue calculations require domain-specific business rules that may not be fully captured in code. Getting these wrong has direct financial impact, warranting extra review.",
+      "2": "",
+      "3": "Security flows are high-consequence and high-complexity. A subtle auth bug can be catastrophic. These warrant the most thorough human review, not the highest confidence."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.5 Human Review & Confidence",
+    "difficulty": 1,
+    "question": "What is the multi-instance review pattern?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Having multiple Claude Code instances review the same work from different perspectives (spec compliance, security, architecture, etc.)",
+      "Running the same code through different programming languages",
+      "Installing the same software on multiple computers",
+      "Running tests on multiple operating systems simultaneously"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "The multi-instance pattern spawns parallel review agents with different specializations: a Spec Compliance agent checks plan vs. reality, a DevOps agent checks infrastructure, a CTO agent checks architecture and patterns, and a Cyber agent checks security. Each agent reviews the same code through a different lens. Issues caught by specialized reviewers are often invisible to generalist reviews \u2014 a security reviewer spots an SSRF that a code quality reviewer would miss.",
+    "wrongExplanations": {
+      "0": "",
+      "1": "This isn't about programming languages. The pattern uses multiple AI instances with different review perspectives on the same codebase.",
+      "2": "Running software on multiple machines is deployment/testing, not code review. The multi-instance pattern is about parallel AI review from different expert perspectives.",
+      "3": "Cross-platform testing is valuable but different from the multi-instance review pattern, which is about having multiple specialized AI reviewers examine the same code changes."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.5 Human Review & Confidence",
+    "difficulty": 2,
+    "question": "Claude Code completes a task and reports 'all tests pass.' Should the developer trust this as sufficient verification?",
+    "explanation": "Claude Code refactored a payment processing module. It ran the test suite and all 47 tests pass. The developer is about to merge to production.",
+    "photoUrl": null,
+    "options": [
+      "Yes \u2014 passing tests means the code is correct",
+      "Only if the tests were written by a senior engineer",
+      "Only if there are more than 100 tests",
+      "No \u2014 tests verify what they test, not what they don't. The developer should also check for edge cases, review the diff for unintended changes, and verify behavior change matches expectations."
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "The verification protocol has 5 steps, not just 'run tests': (1) Run existing test suite. (2) Demonstrate the behavior change (before/after). (3) Explore edge cases. (4) Diff behavior between main and changes. (5) Apply the 'staff engineer' test. Tests are necessary but not sufficient \u2014 they only check what someone thought to test. A payment refactoring might pass all tests but introduce a subtle rounding error that no test covers.",
+    "wrongExplanations": {
+      "0": "Tests only verify the scenarios they were written for. A refactored function might pass all existing tests but fail on an untested edge case (null input, currency boundary, concurrent access).",
+      "1": "The author's seniority doesn't determine test quality. The question is whether the tests cover the actual scenarios that matter, not who wrote them.",
+      "2": "Test count doesn't determine reliability. 10 well-targeted tests can catch more bugs than 200 shallow ones. Quality and coverage matter more than quantity.",
+      "3": ""
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.5 Human Review & Confidence",
+    "difficulty": 2,
+    "question": "What are the '3 Critical Questions' that must be answered before moving a card from AI Testing to Ready for Human Review?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Does the output match what the user asked for? Would you stake the client's reputation on this output? What's the simplest thing that could go wrong that hasn't been tested?",
+      "Is the code formatted correctly? Does it compile? Are there any TODOs left?",
+      "How many lines of code were changed? How long did it take? Was it under budget?",
+      "Does it work on Chrome? Does it work on Firefox? Does it work on Safari?"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "These questions are deliberately user-centric, not code-centric. Question 1 checks spec compliance from the USER's perspective. Question 2 raises the bar from 'works' to 'would I put my name on this?' \u2014 critical for B2B deliverables. Question 3 forces adversarial thinking about untested scenarios. If any answer is 'no' or 'I don't know,' the card stays in AI Testing. This gate prevents the trap of 'the app works but the output looks amateur.'",
+    "wrongExplanations": {
+      "0": "",
+      "1": "Formatting, compilation, and TODOs are basic hygiene \u2014 they should have been handled already. The 3 Critical Questions are about output quality and real-world readiness, not code mechanics.",
+      "2": "Metrics about lines changed, time, and budget are project management concerns, not quality gates. A feature could be over budget but excellent, or under budget but broken.",
+      "3": "Browser compatibility is a testing concern but too narrow. The 3 Critical Questions are about fundamental output quality \u2014 does the actual deliverable meet the standard you'd stake your reputation on?"
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.5 Human Review & Confidence",
+    "difficulty": 2,
+    "question": "Why should Claude Code flag uncertainty rather than express false confidence?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Because flagging uncertainty makes Claude look more professional",
+      "Because false confidence causes the developer to skip verification, potentially sending a performance issue to production",
+      "Because Claude Code is required to always say 'I'm not sure' regardless of confidence level",
+      "Because uncertainty flags are counted as metrics by the development team"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "The asymmetry of outcomes drives this principle. If Claude flags uncertainty, the developer spends 5 minutes verifying \u2014 a small cost. If Claude expresses false confidence and the developer trusts it, a real performance issue reaches production \u2014 potentially a large cost. 'I suspect this query may have a full table scan issue at L45 \u2014 worth verifying with EXPLAIN ANALYZE' is far more useful than either 'this query is fine' or 'this query has a performance bug.'",
+    "wrongExplanations": {
+      "0": "Professionalism isn't the goal \u2014 preventing production incidents is. Flagging uncertainty is a practical safety mechanism, not a communication style preference.",
+      "1": "",
+      "2": "Claude should NOT always express uncertainty. For mechanical facts (syntax, import paths, function signatures), high confidence is appropriate. The rule applies when Claude genuinely isn't sure.",
+      "3": "There's no metric-tracking system for uncertainty flags. The practice exists purely to help developers make informed decisions about where to invest their review time."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.5 Human Review & Confidence",
+    "difficulty": 3,
+    "question": "A team relies entirely on Claude Code's multi-instance review and has eliminated human code review. What failure mode does this create?",
+    "explanation": "The team's process is: Claude writes code, 4 specialized Claude agents review it, all issues are auto-fixed, and code is merged to main. No human sees the code before production. Deployment has been smooth for 3 months.",
+    "photoUrl": null,
+    "options": [
+      "No failure mode \u2014 AI review is more thorough than human review",
+      "The team will forget how to program",
+      "The code will eventually become too complex for Claude to understand",
+      "Systematic blind spots: all Claude instances share the same training biases and knowledge cutoffs, so issues outside their collective knowledge are consistently missed"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "Multiple Claude instances are not independent reviewers \u2014 they share training data, knowledge cutoffs, and reasoning patterns. A vulnerability pattern unknown to Claude will be missed by ALL 4 reviewers. This is correlated failure: the instances aren't diverse in the way that a human + AI review team would be. Human reviewers bring domain knowledge, recent security advisories, business context, and intuition that complements AI analysis. Multi-instance review enhances human review; it shouldn't replace it.",
+    "wrongExplanations": {
+      "0": "AI review is thorough within its training distribution, but it has systematic blind spots. 'More thorough' only applies to patterns it was trained to detect \u2014 novel issues slip through consistently.",
+      "1": "While skill atrophy is a real concern, it's not the immediate failure mode. The first failure will be a production incident from an issue all AI reviewers missed, not developer skill degradation.",
+      "2": "Code complexity isn't the primary risk. Claude can handle complex code. The risk is shared blind spots across all instances, not comprehension limits.",
+      "3": ""
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.5 Human Review & Confidence",
+    "difficulty": 4,
+    "question": "A Claude Code agent reports 'high confidence' on its architectural recommendation for a new microservice. The recommendation uses a pattern Claude frequently suggests. A senior engineer points out this pattern would create a circular dependency with an existing service. What does this reveal about confidence calibration?",
+    "explanation": "Claude recommended the Repository Pattern with event sourcing for the new service. The pattern itself is sound in isolation, but the existing Order Service already publishes events that the new service would consume AND produce, creating a bidirectional dependency that would cause deadlocks under load.",
+    "photoUrl": null,
+    "options": [
+      "Claude's confidence was correctly calibrated \u2014 the pattern IS good",
+      "Claude should never express confidence on any recommendation",
+      "Claude's confidence was based on pattern familiarity rather than system-specific context analysis \u2014 familiar patterns can be wrong in specific contexts",
+      "The senior engineer is wrong because the Repository Pattern is an industry best practice"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "This is the familiarity-confidence trap. Claude has seen the Repository Pattern work in thousands of codebases, so it feels confident. But confidence should be calibrated to context-completeness, not pattern familiarity. The right response: 'This pattern works well in general [high confidence]. However, I haven't fully analyzed how it interacts with your existing event flows [flagged uncertainty]. A senior engineer should validate the dependency graph before we proceed.' Confidence on the pattern + uncertainty about the context = appropriate calibration.",
+    "wrongExplanations": {
+      "0": "The pattern is good in isolation, but confidence was miscalibrated because it didn't account for system-specific interactions. Being right about the pattern while wrong about the context is still wrong overall.",
+      "1": "Blanket uncertainty is unhelpful. Claude should be confident about mechanical facts and well-understood patterns. The issue is distinguishing 'I know this pattern' from 'I know this pattern works HERE.'",
+      "2": "",
+      "3": "Best practices are contextual, not universal. The Repository Pattern is excellent in many scenarios but can create circular dependencies in specific architectures. Context trumps general best practices."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.5 Human Review & Confidence",
+    "difficulty": 5,
+    "question": "Design a confidence calibration system for a Claude Code deployment where agents make 500+ decisions per day across 20 repositories. How do you measure and improve calibration over time?",
+    "explanation": "An enterprise wants to deploy Claude Code at scale. They need to know: when Claude says it's confident, how often is it actually correct? And when it flags uncertainty, how often was the concern valid? They want to track and improve this over time.",
+    "photoUrl": null,
+    "options": [
+      "Track confidence levels on every decision, sample human reviews at each level, compute calibration curves (predicted confidence vs actual accuracy), and feed miscalibrations back into CLAUDE.md rules as explicit guidance",
+      "Have humans review 100% of Claude's decisions and mark each as correct or incorrect",
+      "Only deploy Claude for tasks where it's always 100% confident",
+      "Use a second AI model to verify every decision made by the first"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "Calibration curves show whether 'high confidence' actually means ~90% correct and 'low confidence' means ~50% correct. If high-confidence decisions are only 60% accurate, the system is overconfident on those categories. The feedback loop: (1) Log all decisions with confidence metadata. (2) Sample human reviews stratified by confidence level. (3) Compute calibration per category (e.g., 'auth changes: over-confident, DB changes: well-calibrated'). (4) Update CLAUDE.md with explicit rules: 'Always flag uncertainty on auth changes.' This creates a system that gets better at knowing what it doesn't know.",
+    "wrongExplanations": {
+      "0": "",
+      "1": "100% human review doesn't scale to 500+ decisions/day across 20 repos. Stratified sampling provides calibration data at a fraction of the cost while covering all confidence levels.",
+      "2": "Restricting to 100% confidence eliminates most of Claude's value. Many useful decisions involve uncertainty \u2014 the goal is to calibrate confidence accurately, not to avoid all uncertainty.",
+      "3": "A second AI model shares similar blind spots and biases. It doesn't provide the independent ground truth needed for calibration. Human review samples are the gold standard for measuring actual accuracy."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.6 Information Provenance",
+    "difficulty": 1,
+    "question": "What does the 'everything in-repo' rule mean?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "All code dependencies must be bundled inside the repository",
+      "If information isn't in a versioned file in the repository, it doesn't exist to agents",
+      "Every file on the developer's computer must be added to git",
+      "All team communication must happen through git commit messages"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Slack discussions, verbal decisions, Google Docs, tribal knowledge \u2014 all of these are invisible to Claude Code agents. An agent can only work with what's in versioned files. When a decision is made in conversation (e.g., 'we'll use JWT for auth'), it must be encoded into the appropriate file (CLAUDE.md, a design doc, or the code itself) before the session ends. Otherwise, the next agent session starts from zero on that decision.",
+    "wrongExplanations": {
+      "0": "Dependency bundling (like vendoring) is a separate concern. The 'everything in-repo' rule is about decisions and knowledge, not about npm packages or library files.",
+      "1": "",
+      "2": "The rule applies to project knowledge and decisions, not to every file on the machine. Personal files, system files, and unrelated content don't belong in the repo.",
+      "3": "Git commit messages are too constrained for capturing design decisions. The rule means decisions should be in docs, code comments, CLAUDE.md, or design files \u2014 not necessarily in commits."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.6 Information Provenance",
+    "difficulty": 1,
+    "question": "Why are Slack discussions invisible to Claude Code agents?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Claude Code has a bug that prevents Slack integration",
+      "Claude Code only reads files that end in .js or .ts",
+      "Slack uses encryption that Claude can't decrypt",
+      "Claude Code can only read files in the repository \u2014 Slack messages aren't versioned files in the codebase"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "This is the practical consequence of the 'everything in-repo' rule. Claude Code's tools (Read, Glob, Grep, Bash) operate on local files. External platforms (Slack, Jira, Google Docs, email) are outside its reach. The fix: after important Slack discussions, write the decision to a file \u2014 even a quick note in tasks/decisions.md. One minute of writing saves twenty minutes of re-explaining to agents.",
+    "wrongExplanations": {
+      "0": "It's not a bug \u2014 it's a fundamental design constraint. Agents operate on local files. External communication platforms aren't part of the local file system.",
+      "1": "Claude Code reads all file types, not just JavaScript/TypeScript. The issue is that Slack messages aren't files at all \u2014 they exist on Slack's platform, not on the local filesystem.",
+      "2": "Encryption isn't the barrier. Even if Slack messages were unencrypted, they exist on Slack's servers, not in the local repository. The issue is location, not access control.",
+      "3": ""
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.6 Information Provenance",
+    "difficulty": 1,
+    "question": "What are 'line number citations' and why are they recommended?",
+    "explanation": "During a code review, Claude Code writes 'the validation code has a bug.' A senior developer asks Claude to be more specific about the location.",
+    "photoUrl": null,
+    "options": [
+      "Academic-style footnotes at the bottom of Claude's response",
+      "Timestamps showing when each line of code was last modified",
+      "URLs linking to GitHub line ranges",
+      "References to specific lines (e.g., L45, lines 98-102) so the reader can quickly locate the exact code being discussed"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "Line number citations transform vague references into precise pointers. 'The validation code has a bug' forces the reader to search for what Claude means. 'The validation at L45 fails to check for null' tells them exactly where to look. For plans and specs that others will execute, also provide a context anchor (a code pattern near the location) since line numbers shift as code changes. Example: 'After the line containing import { Settings }'.",
+    "wrongExplanations": {
+      "0": "Academic footnotes are for bibliographic references. Line number citations are inline references to specific code locations for precise communication.",
+      "1": "Last-modified timestamps are git metadata, not code references. Line citations identify WHERE code is, not WHEN it was changed.",
+      "2": "GitHub URLs are useful for remote collaboration but line number citations are about precision in direct communication \u2014 referencing L45 in conversation, not linking to GitHub.",
+      "3": ""
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.6 Information Provenance",
+    "difficulty": 2,
+    "question": "A team makes an architectural decision during a standup meeting: 'We'll use Redis for session storage instead of JWT.' Two weeks later, Claude Code recommends JWT for a new feature. What went wrong?",
+    "explanation": "The decision was unanimous and well-reasoned. But it was only communicated verbally at the standup and in a Slack message. Nobody wrote it down in the codebase.",
+    "photoUrl": null,
+    "options": [
+      "Claude Code doesn't understand Redis, so it defaulted to JWT",
+      "The decision was never encoded into a versioned file, so it's invisible to Claude Code agents",
+      "Two weeks is too long \u2014 Claude forgets decisions after 7 days",
+      "Claude Code always recommends JWT regardless of project context"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "This is the 'everything in-repo' rule in action. The fix takes 30 seconds: add to CLAUDE.md or a design doc: 'Session storage: Redis (decided 2026-03-01, standup consensus). NOT JWT \u2014 evaluated and rejected due to token revocation complexity.' Now every future Claude session respects this decision. Verbal decisions and Slack discussions are ephemeral \u2014 they only exist to the humans who heard them.",
+    "wrongExplanations": {
+      "0": "Claude understands both Redis and JWT well. The issue isn't capability \u2014 it's information availability. Claude recommended JWT because it had no knowledge of the Redis decision.",
+      "1": "",
+      "2": "Claude doesn't have a memory timer. Decisions persist if they're in files that Claude reads (like CLAUDE.md). The issue is that this decision was never written to any file.",
+      "3": "Claude's recommendations are context-dependent. It would recommend Redis, Memcached, or database sessions if the project context indicated those preferences. Without context, it defaults to common patterns."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.6 Information Provenance",
+    "difficulty": 2,
+    "question": "What is a 'context anchor' and when should it be used alongside line numbers?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "A physical anchor emoji placed in the code",
+      "A comment in the code that says 'DO NOT MOVE THIS LINE'",
+      "A git tag that locks the file at a specific version",
+      "A code pattern near the target location that survives line number shifts (e.g., 'after the line containing import { Settings }')"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "Line numbers are precise but fragile \u2014 they shift whenever code is added or removed above them. Context anchors are resilient: 'After the line containing import { Settings } from ./Settings' will find the right location regardless of line number changes. Best practice for specs and plans: provide BOTH a line number (for quick reference) AND a context anchor (for reliability). This is especially important in multi-agent workflows where days may pass between writing the spec and executing it.",
+    "wrongExplanations": {
+      "0": "Emojis in code would cause syntax errors and are a style concern, not a navigation mechanism.",
+      "1": "Comments like 'DO NOT MOVE' are unreliable \u2014 developers may not see them or may ignore them during refactoring. Context anchors don't require cooperation from other developers.",
+      "2": "Git tags lock the entire repository state, not individual line locations. They also create branching complexity for what should be a simple location reference.",
+      "3": ""
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.6 Information Provenance",
+    "difficulty": 2,
+    "question": "Where should project-specific quirks and lessons be documented versus cross-project patterns?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Everything goes in a single global file",
+      "All lessons go in the project's README.md",
+      "Project-specific quirks go in <project>/tasks/lessons.md; cross-project patterns go in ~/.claude/tasks/lessons-global.md",
+      "Lessons should only be communicated verbally, never written down"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "The two-tier system keeps knowledge organized: global lessons (lessons-global.md) apply everywhere and are always available. Project lessons (tasks/lessons.md) contain project-specific quirks that would be noise in other contexts. Claude Code should review the project-specific lessons at session start when working on that project. This mirrors the 'CLAUDE.md is a map, not an encyclopedia' principle \u2014 progressive disclosure of relevant knowledge.",
+    "wrongExplanations": {
+      "0": "A single global file would grow enormous and mix irrelevant project-specific details. An ORM quirk for Project A is noise when working on Project B.",
+      "1": "README.md is for human onboarding documentation, not for agent-specific lessons and operational quirks. Mixing the two dilutes both purposes.",
+      "2": "",
+      "3": "This directly violates the 'everything in-repo' rule. Verbal knowledge is invisible to agents. If a lesson isn't written in a file, it's as if it was never learned."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.6 Information Provenance",
+    "difficulty": 3,
+    "question": "An agent outputs a code recommendation citing 'best practice from the React docs.' Upon verification, the recommendation is outdated \u2014 it references class component patterns deprecated 3 years ago. What information provenance issue does this reveal?",
+    "explanation": "Claude Code confidently recommended implementing shouldComponentUpdate for performance optimization. The developer pointed out that the project uses React 18 with functional components and hooks, making this recommendation outdated.",
+    "photoUrl": null,
+    "options": [
+      "React documentation is poorly written",
+      "The agent's training data has a knowledge cutoff, and it presented stale knowledge as current without flagging the potential for outdatedness",
+      "The developer should have specified which version of React to use",
+      "Claude Code should never reference external documentation"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "This is a provenance gap: the agent's source (training data) has a temporal boundary that it doesn't always acknowledge. The fix is bidirectional: (1) Project CLAUDE.md should state 'React 18, functional components only, no class components.' (2) The agent should flag temporal uncertainty on framework recommendations: 'This was best practice as of my training cutoff \u2014 verify against current React docs.' Knowledge cutoffs are a known limitation that should be treated as a form of uncertainty, not hidden behind confident assertions.",
+    "wrongExplanations": {
+      "0": "React documentation quality isn't the issue. The problem is that the agent cited outdated patterns from its training data without acknowledging the potential for the information to be stale.",
+      "1": "",
+      "2": "While specifying the React version helps, the deeper issue is that the agent should have flagged temporal uncertainty rather than presenting potentially outdated information as current best practice.",
+      "3": "Referencing documentation is valuable. The issue isn't the reference itself \u2014 it's the failure to acknowledge that the referenced information might be outdated relative to the project's actual stack."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.6 Information Provenance",
+    "difficulty": 3,
+    "question": "A team encodes their engineering standards in CLAUDE.md prose ('We prefer composition over inheritance'). Despite this, Claude keeps suggesting inheritance patterns. What stronger enforcement mechanism is recommended?",
+    "explanation": "The CLAUDE.md instruction has been there for months. Claude follows it in 80% of cases but occasionally suggests class hierarchies, especially in complex scenarios where inheritance seems like the more natural fit.",
+    "photoUrl": null,
+    "options": [
+      "Encode the preference as a lint rule that fails CI, not just prose guidance \u2014 'prose rots, rules compound'",
+      "Write the instruction in all caps in CLAUDE.md",
+      "Remove CLAUDE.md entirely since it doesn't work perfectly",
+      "Have a team member manually review every suggestion for inheritance patterns"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "This is the 'golden principles = mechanical enforcement' axiom from the Harness methodology. A lint rule like 'no-class-extends' or a custom ESLint rule that flags 'extends' keywords catches EVERY violation automatically, on EVERY line of code, regardless of context window pressure or compression. Prose guidance is a starting point, but the goal is to encode it as an enforceable rule. 'Captured once, enforced continuously.'",
+    "wrongExplanations": {
+      "0": "",
+      "1": "ALL CAPS doesn't change how the model processes instructions. Context window pressure and compression affect all text equally regardless of capitalization.",
+      "2": "CLAUDE.md works well for many instructions. The issue isn't CLAUDE.md itself \u2014 it's that critical rules need stronger enforcement than prose alone can provide. Keep CLAUDE.md AND add linter rules.",
+      "3": "Manual review is the expensive, fragile version of what a linter does automatically. It doesn't scale, requires constant human attention, and will eventually be skipped under time pressure."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.6 Information Provenance",
+    "difficulty": 4,
+    "question": "Your team uses Claude Code across 5 repositories. Over 6 months, CLAUDE.md files have grown stale \u2014 some instructions reference deleted features, deprecated APIs, and removed team members. The 'garbage collection cadence' recommends what action?",
+    "explanation": "A new developer joins the team and notices that CLAUDE.md references a 'payments-v1' API that was replaced by 'payments-v2' three months ago. Claude Code occasionally generates code targeting the deleted v1 API because the stale instruction tells it to.",
+    "photoUrl": null,
+    "options": [
+      "Ignore stale docs \u2014 they'll eventually scroll off the context window anyway",
+      "Rewrite all CLAUDE.md files from scratch every month",
+      "On a recurring basis (weekly or per-sprint), scan for stale documentation, deviations from actual code behavior, and quality gaps \u2014 then open targeted fix PRs",
+      "Assign one person to be the permanent 'CLAUDE.md maintainer'"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "The garbage collection cadence treats tech debt in documentation the same way you'd treat it in code: it's a high-interest loan. Stale docs are actively harmful because agents trust them and produce incorrect output. The scanning should check: (1) Do documented APIs still exist? (2) Do documented patterns match current code? (3) Are referenced team members and processes still current? Most fix PRs should be reviewable in under a minute. Don't let bad patterns spread for days.",
+    "wrongExplanations": {
+      "0": "Stale docs don't harmlessly scroll away \u2014 they actively mislead agents into generating code for deleted features. Ignoring them compounds the problem.",
+      "1": "Monthly rewrites are too expensive and risk losing valuable accumulated knowledge. Targeted pruning (removing or updating specific stale sections) is more efficient than wholesale rewrites.",
+      "2": "",
+      "3": "Single-person ownership creates a bottleneck and single point of failure. Garbage collection should be a team practice integrated into the sprint cycle, not an individual's burden."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.6 Information Provenance",
+    "difficulty": 4,
+    "question": "An agent makes a recommendation and the developer asks 'Where did you get that information?' The agent cites a file that doesn't exist in the repository. Investigation reveals the agent hallucinated both the recommendation and the citation. What systemic fix prevents this?",
+    "explanation": "Claude Code recommended using a custom hook called useAuthSession and cited 'src/hooks/useAuthSession.ts' as the source. The file doesn't exist. Neither does the hook. Claude fabricated a plausible-sounding citation to support a hallucinated recommendation.",
+    "photoUrl": null,
+    "options": [
+      "Trust that Claude will eventually stop hallucinating with more training",
+      "Require agents to verify citations exist (Glob/Read the cited file) before presenting them, and add a CLAUDE.md rule: 'Never cite a file without first confirming it exists'",
+      "Disable all file citations in Claude Code responses",
+      "Only allow Claude to recommend code it has directly copied from existing files"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Hallucinated citations are especially dangerous because they look credible \u2014 a plausible file path gives false provenance to a fabricated recommendation. The fix is mechanical verification: before citing any file, the agent must Glob or Read it to confirm it exists. This can be encoded in CLAUDE.md as a hard rule. It adds milliseconds of verification but prevents the most insidious form of misinformation: confident falsehoods backed by fake sources.",
+    "wrongExplanations": {
+      "0": "Hallucination is an inherent characteristic of language models, not a training bug that will be fully eliminated. Systemic safeguards (verification before citation) are needed regardless of model improvements.",
+      "1": "",
+      "2": "Disabling citations removes a valuable feature. Citations help developers verify recommendations. The fix is to make citations trustworthy through verification, not to eliminate them.",
+      "3": "Restricting to only copied code would prevent Claude from making novel recommendations, which is much of its value. The solution is verified citations, not restricted output."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.6 Information Provenance",
+    "difficulty": 5,
+    "question": "Design an information provenance system for a large organization where 50 developers use Claude Code across 30 repositories. Decisions are made in Slack, Notion, Jira, and meetings. How do you ensure agents always have accurate, up-to-date context?",
+    "explanation": "An enterprise engineering org is adopting Claude Code at scale. Their knowledge is fragmented across platforms, and they've already seen multiple incidents where agents contradicted decisions that were made but never encoded into the codebase.",
+    "photoUrl": null,
+    "options": [
+      "Build a decision pipeline: decisions from any source get encoded into versioned repo files within 24 hours, with automated staleness checks (CI jobs that flag docs older than N days without review), and a decision registry linking each rule to its rationale and date",
+      "Give Claude Code API access to Slack, Notion, and Jira so it can read everything",
+      "Hold all discussions inside git commit messages so they're automatically versioned",
+      "Accept that some decisions will be lost and let agents make their best guess"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "The decision pipeline operationalizes 'everything in-repo' at scale: (1) Decision made anywhere \u2192 someone writes it to the repo within 24 hours (can be automated with Slack bots that create PRs). (2) Staleness detection: CI job checks if any CLAUDE.md or design docs haven't been reviewed in N days. (3) Decision registry: each rule has metadata (who decided, when, why, links to discussion). This creates auditable provenance while keeping agent context accurate. The 24-hour SLA prevents the 'we'll write it down later' procrastination that kills knowledge management.",
+    "wrongExplanations": {
+      "0": "",
+      "1": "API access to every platform creates security risks, token management complexity, and doesn't solve the curation problem \u2014 agents would be overwhelmed by raw Slack noise. Curated, versioned decisions are far more useful.",
+      "2": "Commit messages are too constrained for architectural decisions and team discussions. They also require a commit to exist, which means you can't document a decision until code is written. Decisions often precede code.",
+      "3": "Accepting knowledge loss means accepting preventable production incidents. At 50 developers and 30 repos, 'best guess' failures compound quickly into significant reliability problems."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.1 Context Preservation",
+    "difficulty": 4,
+    "question": "A team writes all critical context to files but finds that agents are reading outdated versions of those files from earlier in the conversation instead of re-reading them. What's happening?",
+    "explanation": "The workflow is: Agent A writes findings to analysis.md. Agent B needs those findings 20 minutes later. But Agent B references the version of analysis.md it saw at the start of the session (which was empty), not the current version.",
+    "photoUrl": null,
+    "options": [
+      "File system permissions prevent Agent B from reading updated files",
+      "Agent B has analysis.md in its context from an earlier Read operation, and uses that stale cached version instead of re-reading the file",
+      "analysis.md can only be read once per session",
+      "Agent A didn't actually save the file successfully"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "This is a subtle context freshness issue. When an agent reads a file, that content enters the conversation context. Later, if the agent needs the file's contents again, it may rely on the version already in its context rather than performing a fresh Read. The fix: when coordinating between agents via files, the consuming agent should explicitly re-read the file at the point of use, not rely on earlier reads. Some teams add a CLAUDE.md rule: 'When reading shared state files, always perform a fresh Read, never rely on previously loaded content.'",
+    "wrongExplanations": {
+      "0": "File permissions don't selectively affect freshness. If Agent B could read the file initially, permissions aren't the issue. The problem is stale context, not access control.",
+      "1": "",
+      "2": "There's no once-per-session read limit. Files can be read multiple times. The issue is that the agent didn't re-read \u2014 it used the version already in its conversation context.",
+      "3": "If Agent A's write failed, the file on disk would still be empty. But the issue described is that Agent B sees old content, which means the file was updated but Agent B didn't re-read it."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.1 Context Preservation",
+    "difficulty": 5,
+    "question": "You're building a Claude Code workflow that must maintain perfect accuracy over a 200-step data pipeline. Each step's output depends on 3-4 previous steps. Context window capacity is 200K tokens. How do you architect the state management?",
+    "explanation": "A data science team needs to process clinical trial data through 200 transformations. Each transformation references multiple previous results. A single error in any step invalidates everything downstream. The total data easily exceeds any context window.",
+    "photoUrl": null,
+    "options": [
+      "Run all 200 steps in a single conversation and hope compression preserves the important parts",
+      "Reduce the pipeline to 10 steps to fit in the context window",
+      "Split into 200 separate conversations with no state sharing between them",
+      "Use a file-based state machine: each step reads its inputs from specific files, writes outputs to specific files, and a manifest tracks which steps are complete with checksums to verify data integrity"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "The file-based state machine pattern treats the filesystem as the authoritative state store. Key design elements: (1) Each step has a declared input/output file manifest. (2) Outputs include checksums so downstream steps can verify integrity. (3) A manifest.json tracks completion status of each step. (4) Any step can be re-run independently by reading its input files fresh. (5) The orchestrator only needs to track the manifest, not all 200 steps' data. This decouples computation from context, making each step independently verifiable.",
+    "wrongExplanations": {
+      "0": "200 steps in a single conversation would catastrophically overflow the context window. By step 20, the first steps' details would be compressed beyond recovery, violating the 'perfect accuracy' requirement.",
+      "1": "Reducing the pipeline changes the science. The 200 steps exist for a reason \u2014 data processing fidelity. The architecture should accommodate the pipeline, not force the pipeline to accommodate architecture limits.",
+      "2": "200 separate conversations with no state sharing means no step can reference previous steps' outputs. The problem requires inter-step dependencies, which need a shared state mechanism (files).",
+      "3": ""
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.1 Context Preservation",
+    "difficulty": 3,
+    "question": "A developer uses Claude Code's memory feature to store 'Always use TypeScript strict mode.' But in a new project that intentionally uses JavaScript, Claude keeps pushing TypeScript. What's the anti-pattern?",
+    "explanation": "The memory entry was created during a TypeScript-heavy phase. Now the developer is building a quick prototype in plain JavaScript, but Claude insists on TypeScript types and strict mode checks.",
+    "photoUrl": null,
+    "options": [
+      "Claude Code's memory feature is broken and should never be used",
+      "The developer should never use JavaScript",
+      "Global memory entries that are project-specific create false universal rules \u2014 this instruction should have been project-scoped, not global",
+      "Claude is correct to enforce TypeScript everywhere"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "This is the scope pollution problem. Global CLAUDE.md and global memory should only contain truly universal rules ('always read before edit'). Project-specific preferences ('use TypeScript strict mode') belong in the project-level CLAUDE.md or tasks/lessons.md. When a project-specific rule leaks into global scope, it becomes a false constraint in other contexts. Regular garbage collection of global memory helps catch these scope mismatches.",
+    "wrongExplanations": {
+      "0": "The memory feature works correctly \u2014 it persists and applies the instruction as stored. The problem is what was stored and at which scope level, not the feature itself.",
+      "1": "JavaScript is a legitimate choice for prototypes and certain projects. Forcing TypeScript everywhere is over-engineering when the project doesn't need it.",
+      "2": "",
+      "3": "Enforcing TypeScript in a deliberate JavaScript project is counterproductive. The instruction was project-specific but stored globally, creating a mismatch."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.2 Escalation & Ambiguity",
+    "difficulty": 4,
+    "question": "A Claude Code agent encounters an edge case not covered by the spec: a user submits a form with a field containing both valid and invalid data (e.g., 'John123' in a name field). The spec only covers fully valid and fully invalid inputs. The agent is running autonomously in a CI pipeline with no human available. What should happen?",
+    "explanation": "The validation spec defines rules for valid names (letters, spaces, hyphens) and invalid names (empty, numbers only). But 'John123' is a mix \u2014 partly valid letters with trailing numbers. The CI pipeline needs a definitive answer.",
+    "photoUrl": null,
+    "options": [
+      "Accept the input since it contains some valid characters",
+      "Reject the input since it contains some invalid characters",
+      "The agent should flag this as an unspecified edge case, reject the input as the safer default (invalid > valid for untested cases), log the exact case for human review, and continue processing",
+      "Crash the pipeline to force human attention"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "This demonstrates principled autonomy under ambiguity: (1) Identify that the case isn't covered by the spec. (2) Choose the safer default \u2014 for validation, rejecting suspicious input is safer than accepting it. (3) Log the case with full context for post-run human review. (4) Continue processing remaining items. This avoids both the over-asking problem (no human available) and the false confidence problem (pretending the spec covers this). The key: when autonomous, fail safe and log for later review.",
+    "wrongExplanations": {
+      "0": "Accepting partially invalid input is the unsafe default. In validation, false positives (accepting bad data) are typically more dangerous than false negatives (rejecting ambiguous data).",
+      "1": "Simply rejecting without logging the edge case means the spec gap is never fixed. The rejection is correct, but without logging, the team doesn't learn about the gap.",
+      "2": "",
+      "3": "Crashing an entire pipeline for one edge case is disproportionate. The pipeline should handle the edge case gracefully and continue processing other items. Logging ensures the team can address it."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.2 Escalation & Ambiguity",
+    "difficulty": 3,
+    "question": "How should a Claude Code agent frame an escalation question to minimize back-and-forth?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Ask yes/no questions with no context to keep messages short",
+      "Provide the specific ambiguity, the options considered, the tradeoffs of each, and a recommended default \u2014 so the user can approve or choose with one response",
+      "Send a link to the relevant documentation and let the user figure it out",
+      "Only escalate by creating a Jira ticket and waiting for assignment"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "A good escalation question is self-contained and actionable: 'The spec doesn't cover empty arrays. I see two approaches: (A) Return an empty result with status 200 \u2014 simpler but the client needs to handle empty state. (B) Return 404 \u2014 clearer signal but changes the API contract. I recommend (A) since the existing client already handles empty arrays. Should I go with (A), or do you prefer (B)?' This can be answered in one word instead of a 5-message back-and-forth.",
+    "wrongExplanations": {
+      "0": "Context-free yes/no questions ('Should I proceed?') force the user to ask 'proceed with what?' \u2014 creating the exact back-and-forth that wastes time.",
+      "1": "",
+      "2": "Sending documentation links shifts the cognitive load to the user. The agent should do the research and present a distilled decision, not delegate reading.",
+      "3": "Jira tickets introduce hours of latency for what could be a 30-second decision. Escalation should happen at the speed of the conversation, not the speed of ticket triage."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.2 Escalation & Ambiguity",
+    "difficulty": 5,
+    "question": "You're deploying Claude Code agents that serve both internal developers and external enterprise clients. Internal users want maximum autonomy (fewer questions). External clients want maximum safety (more verification). How do you implement context-aware escalation?",
+    "explanation": "The company offers Claude Code as an internal productivity tool and also as a white-labeled service for enterprise clients. The same codebase serves both audiences, but the risk profiles are completely different.",
+    "photoUrl": null,
+    "options": [
+      "Build two completely separate systems with no shared code",
+      "Use a single escalation threshold that's a compromise between both needs",
+      "Implement role-based escalation profiles: internal agents get a high autonomy threshold with audit logging, external agents get a low threshold with mandatory checkpoints at every destructive operation and client-specific rules in per-tenant CLAUDE.md",
+      "Let each user individually configure their own escalation preferences with no guardrails"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "Role-based escalation separates the autonomy dial by audience. Internal profile: escalate only on irreversible or high-risk operations, assume low-risk ambiguity, log all assumptions. External profile: escalate at every decision point that affects client data, require explicit approval for schema changes, include client-specific rules (from their onboarding). Per-tenant CLAUDE.md files allow enterprise clients to encode their own preferences. Audit logging covers both \u2014 internal assumptions are logged even if not escalated, enabling after-the-fact review.",
+    "wrongExplanations": {
+      "0": "Two separate systems doubles maintenance cost and diverges over time. The core logic is the same \u2014 only the escalation thresholds differ, which can be parameterized.",
+      "1": "A compromise threshold either over-asks internal users (reducing productivity) or under-asks external clients (increasing risk). The needs are genuinely different and require different treatment.",
+      "2": "",
+      "3": "Unrestricted user configuration for external clients creates liability. Enterprise clients need guardrails enforced by the platform, not optional settings they might misconfigure."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.3 Error Propagation",
+    "difficulty": 4,
+    "question": "A multi-agent system has a 'retry on failure' policy. Agent A fails, retries 3 times with the same input, and succeeds on the 3rd try. However, the two failed attempts each triggered partial writes to a shared database. What error propagation issue does this reveal?",
+    "explanation": "Agent A processes a batch of 100 records. The first two attempts each wrote ~30 records before failing. The third attempt succeeds and writes all 100. Now the database has 160 records: 100 from the success plus 60 partial duplicates from the failed attempts.",
+    "photoUrl": null,
+    "options": [
+      "The retry count should be increased to 5 to reduce partial write probability",
+      "Partial writes are acceptable as long as the final attempt succeeds",
+      "The database should automatically detect and remove duplicates",
+      "Retries without idempotency guarantees cause duplicate data \u2014 failed attempts must be fully rolled back before retry, or operations must be designed to be idempotent"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "This is the non-idempotent retry problem. An operation is idempotent if running it multiple times produces the same result as running it once. Database inserts are NOT idempotent by default \u2014 each attempt adds rows. Two fixes: (1) Transactional: wrap each attempt in a transaction that rolls back on failure. (2) Idempotent: use UPSERT with unique keys so re-inserts overwrite rather than duplicate. In agent pipelines, any step that modifies external state MUST be either transactional or idempotent before enabling retries.",
+    "wrongExplanations": {
+      "0": "More retries make the problem worse, not better. Five attempts could create 5x the partial duplicates. The issue is the retry mechanism, not the retry count.",
+      "1": "Partial writes from failed attempts are NOT acceptable \u2014 they create data integrity issues. The 60 duplicate records could cause incorrect calculations, duplicate notifications, or billing errors.",
+      "2": "Databases don't automatically deduplicate unless explicitly configured with unique constraints. And even with constraints, the failed partial writes may have slightly different data, making automatic dedup unreliable.",
+      "3": ""
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.3 Error Propagation",
+    "difficulty": 5,
+    "question": "Design a defensive architecture for a 4-agent pipeline where Agent 1 fetches data from an unreliable external API, Agent 2 enriches it, Agent 3 validates business rules, and Agent 4 writes to production. The external API returns incorrect data ~2% of the time with no error indication.",
+    "explanation": "A financial services company discovered that their data vendor occasionally returns stale prices (yesterday's close instead of today's). The data looks structurally valid \u2014 correct format, reasonable-looking numbers \u2014 but the values are wrong. This has caused incorrect portfolio valuations.",
+    "photoUrl": null,
+    "options": [
+      "Trust the API data since it comes from a paid vendor",
+      "Cache all API responses and never fetch fresh data",
+      "Retry the API call 100 times and use the most common response",
+      "Add validation checkpoints: Agent 1 cross-references data against a secondary source or historical bounds, Agent 2 flags anomalies (values outside N standard deviations), Agent 3 applies business-rule sanity checks (no negative prices, price change < 50% per day), and Agent 4 writes to a staging table first with a human approval gate before production"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "Defense in depth for unreliable inputs: (1) Cross-validation at ingestion (compare against a second source or yesterday's data \u00b1 expected range). (2) Statistical anomaly detection during enrichment (Z-score or IQR-based outlier flagging). (3) Domain-specific business rules (no negative stock prices, max daily change bounds). (4) Staging table with approval gate before production write. Each layer catches different error types: cross-validation catches stale data, anomaly detection catches magnitude errors, business rules catch logical impossibilities, and staging catches anything else. The 2% silent error rate means ~1 in 50 records is wrong \u2014 at scale, that's catastrophic without layered defense.",
+    "wrongExplanations": {
+      "0": "Paid vendors have SLAs but still make mistakes. A 2% error rate from a trusted source is especially dangerous because the trust discourages verification. Always verify, regardless of source reputation.",
+      "1": "Never refreshing data guarantees staleness. The problem is occasional stale data from the API; caching everything makes the staleness problem 100% instead of 2%.",
+      "2": "If the API consistently returns the same stale data, 100 retries will return the same wrong answer 100 times. Repetition doesn't fix systematic errors \u2014 it just wastes API quota.",
+      "3": ""
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.4 Codebase Exploration",
+    "difficulty": 3,
+    "question": "A developer asks Claude Code to add a new API endpoint. Claude uses Grep to find similar endpoints and discovers three different patterns used across the codebase: Express-style, Fastify-style, and a custom framework. Without asking, Claude picks Express-style because it found the most instances. What principle did it violate?",
+    "explanation": "The project started with Express, migrated to Fastify for new endpoints, and has one legacy custom framework module. The team has been standardizing on Fastify for all new code, but this preference isn't documented anywhere in the codebase.",
+    "photoUrl": null,
+    "options": [
+      "Claude made a high-risk assumption (which architectural pattern to follow) based on frequency rather than recency or team intent \u2014 it should have escalated to ask which pattern to use for new endpoints",
+      "Claude should have used all three patterns simultaneously",
+      "Claude should have invented a fourth pattern to avoid choosing favorites",
+      "Counting instances is always the correct approach for pattern selection"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "Frequency bias is a common trap in codebase exploration: the most common pattern isn't always the current standard. Legacy code often outnumbers new code. Recency is a better signal (which pattern appears in the most recent commits?), but even that's not definitive. When multiple architectural patterns coexist in a codebase, the choice of which to follow for new code is a high-risk decision that should be escalated. This is also a case for the 'everything in-repo' rule \u2014 the team should document 'all new endpoints use Fastify' in CLAUDE.md.",
+    "wrongExplanations": {
+      "0": "",
+      "1": "Mixing three incompatible architectural patterns in new code would create maintenance nightmares. New code should follow one consistent pattern.",
+      "2": "Inventing a fourth pattern adds complexity without solving the decision problem. The team needs to choose from existing approaches, not add more options.",
+      "3": "Frequency-based selection is misleading in codebases with legacy code. A project might have 100 Express endpoints from 2 years ago and 10 Fastify endpoints from last month \u2014 the direction is clearly Fastify despite lower count."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.4 Codebase Exploration",
+    "difficulty": 5,
+    "question": "You're asked to add distributed tracing to a microservices system you've never seen before. You have 2 hours. The system has 15 services, 8 databases, and 3 message queues. How do you structure your exploration to maximize coverage within the time constraint?",
+    "explanation": "A platform team needs to add OpenTelemetry instrumentation to a production microservices architecture. The services use different languages (Node.js, Go, Python) and communication patterns (REST, gRPC, Kafka). There's no architecture diagram.",
+    "photoUrl": null,
+    "options": [
+      "Read every file in all 15 services sequentially",
+      "Spend 2 hours documenting the architecture before touching any code",
+      "Use a 30-minute tiered exploration: (1) 10 min: Glob + Grep across all services to map entry points, dependencies, and communication patterns. (2) 10 min: Deep-read the 3 most interconnected services. (3) 10 min: Map all inter-service call sites. Then spend 90 min on instrumentation using the map.",
+      "Pick one service at random and add tracing, hoping the pattern works for the others"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "Time-boxed exploration with a funnel structure maximizes coverage under constraints. The first 10 minutes creates a breadth-first map: Glob('**/package.json', '**/go.mod', '**/requirements.txt') identifies languages, Grep('fetch|axios|grpc|kafka|rabbitmq') identifies communication patterns. The next 10 minutes go deep on hub services (those with the most connections). The final 10 minutes maps the specific code locations where tracing hooks need to be inserted. This gives you an 80% accurate architecture map in 30 minutes, leaving 90 minutes for actual implementation.",
+    "wrongExplanations": {
+      "0": "Sequential reading of 15 services would take days, not hours. The time constraint demands a strategic, tiered approach that prioritizes breadth first.",
+      "1": "Spending 100% of the time on documentation leaves zero time for implementation. Exploration should be time-boxed to create an actionable map, not a perfect document.",
+      "2": "",
+      "3": "Microservices use different languages, frameworks, and communication patterns. A pattern from one service rarely works for others without adaptation. The exploration phase identifies these differences."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.5 Human Review & Confidence",
+    "difficulty": 3,
+    "question": "Claude Code generates a complex SQL migration that adds 3 new tables and modifies 2 existing ones. It reports 'high confidence' because the SQL syntax is correct. A DBA reviews it and finds the migration will lock the users table for 4 hours during deployment. What confidence calibration error occurred?",
+    "explanation": "The migration adds a NOT NULL column with a default value to a 50-million-row users table. The SQL is syntactically perfect, but the ALTER TABLE operation will acquire an exclusive lock that blocks all reads and writes to the table for hours.",
+    "photoUrl": null,
+    "options": [
+      "Syntactic correctness and operational safety are different dimensions \u2014 Claude was confident about syntax but failed to assess the operational impact on a production database at scale",
+      "Claude should have lower confidence on all SQL operations",
+      "The DBA is wrong \u2014 modern databases handle this without locking",
+      "Claude should have refused to generate the migration entirely"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "This illustrates multi-dimensional confidence: code can be correct in one dimension (syntax, logic) while dangerous in another (performance, operational impact). Claude should separately assess: (1) Is the SQL syntactically correct? [high confidence] (2) Will this perform well on the actual data volume? [should flag uncertainty \u2014 depends on table size, which Claude may not know] (3) What's the operational impact during deployment? [should flag uncertainty \u2014 lock duration depends on row count and engine]. The fix: CLAUDE.md rule 'For database migrations, always flag table size and locking implications as uncertainty areas.'",
+    "wrongExplanations": {
+      "0": "",
+      "1": "Blanket low confidence on SQL is unhelpful. Simple SELECT queries or small-table changes deserve high confidence. The issue is specifically about operational impact assessment, not SQL in general.",
+      "2": "While some databases (e.g., PostgreSQL with certain operations) handle this better than others, adding a NOT NULL column with a default to a large table can still cause significant locking in many database engines. The DBA's concern is valid.",
+      "3": "Refusing to generate migrations is unhelpful. Claude should generate the migration AND flag operational concerns: 'This migration on a large table may cause locking. Consider using a phased approach or pt-online-schema-change.'"
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.5 Human Review & Confidence",
+    "difficulty": 4,
+    "question": "A team runs /review-parallel on a feature and gets: Spec Compliance (Pass), DevOps (Pass), CTO (1 Medium finding), Cyber (1 Critical finding: potential SSRF in URL parameter). The developer says 'it's fine, we'll fix the SSRF later' and wants to merge. What should happen?",
+    "explanation": "The feature is behind schedule and the product manager is pressuring for a release. The SSRF vulnerability allows an attacker to use the server as a proxy to reach internal services. The developer argues the feature is behind an auth wall.",
+    "photoUrl": null,
+    "options": [
+      "Merge it \u2014 the auth wall provides sufficient protection",
+      "The card stays in AI Testing until the Critical finding is resolved \u2014 Critical findings from /review-parallel are a hard gate that cannot be deferred",
+      "Create a follow-up ticket for the SSRF and merge now",
+      "Disable the /review-parallel check for this feature"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "The rule is explicit: if /review-parallel returns any Critical findings, the card stays in AI Testing until fixed and re-reviewed. This is a non-negotiable gate. SSRF behind an auth wall is still SSRF \u2014 a compromised user account or a separate auth bypass would chain with the SSRF for full internal network access. 'We'll fix it later' is how security vulnerabilities reach production and stay there for months. The schedule pressure is real, but shipping a Critical vulnerability is a decision that should require explicit sign-off from a security-aware stakeholder, not a developer override.",
+    "wrongExplanations": {
+      "0": "Auth walls are a defense layer, not a complete mitigation for SSRF. Auth bypasses, compromised credentials, and insider threats all defeat the auth wall, exposing the SSRF.",
+      "1": "",
+      "2": "Follow-up tickets for security vulnerabilities have a poor completion rate. Studies show >40% of 'fix later' security tickets remain open after 90 days. The gate exists to prevent this pattern.",
+      "3": "Disabling the review check to bypass a finding defeats the entire purpose of the quality gate. It's equivalent to removing the smoke detector because the alarm is inconvenient."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.5 Human Review & Confidence",
+    "difficulty": 5,
+    "question": "Design a trust calibration framework for an organization transitioning from 'human reviews everything' to 'AI handles most reviews with human spot-checks.' What milestones determine when to reduce human review involvement?",
+    "explanation": "A 200-person engineering org wants to use Claude Code for code review but their compliance team requires a documented process for gradually reducing human oversight. They need measurable milestones, not just 'trust your gut.'",
+    "photoUrl": null,
+    "options": [
+      "Switch immediately to full AI review on day 1 to maximize ROI",
+      "Never reduce human review \u2014 AI should only supplement, never replace",
+      "Phase-based transition: Phase 1 (100% human review + AI review in parallel, measure agreement rate). Phase 2 (AI reviews all, humans spot-check 30%, measuring false negative rate). Phase 3 (AI reviews all, humans review only flagged items + 10% random sample, tracking production incident rate). Advance phases only when agreement rate >95% and false negative rate <2%.",
+      "Let each team decide independently with no org-wide standards"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "The phase-based approach generates data before reducing oversight. Phase 1 answers: 'Does the AI catch what humans catch?' (agreement rate). Phase 2 answers: 'Does the AI miss things humans would catch?' (false negative rate). Phase 3 answers: 'Does reduced oversight increase production incidents?' (outcome metric). The advancement criteria (>95% agreement, <2% false negatives) are auditable numbers, not subjective judgments. The 10% random sample in Phase 3 is the long-term calibration mechanism \u2014 it catches drift before it reaches production. This satisfies compliance because every phase reduction is backed by measured data.",
+    "wrongExplanations": {
+      "0": "Immediate full transition provides no safety net and no data to justify the decision. Compliance teams would reject this because there's no evidence of AI review quality.",
+      "1": "Permanent 100% human review doesn't capture the productivity gains that AI review enables. The goal is responsible reduction, not permanent duplication of effort.",
+      "2": "",
+      "3": "Per-team independence without standards creates inconsistent quality across the org. One team might prematurely reduce oversight while another never adopts AI review. Org-wide standards ensure consistent risk management."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.6 Information Provenance",
+    "difficulty": 2,
+    "question": "A developer tells Claude Code verbally (via text in the conversation): 'We decided last week to deprecate the v1 API.' Claude implements the deprecation. But in the next session, a different developer asks Claude to add features to v1. What's the root cause?",
+    "explanation": "The first developer had a productive session where Claude correctly deprecated the v1 API. But the decision to deprecate was only communicated in that conversation \u2014 it was never written to any file in the repository.",
+    "photoUrl": null,
+    "options": [
+      "Claude has a memory bug that prevents it from remembering decisions",
+      "Each Claude Code session starts fresh \u2014 decisions communicated only in conversation don't persist. The deprecation decision should have been written to CLAUDE.md or a design doc.",
+      "The second developer should have asked the first developer before starting",
+      "Claude should refuse to work on v1 since it was deprecated in a previous session"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Conversations are ephemeral. Each Claude Code session starts with only: the files in the repo, CLAUDE.md, and any memory entries. If the deprecation decision lived only in a conversation, it vanished when that session ended. The fix: when a decision is made in conversation, encode it into the appropriate file before the session ends. A one-line addition to CLAUDE.md ('v1 API: deprecated as of 2026-03-01, do not add features, will be removed by Q3') would have prevented the conflict.",
+    "wrongExplanations": {
+      "0": "It's not a memory bug \u2014 it's by design. Sessions are independent. Cross-session persistence requires writing to files, not relying on conversation history.",
+      "1": "",
+      "2": "Developer communication helps but doesn't solve the agent problem. Even if developers coordinate perfectly, Claude Code still needs the information in a file to act on it.",
+      "3": "Claude can't remember previous sessions unless information was persisted to a file. It has no way to know about the deprecation decision from a different session."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.6 Information Provenance",
+    "difficulty": 5,
+    "question": "An enterprise compliance audit asks: 'For every AI-generated code change in the past 6 months, can you prove what information the AI agent had access to when it made each decision?' How would you architect a provenance system to answer this?",
+    "explanation": "A regulated financial institution uses Claude Code for code generation. Auditors want to verify that AI-generated code was based on approved specifications and up-to-date requirements, not hallucinated or based on stale information.",
+    "photoUrl": null,
+    "options": [
+      "Tell the auditors that AI decisions can't be traced and accept the audit finding",
+      "Log every conversation in full \u2014 auditors can read the transcripts",
+      "Build a provenance chain: every AI-generated commit includes metadata linking to (1) the spec/ticket it was based on, (2) the CLAUDE.md version hash at time of generation, (3) the files read before modification, and (4) the verification steps performed \u2014 all stored in an immutable audit log",
+      "Use git blame to show which lines were AI-generated"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "The provenance chain creates a verifiable evidence trail: for commit X, you can prove: 'The agent read spec Y (hash: abc), CLAUDE.md version Z (hash: def), read files A/B/C before modifying them, and ran tests 1/2/3 after.' This is stored in an immutable audit log (append-only, tamper-evident). The spec hash proves the agent followed approved requirements. The CLAUDE.md hash proves which rules were in effect. The file-read log proves the agent understood existing code before changing it. This level of provenance satisfies SOX, SOC2, and GDPR requirements for decision traceability.",
+    "wrongExplanations": {
+      "0": "AI decisions CAN be traced with proper tooling. Accepting an audit finding when the solution exists is unnecessary compliance risk and may result in being prohibited from using AI tools.",
+      "1": "Full conversation logs are verbose, contain irrelevant content, and don't structure the provenance in an auditor-friendly format. Auditors need: 'What was the input? What was the output? What rules applied?' not 300 messages of back-and-forth.",
+      "2": "",
+      "3": "Git blame shows WHO changed each line but not WHAT INFORMATION informed the change. An auditor needs to know not just that AI wrote line 45, but what spec, what context, and what rules the AI was following when it wrote that line."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.3 Error Propagation",
+    "difficulty": 2,
+    "question": "What is 'defensive coding' in the context of agent pipelines?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Each agent validates its inputs independently rather than trusting the previous agent's output \u2014 because upstream agents can fail, return unexpected formats, or produce subtly wrong data",
+      "Writing code that defends against hackers and security threats",
+      "Writing code that is difficult for other developers to modify",
+      "Adding excessive error handling that slows down the pipeline"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "In agent pipelines, trust boundaries exist between every step. Agent B should validate that Agent A's output matches the expected schema, types, and value ranges before processing it. This catches: (1) Silent failures from upstream. (2) Schema changes that weren't propagated. (3) Partial results masquerading as complete data. (4) Type mismatches (string '5' vs number 5). The cost of input validation is microseconds; the cost of processing bad data is hours of debugging.",
+    "wrongExplanations": {
+      "0": "",
+      "1": "Security defensive coding overlaps but is a different concept. In agent pipelines, 'defensive' means not trusting upstream agents' output format and validity, not defending against external attackers.",
+      "2": "Making code difficult to modify is obfuscation, not defensive coding. Defensive coding makes the system more robust, not more opaque.",
+      "3": "Proper input validation at pipeline boundaries adds negligible overhead. It's not 'excessive' \u2014 it's essential. The alternative (no validation) is what leads to the expensive debugging sessions."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.4 Codebase Exploration",
+    "difficulty": 4,
+    "question": "Claude Code reads a 300-line function and immediately suggests a fix at line 50. Upon implementation, the fix breaks logic at line 250 that depended on the original behavior at line 50. What exploration principle was violated?",
+    "explanation": "The function handles order processing. Line 50 had what appeared to be a bug: a variable was being set to null before a check. Claude 'fixed' it to preserve the value. But line 250 relied on that null assignment to trigger a special 'new order' code path.",
+    "photoUrl": null,
+    "options": [
+      "Claude should have used a different programming language",
+      "Claude should have asked the user before making any fix",
+      "300 lines is too long for Claude to process",
+      "The 'Slow is Fast' principle: Claude formed a conclusion before reading the full function and identifying what depends on the code it wanted to change"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "The Slow is Fast principle explicitly states: (1) Read the FULL function before concluding. (2) Trace data flow across function boundaries. (3) Identify what earlier code depends on this. (4) ONLY THEN form conclusions. Claude stopped at step 1 (partially \u2014 it only read to line 50). The null assignment at line 50 looked like a bug in isolation but was an intentional invariant: 'variable is null means new order.' This is why invariant awareness matters \u2014 non-obvious invariants should be documented, but their absence doesn't justify ignoring them.",
+    "wrongExplanations": {
+      "0": "Language choice is irrelevant. The same exploration error would occur in any language \u2014 the issue is incomplete analysis, not tooling.",
+      "1": "Asking the user about every potential fix is over-escalation. The right approach is thorough analysis \u2014 reading the full function would have revealed the dependency at line 250 without needing to interrupt the user.",
+      "2": "Claude can process functions much longer than 300 lines. The issue isn't capacity \u2014 it's that Claude formed a premature conclusion before fully understanding the function's logic flow.",
+      "3": ""
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.2 Escalation & Ambiguity",
+    "difficulty": 2,
+    "question": "A developer asks Claude Code to 'optimize the database queries.' Claude finds 15 slow queries. Some need index changes (safe), while others need schema restructuring (risky). How should Claude handle this?",
+    "explanation": "Performance profiling reveals queries ranging from 'add an index' (5-minute fix, no risk) to 'denormalize the users table' (multi-day effort, requires data migration, potential data loss if done wrong).",
+    "photoUrl": null,
+    "options": [
+      "Fix all 15 queries silently without asking",
+      "Refuse to optimize any queries until the user specifies each one individually",
+      "Fix the safe index additions autonomously (low-risk), but escalate the schema restructuring decisions to the user with options and tradeoffs",
+      "Only report the findings without making any changes"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "This demonstrates the low-risk/high-risk ambiguity split in practice. Adding an index is reversible, well-understood, and low-risk \u2014 proceed and flag it. Denormalizing a table changes data structure, requires migration, and is hard to reverse \u2014 that's a high-risk decision requiring user input. The agent maximizes productivity by handling the safe work autonomously while protecting against catastrophic decisions on the risky work.",
+    "wrongExplanations": {
+      "0": "Silently restructuring a database schema could cause data loss, break dependent applications, and require emergency rollbacks. High-risk changes must be approved.",
+      "1": "Requiring individual approval for every index addition wastes the user's time on trivial decisions. Low-risk optimizations should proceed autonomously with notification.",
+      "2": "",
+      "3": "Only reporting without acting on low-risk fixes wastes the opportunity to be productive. The agent should act on what's safe and escalate what's not."
+    }
+  },
+  {
+    "category": "Context & Reliability",
+    "subtopic": "5.3 Error Propagation",
+    "difficulty": 3,
+    "question": "An agent pipeline uses JSON to pass data between steps. Agent 2 receives a field 'price' as the string '49.99' instead of the number 49.99. Agent 2 doesn't validate types and passes it to Agent 3, which tries to do arithmetic and gets 'NaN'. Where should the fix be applied?",
+    "explanation": "Agent 1 fetches data from a web scraper that returns all values as strings. Agent 2 enriches the data with additional fields. Agent 3 calculates tax by multiplying price by 0.2. The NaN propagates to the invoice generator.",
+    "photoUrl": null,
+    "options": [
+      "Only fix Agent 3 to handle string inputs",
+      "Only fix Agent 1 to return proper types",
+      "Add type validation at Agent 2's input boundary \u2014 each agent should validate its inputs match expected types before processing, catching the mismatch where it enters the pipeline",
+      "Remove JSON and use a different data format"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "Defensive coding at pipeline boundaries means every agent validates its input schema: types, required fields, value ranges. While fixing Agent 1 is also good, the defensive pattern is that EVERY agent should validate inputs. Agent 1 might be fixed today but replaced tomorrow with a different scraper that has the same issue. Input validation at each boundary creates resilience against upstream changes. The principle: trust nothing from the previous step, validate everything at the boundary.",
+    "wrongExplanations": {
+      "0": "Fixing only Agent 3 treats the symptom. If Agent 2 also needs numeric prices for enrichment calculations, the bug would reappear there. Fix at the boundary, not at the symptom.",
+      "1": "Fixing Agent 1 helps but doesn't prevent the same issue if Agent 1 is swapped for a different data source. Each agent should defend its own inputs regardless of upstream promises.",
+      "2": "",
+      "3": "The data format isn't the problem \u2014 JSON is fine. The issue is that string '49.99' is valid JSON. The problem is type expectations not being validated at agent boundaries."
+    }
+  }
+]

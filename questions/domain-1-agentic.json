@@ -1,0 +1,1542 @@
+[
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.1 Agentic Loops",
+    "difficulty": 1,
+    "question": "What are the three core phases of an agentic loop?",
+    "explanation": "A junior developer is asked to explain how Claude Code processes a multi-step request like 'find the bug in auth.ts and fix it.' They need to identify the fundamental cycle the agent repeats.",
+    "photoUrl": null,
+    "options": [
+      "Observe, Think, Act",
+      "Read, Write, Deploy",
+      "Parse, Compile, Execute",
+      "Input, Process, Output"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "The Observe-Think-Act loop is the heartbeat of every agentic system. Observe gathers information (tool results, user messages), Think reasons about what to do next, and Act executes a tool call or responds. The loop repeats until the task is complete or a termination condition is met.",
+    "wrongExplanations": {
+      "0": "",
+      "1": "Read/Write/Deploy describes a CI/CD pipeline, not an agent's decision cycle. Agents don't 'deploy' as part of their core loop.",
+      "2": "Parse/Compile/Execute describes how code is processed by a runtime, not how an AI agent reasons and acts iteratively.",
+      "3": "Input/Process/Output is a generic computing model. Agentic loops are specifically iterative with tool use and self-directed reasoning."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.1 Agentic Loops",
+    "difficulty": 1,
+    "question": "What happens when an agent calls a tool during the 'Act' phase?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "The conversation ends and a new one starts",
+      "The tool result is appended to context and the loop continues with a new Observe phase",
+      "The model retrains on the tool output",
+      "The tool result is cached but not shown to the model"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Tool results become part of the conversation context. The agent observes the result, thinks about what it learned, and decides the next action. This is why tool results can influence subsequent tool choices \u2014 the agent truly 'sees' them.",
+    "wrongExplanations": {
+      "0": "The conversation doesn't restart. Tool calls happen within the same agentic loop iteration, and context accumulates across iterations.",
+      "1": "",
+      "2": "LLMs don't retrain at inference time. Tool results are added to the context window, not used for weight updates.",
+      "3": "If results weren't shown to the model, the agent couldn't reason about them. The entire point is that tool outputs feed back into the observe phase."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.1 Agentic Loops",
+    "difficulty": 2,
+    "question": "Which factor is MOST important for an agent to select the right tool?",
+    "explanation": "An agent has access to Bash, Read, Grep, and Edit. A user asks it to 'find all files that import the auth module.' The agent needs to pick the best tool for this job.",
+    "photoUrl": null,
+    "options": [
+      "The tool's execution speed",
+      "The tool's description and parameter schema",
+      "The alphabetical order of available tools",
+      "The number of times the tool has been used in the session"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Tool descriptions are essentially prompts that teach the model when and how to use each tool. A well-written description like 'Search for patterns across files using regex' directly helps the model match 'find all files that import X' to the Grep tool. Poor descriptions lead to poor tool selection.",
+    "wrongExplanations": {
+      "0": "The model doesn't know tool execution speeds at selection time. It selects based on semantic fit between the task and the tool's described capabilities.",
+      "1": "",
+      "2": "Tool ordering has minimal effect on selection. The model uses semantic understanding, not list position, to choose tools.",
+      "3": "Usage frequency doesn't drive tool selection. The model reasons about which tool fits the current need, not which was used most."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.1 Agentic Loops",
+    "difficulty": 2,
+    "question": "What is a common cause of infinite agentic loops?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "The context window is too large",
+      "The agent has too many tools available",
+      "The agent lacks a clear termination condition or error-handling strategy",
+      "The API rate limit is set too high"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "Without explicit termination conditions (max iterations, success criteria, or escalation rules), an agent can repeat the same failing action indefinitely. The '3-Strike Error Protocol' exists for this reason: after 3 failed attempts, escalate rather than loop forever.",
+    "wrongExplanations": {
+      "0": "A large context window doesn't cause loops. If anything, more context helps the agent remember what it already tried.",
+      "1": "Having many tools available doesn't cause infinite loops. The loop issue is about termination logic, not tool count.",
+      "2": "",
+      "3": "Rate limits restrict how fast calls happen but don't cause logical loops. The agent would still repeat the same action regardless of rate limiting."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.1 Agentic Loops",
+    "difficulty": 3,
+    "question": "Why should agents avoid repeating the exact same failed action?",
+    "explanation": "An agent tries to run 'npm test' and it fails due to a missing dependency. Without changing anything, the agent runs 'npm test' again and gets the same failure. A senior engineer reviews the trace and flags a critical anti-pattern.",
+    "photoUrl": null,
+    "options": [
+      "Repeated actions cost more tokens",
+      "The 3-Strike Protocol requires mutating the approach each time to converge on a solution",
+      "API providers will ban accounts that make duplicate calls",
+      "Repeated actions corrupt the context window"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "The rule 'if action_failed: next_action != same_action' exists because repeating identical failing actions wastes resources and never yields new information. Each retry should mutate the approach: try a different command, inspect the error, or question assumptions.",
+    "wrongExplanations": {
+      "0": "While token cost is real, the primary reason is effectiveness. Repeating a failed action yields zero new information regardless of cost.",
+      "1": "",
+      "2": "API providers don't ban for duplicate tool calls within an agent loop. This is about agent effectiveness, not API policy.",
+      "3": "Repeated actions don't corrupt context \u2014 they just fill it with redundant information. The issue is wasted cycles, not data corruption."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.1 Agentic Loops",
+    "difficulty": 3,
+    "question": "In the 3-Strike Error Protocol, what should happen after the third failure?",
+    "explanation": "An agent has tried three different approaches to fix a TypeScript compilation error. Strike 1: targeted fix. Strike 2: different approach. Strike 3: broader rethink. All three failed. What's the correct next step?",
+    "photoUrl": null,
+    "options": [
+      "Try a fourth approach with more creativity",
+      "Delete the problematic file and start over",
+      "Escalate to the user with a summary of what was attempted",
+      "Switch to a different programming language"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "Escalation after 3 strikes prevents runaway agent loops and acknowledges that some problems need human judgment. The summary of attempts is critical \u2014 it gives the human enough context to unblock the situation without re-investigating from scratch.",
+    "wrongExplanations": {
+      "0": "The protocol explicitly says to escalate after 3 strikes, not continue indefinitely. Unbounded retries waste tokens and time.",
+      "1": "Destructive actions like deletion should never be taken as a recovery strategy without explicit user permission.",
+      "2": "",
+      "3": "Switching languages is a drastic architectural change that should never be an agent's autonomous decision."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.1 Agentic Loops",
+    "difficulty": 4,
+    "question": "How does loop termination interact with context window limits in long-running agents?",
+    "explanation": "An agent is performing a 50-step refactoring task. Around step 35, its responses become less coherent and it starts repeating earlier mistakes. The team suspects a context-related issue.",
+    "photoUrl": null,
+    "options": [
+      "The model automatically compresses old context to make room",
+      "Earlier context gets truncated or degraded, causing the agent to 'forget' what it already tried",
+      "The model switches to a smaller version when context is full",
+      "Context limits only affect response length, not reasoning quality"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "As context grows, earlier information may be truncated or receive less attention (the 'lost in the middle' effect). This is why the 2-Action Rule exists: save findings to files frequently, so the agent can re-read them rather than relying on degrading context. For long tasks, explicit state management beats implicit context.",
+    "wrongExplanations": {
+      "0": "Current LLMs don't automatically compress context. When the window fills, earlier tokens are typically truncated or the API returns an error.",
+      "1": "",
+      "2": "Models don't downgrade mid-conversation. The same model processes the entire context, but quality degrades as context approaches limits.",
+      "3": "Context limits significantly affect reasoning quality. The model's ability to reason about information degrades as context grows, especially for information in the middle of long contexts."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.1 Agentic Loops",
+    "difficulty": 4,
+    "question": "What is the key difference between a 'reactive' and a 'planning' agent loop?",
+    "explanation": "Team A's agent processes each user message independently \u2014 it picks a tool, gets a result, picks another tool. Team B's agent first creates a multi-step plan, then executes it systematically. Both are agentic, but they handle complex tasks very differently.",
+    "photoUrl": null,
+    "options": [
+      "Reactive agents use more tokens per step",
+      "Planning agents create an explicit strategy before acting, while reactive agents select actions one step at a time based on immediate context",
+      "Reactive agents can use tools but planning agents cannot",
+      "Planning agents are slower because they use smaller models"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Planning agents (like those using the Plan-Spec-Execute pipeline) decompose complex tasks upfront, reducing the chance of local optima decisions. Reactive agents work well for simple tasks but can thrash on complex multi-step work because each action is chosen without a global strategy.",
+    "wrongExplanations": {
+      "0": "Token usage per step depends on the task complexity, not the loop type. Planning agents may use fewer total tokens by avoiding backtracking.",
+      "1": "",
+      "2": "Both reactive and planning agents use tools. The difference is in how they decide which tool to use \u2014 tactically vs. strategically.",
+      "3": "Planning agents aren't inherently slower. The upfront planning cost is often recovered by avoiding wasted actions and backtracking."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.1 Agentic Loops",
+    "difficulty": 5,
+    "question": "An agent's Observe phase returns a 3MB log file from a tool call. What architectural problem does this create?",
+    "explanation": "A monitoring agent calls a tool that returns the full application log. The log is massive and fills most of the context window. Subsequent reasoning becomes poor and the agent can't complete its analysis.",
+    "photoUrl": null,
+    "options": [
+      "The log file will be automatically summarized by the API",
+      "Large tool results consume context window budget, crowding out space for reasoning and future observations",
+      "The agent will crash because tool results have a hard 1MB limit",
+      "Large tool results are stored in vector memory and retrieved as needed"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Tool result size management is a critical architectural concern. Best practices include: truncating large outputs, streaming results in chunks, summarizing before returning, or writing to a file and returning only the path. The context window is a shared resource between observations, reasoning, and actions.",
+    "wrongExplanations": {
+      "0": "The API doesn't automatically summarize tool results. They're inserted verbatim into context. Managing result size is the developer's responsibility.",
+      "1": "",
+      "2": "While APIs have token limits, there's no universal 1MB hard limit on tool results. The problem is context budget consumption, not a crash.",
+      "3": "Standard agentic loops don't have automatic vector memory for tool results. Results go directly into the conversation context."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.1 Agentic Loops",
+    "difficulty": 5,
+    "question": "How should an agentic system handle tool calls that have side effects (e.g., sending an email, deleting a file)?",
+    "explanation": "An agent is tasked with cleaning up old deployments. During its loop, it identifies 5 deployments to delete. A production deployment is mistakenly in the list. The team needs a safety architecture for irreversible actions.",
+    "photoUrl": null,
+    "options": [
+      "All tool calls should be idempotent so side effects don't matter",
+      "Side-effecting tools should require explicit user confirmation or have a dry-run mode, with the agent treating destructive actions as high-risk ambiguity requiring escalation",
+      "The agent should maintain a transaction log and roll back all actions if any one fails",
+      "Side effects should be queued and batch-executed after the loop completes"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "The 'ambiguity handling' principle applies directly: destructive/irreversible actions are high-risk ambiguity that requires stopping and asking. This is why Claude Code warns before destructive git operations and why the 'delete means delete' rule exists \u2014 to ensure the USER makes the decision, not the agent.",
+    "wrongExplanations": {
+      "0": "Not all tools can be idempotent. Sending an email or deleting a resource are inherently side-effecting. The architecture must handle this, not wish it away.",
+      "1": "",
+      "2": "Not all side effects are reversible. You can't 'roll back' a sent email or a deleted cloud resource. Prevention is better than rollback for irreversible actions.",
+      "3": "Batch execution after the loop doesn't solve the safety problem \u2014 it just delays it. The agent still needs to identify which actions are safe and which need confirmation."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.2 Multi-Agent Orchestration",
+    "difficulty": 1,
+    "question": "What is the parent-child relationship in multi-agent systems?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Two independent agents that share a database",
+      "A coordinating agent (parent) that delegates specific tasks to specialized agents (children)",
+      "Two copies of the same agent running in parallel",
+      "An agent that calls itself recursively"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "The parent agent acts as an orchestrator \u2014 it breaks work into pieces, assigns them to child agents with specific constraints, and integrates results. Children don't coordinate with each other directly; the parent manages all inter-task dependencies.",
+    "wrongExplanations": {
+      "0": "Parent-child isn't about shared storage. It's a hierarchical delegation pattern where the parent controls task assignment and result integration.",
+      "1": "",
+      "2": "Child agents typically have different roles, constraints, and tool access than the parent. They're specialized, not cloned.",
+      "3": "Recursive self-calling is an anti-pattern. Child agents are separate invocations with scoped tasks, not the same agent calling itself."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.2 Multi-Agent Orchestration",
+    "difficulty": 1,
+    "question": "Why would you use multiple agents instead of a single agent for a complex task?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Multiple agents are always faster regardless of the task",
+      "Parallel agents can work on independent tasks simultaneously, and each agent's context stays focused on its specific task",
+      "Single agents can't use tools",
+      "Multiple agents share context automatically"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Multi-agent orchestration provides two key benefits: parallelism (independent tasks run simultaneously) and context isolation (each agent's context window is focused on its specific task, improving reasoning quality). The tradeoff is coordination overhead.",
+    "wrongExplanations": {
+      "0": "Multiple agents add coordination overhead. For simple sequential tasks, a single agent can actually be faster.",
+      "1": "",
+      "2": "Single agents can absolutely use tools. Tool use is a core capability of any agentic system, regardless of how many agents are involved.",
+      "3": "Agents don't automatically share context. Context isolation is actually a feature \u2014 it keeps each agent focused. Sharing requires explicit mechanisms."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.2 Multi-Agent Orchestration",
+    "difficulty": 2,
+    "question": "What is 'wave execution' in multi-agent orchestration?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Running all 8 tasks simultaneously and resolving conflicts afterward",
+      "Running tasks one at a time in numerical order",
+      "Grouping independent tasks into waves that run in parallel, with verification between waves",
+      "Assigning each task to a different model size"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "Wave execution maximizes parallelism while respecting dependencies. Wave 1: tasks 1-3 (independent). Verify. Wave 2: tasks 4-6 (depend on wave 1). Verify. Wave 3: tasks 7-8 (depend on all). The verification step between waves catches errors before they propagate.",
+    "wrongExplanations": {
+      "0": "Running dependent tasks simultaneously causes race conditions and merge conflicts. Dependencies must be respected.",
+      "1": "Sequential execution ignores parallelism opportunities. Independent tasks should run simultaneously to save time.",
+      "2": "",
+      "3": "Model size assignment is unrelated to execution ordering. Wave execution is about dependency management, not resource allocation."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.2 Multi-Agent Orchestration",
+    "difficulty": 2,
+    "question": "What must you check before putting two tasks in the same parallel wave?",
+    "explanation": "Two subagents are assigned to work simultaneously. Task A modifies src/utils.ts and task B also modifies src/utils.ts. After both complete, the codebase has conflicts.",
+    "photoUrl": null,
+    "options": [
+      "That both tasks use the same programming language",
+      "That the tasks don't modify the same files",
+      "That both tasks have the same difficulty level",
+      "That both tasks use the same tools"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "If two tasks in the same wave modify the same file, they must be serialized \u2014 one runs first, the other runs after. This is the #1 source of merge conflicts in multi-agent work. The File Manifest in the spec phase exists precisely to detect these overlaps before execution begins.",
+    "wrongExplanations": {
+      "0": "Language compatibility is irrelevant to wave scheduling. Two Python tasks can conflict just as easily as a Python and TypeScript task.",
+      "1": "",
+      "2": "Difficulty level doesn't determine parallelizability. A hard task and an easy task can run in parallel if they touch different files.",
+      "3": "Tool overlap doesn't cause conflicts. Two agents can both use the Edit tool simultaneously \u2014 the issue is whether they edit the same file."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.2 Multi-Agent Orchestration",
+    "difficulty": 3,
+    "question": "After each wave completes, what verification should occur before starting the next wave?",
+    "explanation": "Wave 1 completed: 3 subagents each modified different files. Before launching wave 2 (which depends on wave 1's output), the orchestrator needs to verify the codebase is healthy.",
+    "photoUrl": null,
+    "options": [
+      "Only check that each agent reported 'success'",
+      "Run the test suite and verify acceptance criteria pass before proceeding",
+      "Count the number of files modified to ensure it matches expectations",
+      "Check that all agents used the same number of tool calls"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Agent self-reported success is unreliable. Running actual tests (typecheck, unit tests, acceptance criteria) catches silent failures before they compound in later waves. A bug in wave 1 that propagates to wave 2 is exponentially harder to debug than one caught between waves.",
+    "wrongExplanations": {
+      "0": "Agent self-reporting isn't reliable enough. An agent might report success even if the code has subtle bugs that only tests would catch.",
+      "1": "",
+      "2": "File count is a weak signal. An agent could modify the right number of files but introduce bugs in each one. Functional verification is needed.",
+      "3": "Tool call counts are meaningless for verification. What matters is whether the code works, not how many steps the agent took."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.2 Multi-Agent Orchestration",
+    "difficulty": 3,
+    "question": "What is the 'post-execution scope check' and why does it matter?",
+    "explanation": "A subagent was told to modify 3 specific files per its spec. After execution, a diff reveals it also modified 2 additional files that weren't in the File Manifest. The orchestrator flags this.",
+    "photoUrl": null,
+    "options": [
+      "It's a performance benchmark comparing expected vs. actual execution time",
+      "It compares files actually touched against the File Manifest to catch scope creep",
+      "It verifies that no files were deleted during execution",
+      "It checks that the agent stayed within its token budget"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Scope creep in multi-agent systems is dangerous because unexpected modifications can break other agents' assumptions. The File Manifest is a contract. If an agent touches files outside it, either the spec was incomplete or the agent went off-script \u2014 both need investigation before proceeding.",
+    "wrongExplanations": {
+      "0": "The scope check is about code changes, not performance timing. It ensures the agent modified only the files it was supposed to modify.",
+      "1": "",
+      "2": "While file deletion is one possible scope violation, the check covers all modifications \u2014 creates, modifies, and deletes \u2014 against the manifest.",
+      "3": "Token budget is a resource constraint, not a scope check. An agent could stay within token limits while still modifying unexpected files."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.2 Multi-Agent Orchestration",
+    "difficulty": 4,
+    "question": "Why should child agents NOT spawn their own child agents?",
+    "explanation": "A parent agent spawns agent A to handle a task. Agent A decides the task is complex and spawns agents A1 and A2. Agent A1 then spawns A1a. The system becomes unmanageable.",
+    "photoUrl": null,
+    "options": [
+      "Child agents don't have permission to use the spawn API",
+      "Recursive spawning creates uncontrollable depth, makes debugging nearly impossible, and the parent loses visibility into what's happening",
+      "Child agents run on smaller models that can't spawn",
+      "It would exceed the API rate limit"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "The 'no recursive spawning' rule keeps the orchestration tree flat and debuggable. If child A spawns grandchildren, the parent can't track progress, can't detect conflicts between grandchildren of different children, and can't abort gracefully. A flat parent-children structure maintains centralized coordination.",
+    "wrongExplanations": {
+      "0": "This is an architectural guideline, not a technical permission restriction. Child agents often have the technical ability to spawn \u2014 the rule prevents them from doing so.",
+      "1": "",
+      "2": "Child agents typically use the same model as the parent. The restriction is about architecture, not model capabilities.",
+      "3": "Rate limits are managed separately. The concern is architectural complexity and loss of orchestrator control, not API throttling."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.2 Multi-Agent Orchestration",
+    "difficulty": 4,
+    "question": "How should a parent agent handle a dependency deadlock between child tasks?",
+    "explanation": "Task A says it depends on Task B's output. Task B says it depends on Task A's output. Neither can start. The orchestrator needs to resolve this during the spec phase.",
+    "photoUrl": null,
+    "options": [
+      "Run both tasks simultaneously and hope they converge",
+      "Detect circular dependencies during the spec phase and restructure tasks to break the cycle before execution begins",
+      "Assign both tasks to the same agent so dependencies don't matter",
+      "Skip both tasks and move to the next wave"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Circular dependencies should be caught during spec review, not at execution time. Solutions include: extracting shared logic into a prerequisite task, merging the two tasks, or identifying which dependency is actually weaker and can be satisfied with an interface contract rather than completed code.",
+    "wrongExplanations": {
+      "0": "Running deadlocked tasks simultaneously doesn't resolve the deadlock \u2014 both will still wait for the other's output, which doesn't exist.",
+      "1": "",
+      "2": "Combining tasks might work but it sidesteps the real issue. The better approach is to restructure so tasks have clean, acyclic dependencies.",
+      "3": "Skipping tasks that have circular dependencies just punts the problem. The tasks presumably need to be done \u2014 the dependencies need to be restructured."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.2 Multi-Agent Orchestration",
+    "difficulty": 5,
+    "question": "In a multi-agent system where agents modify code in parallel worktrees, what is the hardest integration challenge?",
+    "explanation": "Three agents each work in isolated git worktrees. Agent A refactors a function signature, Agent B adds a new call to that function using the old signature, and Agent C modifies the function's implementation. All three succeed individually.",
+    "photoUrl": null,
+    "options": [
+      "Git merge conflicts in text formatting",
+      "Semantic conflicts where changes are textually mergeable but logically incompatible",
+      "Disk space consumed by multiple worktrees",
+      "Network bandwidth for pushing multiple branches"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Semantic conflicts are the silent killer of multi-agent parallel work. Git will happily merge Agent A's signature change with Agent B's call using the old signature \u2014 no merge conflict \u2014 but the code won't compile. This is why the spec's File Manifest must identify overlapping concerns, and why inter-wave verification runs full type checking, not just merge resolution.",
+    "wrongExplanations": {
+      "0": "Text-level merge conflicts are actually the easy case \u2014 git flags them explicitly. The dangerous conflicts are the ones git CAN'T detect.",
+      "1": "",
+      "2": "Disk space for worktrees is trivially cheap. Each worktree shares git objects with the main repo, adding minimal overhead.",
+      "3": "Network bandwidth is a minor operational concern, not an architectural integration challenge."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.2 Multi-Agent Orchestration",
+    "difficulty": 5,
+    "question": "What is the optimal strategy for error recovery when a mid-wave agent fails in a 4-wave execution plan?",
+    "explanation": "Wave 2 has 3 agents. Agent 2B fails while 2A and 2C succeed. Waves 3 and 4 depend on all of wave 2. The orchestrator needs a recovery strategy that doesn't waste the successful work.",
+    "photoUrl": null,
+    "options": [
+      "Restart the entire 4-wave plan from scratch",
+      "Skip agent 2B's task and continue to wave 3",
+      "Retry agent 2B with the same spec, and if it fails again, analyze the failure, potentially re-spec, and only re-run the failed task before continuing",
+      "Merge 2B's partial work and hope wave 3 can compensate"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "Targeted recovery preserves the work of successful agents. The key insight is: don't retry blindly (3-Strike Protocol applies) and don't discard successful sibling work. If re-speccing 2B is needed, check if the new spec conflicts with 2A or 2C's completed work. Only escalate to full re-plan if the failure reveals a fundamental spec flaw.",
+    "wrongExplanations": {
+      "0": "Restarting from scratch wastes all successful work. Targeted recovery should be attempted first unless the failure reveals a systemic spec problem.",
+      "1": "Skipping a task that later waves depend on will cause cascading failures. The dependency exists for a reason.",
+      "2": "",
+      "3": "Merging partial/broken work is dangerous. It introduces undefined state that wave 3 agents can't reason about reliably."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.3 Subagent Invocation & Context",
+    "difficulty": 1,
+    "question": "What is the purpose of the subagent_type parameter when spawning a subagent?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "It determines which AI model the subagent uses",
+      "It controls which tools and permissions the subagent has access to",
+      "It sets the subagent's response language",
+      "It determines the subagent's token budget"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "The subagent_type parameter is a safety and scope mechanism. An 'Explore' type subagent gets read-only tools (Read, Grep, Glob) but no Edit or Write tools, preventing accidental modifications during research. This principle of least privilege keeps subagents focused and safe.",
+    "wrongExplanations": {
+      "0": "The model is typically the same across parent and child agents. subagent_type controls tool access, not model selection.",
+      "1": "",
+      "2": "Response language is determined by the prompt and conversation context, not the subagent_type parameter.",
+      "3": "Token budget is managed separately through configuration, not through the subagent_type parameter."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.3 Subagent Invocation & Context",
+    "difficulty": 1,
+    "question": "Why should you pass spec content INLINE to a subagent rather than telling it to read a spec file?",
+    "explanation": "An orchestrator spawns a subagent with the message: 'Read tasks/spec-auth.md and implement it.' The subagent reads the file, misinterprets the path, and wastes cycles looking for the wrong file.",
+    "photoUrl": null,
+    "options": [
+      "Inline content uses fewer tokens",
+      "Subagents can't access the filesystem",
+      "Passing content inline ensures the subagent has the exact spec without relying on file paths that may be wrong or the agent misreading the file",
+      "Inline specs are encrypted for security"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "File path indirection introduces failure modes: wrong paths, agents reading the wrong section, or files being modified between spawn and read. Inline specs guarantee the subagent sees exactly what the orchestrator intended, with zero ambiguity about which instructions to follow.",
+    "wrongExplanations": {
+      "0": "Inline content actually uses the same or more tokens than a file path reference. The benefit is reliability, not token savings.",
+      "1": "Subagents can access the filesystem through tools like Read. The issue isn't access \u2014 it's reliability of the indirection.",
+      "2": "",
+      "3": "Inline specs aren't encrypted. They're plain text in the subagent's prompt. The benefit is reliability, not security."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.3 Subagent Invocation & Context",
+    "difficulty": 2,
+    "question": "What is worktree isolation and why is it used for parallel subagents?",
+    "explanation": "Two subagents are editing files in the same repo simultaneously. Without isolation, Agent A's edit to utils.ts gets overwritten when Agent B saves its version of utils.ts. The team needs a solution.",
+    "photoUrl": null,
+    "options": [
+      "Worktrees give each agent its own copy of the entire repository including git history",
+      "Each agent gets a separate git worktree \u2014 an independent working directory linked to the same repo, preventing file conflicts between parallel agents",
+      "Worktrees are virtual environments that isolate npm dependencies",
+      "Worktrees lock files so only one agent can edit at a time"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Git worktrees let multiple agents work on separate branches with independent file states while sharing the same underlying git objects. This avoids the overhead of full repo clones while preventing the destructive file conflicts that occur when parallel agents share a single working directory.",
+    "wrongExplanations": {
+      "0": "Worktrees don't copy the entire git history \u2014 they share it. Each worktree has its own working directory but points to the same .git objects, making them lightweight.",
+      "1": "",
+      "2": "Worktrees are a git concept for independent working directories, not npm virtual environments. Dependency isolation would use separate node_modules.",
+      "3": "File locking is a different concurrency strategy. Worktrees provide full directory isolation, not pessimistic locking."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.3 Subagent Invocation & Context",
+    "difficulty": 2,
+    "question": "What constraint should execution subagents operate under?",
+    "explanation": "A parent agent sends a detailed spec to a subagent for implementation. The subagent decides the spec's approach is suboptimal and rewrites the solution using a different architecture. The parent expected the spec to be followed exactly.",
+    "photoUrl": null,
+    "options": [
+      "Execution subagents should optimize the spec if they see a better approach",
+      "Execution subagents should follow the spec exactly and report ambiguity rather than making decisions",
+      "Execution subagents should implement the spec and also write tests not in the spec",
+      "Execution subagents should ask the user directly for clarification"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "The 'no-decisions constraint' exists because execution agents lack the full context the orchestrator used to write the spec. An agent that 'improves' a spec may violate assumptions other agents depend on. The rule: follow exactly, stop on ambiguity, never guess.",
+    "wrongExplanations": {
+      "0": "Subagents lack the orchestrator's full context. A 'better approach' from the subagent's limited view might break other tasks that depend on the original spec's design.",
+      "1": "",
+      "2": "Adding work beyond the spec is scope creep. If tests are needed, they should be in the spec. Unspecified additions can conflict with other agents' work.",
+      "3": "Execution subagents should report ambiguity to the parent orchestrator, not directly to the user. The parent manages the user relationship."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.3 Subagent Invocation & Context",
+    "difficulty": 3,
+    "question": "Why should research subagents be spawned with 'Explore' type (read-only tools)?",
+    "explanation": "A parent agent spawns a subagent to investigate which database indexes are missing. The subagent, given full tool access, decides to 'helpfully' create the indexes it found were missing, causing a production performance issue during the migration.",
+    "photoUrl": null,
+    "options": [
+      "Explore agents use less memory",
+      "Read-only tools prevent the research agent from making changes, ensuring it only gathers information for the orchestrator to act on",
+      "Explore agents can search faster without write tools loaded",
+      "It's a billing optimization \u2014 read tools cost less"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Principle of least privilege applied to agents: a research agent's job is to gather information, not act on it. Giving it write access creates risk of well-intentioned but uncoordinated side effects. The orchestrator should be the only entity making action decisions based on research findings.",
+    "wrongExplanations": {
+      "0": "Tool type doesn't significantly affect memory usage. The constraint is about safety and preventing unintended side effects.",
+      "1": "",
+      "2": "Search speed isn't affected by which other tools are loaded. The benefit is safety, not performance.",
+      "3": "Tool billing isn't based on read vs. write classification. The constraint is about preventing unintended modifications."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.3 Subagent Invocation & Context",
+    "difficulty": 3,
+    "question": "What does 'one focused task per subagent' mean and why is it important?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Each subagent should handle exactly one file",
+      "Each subagent should be given a single, well-defined task so its context stays focused and its output is predictable",
+      "Subagents can only make one tool call before terminating",
+      "Each subagent should take no more than one minute to complete"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Context contamination is a real problem: when a subagent juggles multiple unrelated tasks, reasoning about one task can be influenced by context from another. Single-task agents have cleaner context, more predictable outputs, and are easier to retry if they fail \u2014 you only re-run the failed task, not all three.",
+    "wrongExplanations": {
+      "0": "One task doesn't mean one file. A task like 'refactor auth module' might touch 5 files. The constraint is logical focus, not file count.",
+      "1": "",
+      "2": "Subagents can make many tool calls within their focused task. The constraint is about task scope, not call count.",
+      "3": "Time limits aren't the point. A focused task might take 10 minutes. The constraint ensures context clarity, not speed."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.3 Subagent Invocation & Context",
+    "difficulty": 4,
+    "question": "What problem does 'no self-delegation' prevent?",
+    "explanation": "An agent receives a task to implement a feature. Instead of doing the work, it spawns a subagent with the exact same task description. That subagent could theoretically do the same, creating an infinite delegation chain.",
+    "photoUrl": null,
+    "options": [
+      "It prevents token waste from duplicate context",
+      "It prevents infinite delegation chains where agents pass work down without ever doing it, wasting resources and never producing output",
+      "It prevents agents from accessing their own conversation history",
+      "It prevents naming conflicts between parent and child agents"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Self-delegation is a subtle failure mode where an agent avoids work by delegating it to a copy of itself. Each level adds overhead (context setup, tool loading) without adding value. The rule is simple: if you were assigned a task, either do it or report that you can't \u2014 don't pass it to a clone of yourself.",
+    "wrongExplanations": {
+      "0": "While duplicate context does waste tokens, the primary concern is the infinite delegation loop and the fact that work never actually gets done.",
+      "1": "",
+      "2": "Self-delegation isn't about conversation history access. It's about preventing an agent from spawning a copy of itself to avoid doing its assigned work.",
+      "3": "Agent naming/identity isn't the concern. The problem is infinite loops and wasted resources, not namespace collisions."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.3 Subagent Invocation & Context",
+    "difficulty": 4,
+    "question": "How should context anchors be used in specs sent to subagents, and why are they better than line numbers?",
+    "explanation": "A spec tells a subagent: 'Add the import on line 15 of Dashboard.tsx.' Another agent modified Dashboard.tsx in a previous wave, shifting all lines down by 3. The subagent inserts the import on the wrong line.",
+    "photoUrl": null,
+    "options": [
+      "Context anchors use file hashes instead of line numbers",
+      "Context anchors reference nearby code patterns (e.g., 'after the line containing import Settings') that remain valid even when line numbers shift",
+      "Context anchors embed the full file content in the spec",
+      "Context anchors use git blame annotations"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Line numbers are brittle \u2014 any modification to the file shifts them. Context anchors like 'after the import of Settings' or 'inside the Routes JSX block' are resilient to line number changes. This is especially critical in multi-agent systems where earlier waves may have already modified the file.",
+    "wrongExplanations": {
+      "0": "File hashes identify the whole file, not a specific location within it. Context anchors pinpoint where in the file to make changes.",
+      "1": "",
+      "2": "Embedding full file content in every spec would bloat the context window. Context anchors are lightweight references to stable code patterns.",
+      "3": "Git blame shows who last modified each line, which is useful for auditing but not for specifying insertion points in code."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.3 Subagent Invocation & Context",
+    "difficulty": 5,
+    "question": "What is the tradeoff between subagent context isolation and information sharing?",
+    "explanation": "Subagent A discovers during execution that a shared utility function has a bug. Subagent B, running in parallel, is using that same function. Because their contexts are isolated, B doesn't know about A's discovery and builds on the buggy function.",
+    "photoUrl": null,
+    "options": [
+      "There is no tradeoff \u2014 isolation is always better",
+      "Isolation keeps agents focused but prevents real-time knowledge sharing; the orchestrator must serve as the communication hub, synthesizing findings between waves",
+      "Agents should share a global context to prevent this entirely",
+      "Subagents should broadcast messages to all other active subagents"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "This is the fundamental tension in multi-agent systems. Full isolation maximizes focus but creates information silos. Full sharing creates noise and context contamination. The practical solution is wave-based verification: agents within a wave are isolated, but between waves the orchestrator integrates findings and updates specs for the next wave.",
+    "wrongExplanations": {
+      "0": "Isolation does have real costs \u2014 the bug propagation scenario in the question is a concrete example of isolation's downside.",
+      "1": "",
+      "2": "A global shared context would contaminate each agent's reasoning with irrelevant information from other agents, degrading quality for all.",
+      "3": "Direct agent-to-agent communication creates a coordination nightmare. The parent-orchestrator pattern exists specifically to prevent this."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.3 Subagent Invocation & Context",
+    "difficulty": 5,
+    "question": "When a subagent encounters ambiguity in its spec, what should it do and why?",
+    "explanation": "A subagent is implementing a caching layer per its spec. The spec says 'cache responses for an appropriate duration' but doesn't specify the TTL. The subagent could guess 5 minutes, or it could choose 24 hours \u2014 both are 'appropriate' in different contexts.",
+    "photoUrl": null,
+    "options": [
+      "Choose the most common industry default and proceed",
+      "Implement both options with a feature flag",
+      "Stop execution and report the ambiguity to the parent, because the no-decisions constraint means subagents should never guess on underspecified requirements",
+      "Search the codebase for similar caching patterns and copy the TTL"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "The no-decisions constraint exists because subagents lack the full context that informed the spec. A 'reasonable' guess from the subagent's limited view might be wrong in the broader system context. Stopping and reporting is faster than implementing the wrong thing, discovering it downstream, and having to redo it. It also signals to the orchestrator that the spec needs improvement.",
+    "wrongExplanations": {
+      "0": "Industry defaults may not match the system's specific requirements. The spec was written with context the subagent doesn't have \u2014 guessing undermines the orchestrator's control.",
+      "1": "Feature flags add complexity that wasn't in the spec. This is scope creep and still doesn't resolve which value is correct for this system.",
+      "2": "",
+      "3": "Copying patterns from elsewhere in the codebase is a form of guessing. The existing caching might have different requirements, and the spec's author may have had a specific duration in mind."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.4 Workflow Enforcement & Handoff",
+    "difficulty": 1,
+    "question": "What are the four phases of the Plan-Spec-Execute-Compound pipeline?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Plan discusses architecture, Spec writes the blueprint, Execute implements mechanically, Compound captures lessons",
+      "Plan writes code, Spec tests it, Execute deploys it, Compound monitors it",
+      "Plan creates tickets, Spec assigns them, Execute reviews PRs, Compound merges them",
+      "Plan reads docs, Spec writes docs, Execute publishes docs, Compound archives docs"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "Each phase has a distinct purpose and a gate before the next. Plan is conversational (discuss tradeoffs). Spec is a code-level blueprint (exact files, exact changes). Execute is mechanical (follow the spec, make zero decisions). Compound captures what was learned so the system improves over time.",
+    "wrongExplanations": {
+      "0": "",
+      "1": "Code writing happens in Execute, not Plan. Plan is about discussing architecture and making decisions before any code is written.",
+      "2": "This describes a project management workflow, not the agent execution pipeline. Spec is a technical blueprint, not ticket assignment.",
+      "3": "This describes a documentation lifecycle. The pipeline is about code delivery with quality gates at each phase."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.4 Workflow Enforcement & Handoff",
+    "difficulty": 1,
+    "question": "What does the 'plan means plan' rule enforce?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Plans must be written in a specific template format",
+      "When the user asks for a plan, produce only the plan and STOP \u2014 do not implement until explicitly approved",
+      "Plans must include time estimates for every task",
+      "Plans should be committed to git before implementation"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "This is the #1 friction type in agent interactions. When users say 'plan,' they want to review, discuss, and potentially modify the approach before any code is written. Treating a plan request as implicit permission to implement violates user agency and often leads to wasted work on the wrong approach.",
+    "wrongExplanations": {
+      "0": "While plan templates are useful, the rule is about behavior (stop after planning), not format requirements.",
+      "1": "",
+      "2": "Time estimates may be part of a plan, but the rule is about not jumping to implementation, not about plan contents.",
+      "3": "Git commits are about version control, not workflow gates. The rule is about waiting for explicit user approval before coding."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.4 Workflow Enforcement & Handoff",
+    "difficulty": 2,
+    "question": "What is a 'gate' between workflow phases?",
+    "explanation": "After the Plan phase, the agent produces a proposed architecture. Before moving to Spec, something needs to happen. A developer asks what prevents the agent from automatically proceeding.",
+    "photoUrl": null,
+    "options": [
+      "An automated test suite that must pass",
+      "A mandatory waiting period of 24 hours",
+      "An explicit approval from the user before proceeding to the next phase",
+      "A code review from another agent"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "Gates ensure the user maintains control over the direction of work. Without them, the agent might sprint through Plan-Spec-Execute on the wrong approach. The Plan gate is especially critical: users often change their minds or add constraints after seeing a proposed plan.",
+    "wrongExplanations": {
+      "0": "Automated tests are used for verification during and after Execute, not as gates between Plan and Spec phases.",
+      "1": "Gates are about approval, not time delays. A user might approve immediately after reviewing the plan \u2014 there's no mandatory waiting period.",
+      "2": "",
+      "3": "Agent-to-agent review happens during post-execution testing, not as a gate between planning phases. The user is the gatekeeper."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.4 Workflow Enforcement & Handoff",
+    "difficulty": 2,
+    "question": "When should you use the full 4-phase pipeline vs. skipping directly to Execute?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Always use the full pipeline regardless of task size",
+      "Full pipeline for 3+ files or architectural decisions; Execute-only for single-file fixes, one-liners, and debugging",
+      "Skip the pipeline entirely for any task the agent is confident about",
+      "Use the full pipeline only on Mondays and skip it the rest of the week"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Pipeline overhead should match task complexity. A typo fix doesn't need a plan, spec, and compound phase. But a multi-file refactor needs all four to prevent wasted work. The middle ground (Spec + Execute) works for clear 2-3 file tasks where the approach is obvious but the changes need structure.",
+    "wrongExplanations": {
+      "0": "Applying the full pipeline to a one-line typo fix is wasteful overhead that slows down simple tasks without adding value.",
+      "1": "",
+      "2": "Agent confidence isn't a reliable gate. Even confident agents make mistakes on complex tasks. The criteria should be task complexity, not agent confidence.",
+      "3": "This is obviously not a real workflow rule. Pipeline selection should be based on task complexity, not the day of the week."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.4 Workflow Enforcement & Handoff",
+    "difficulty": 3,
+    "question": "What is the Compound phase and why is it mandatory after every completed task?",
+    "explanation": "A developer completes a card and moves it to Done. They skip the compound step because 'it was a simple task.' Three weeks later, another developer hits the exact same bug and spends hours debugging it.",
+    "photoUrl": null,
+    "options": [
+      "Compound merges all git branches into main",
+      "Compound captures lessons learned, encodes reusable knowledge, and identifies opportunities for automation so the system improves over time",
+      "Compound runs the final deployment to production",
+      "Compound generates user-facing documentation"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "The compound step is what separates 'task done' from 'system improved.' Without it, every session starts from zero. The four compound questions \u2014 What was learned? Should anything be encoded? Can this be automated? Is there a reusable solution? \u2014 ensure knowledge compounds across sessions rather than evaporating.",
+    "wrongExplanations": {
+      "0": "Git branch merging is part of Execute, not Compound. Compound is about knowledge capture, not code integration.",
+      "1": "",
+      "2": "Deployment is an operational step, not a learning step. Compound is about extracting and encoding knowledge from the work that was done.",
+      "3": "Documentation generation is a separate task. Compound is specifically about lessons learned and system improvement, not user docs."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.4 Workflow Enforcement & Handoff",
+    "difficulty": 3,
+    "question": "What should a session handoff include to minimize ramp-up time for the next session?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Just the git commit hash \u2014 the next session can figure everything out from the code",
+      "The full conversation transcript copied into a file",
+      "Project name, status, current task, files modified, next 3 steps, key decisions, and blockers",
+      "A screenshot of the IDE"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "The session handoff template is designed for quick scanning, not thorough reading. Each field answers a specific question: Where am I? What's done? What's next? What decisions were made? What's blocking? This reduces next-session ramp-up from minutes of re-reading to seconds of scanning.",
+    "wrongExplanations": {
+      "0": "A commit hash tells you what code changed but not why, what's next, or what decisions were made. The next session would waste time rediscovering all of this.",
+      "1": "Full transcripts are too long to be useful. They contain noise, dead ends, and exploration that's irrelevant to the next session. A structured summary is far more efficient.",
+      "2": "",
+      "3": "A screenshot captures a moment in time but lacks structure, context, and actionable next steps. Text-based handoffs are searchable and machine-readable."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.4 Workflow Enforcement & Handoff",
+    "difficulty": 4,
+    "question": "What is the Pre-Build Gate and what does it verify before any code is written?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "It verifies the CI/CD pipeline is configured correctly",
+      "It checks that all team members have approved the PR",
+      "It verifies dependencies are available, maps risks, defines scope boundaries, and evaluates alternative approaches",
+      "It runs the existing test suite to ensure nothing is broken"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "The Pre-Build Gate catches 'obvious in hindsight' failures before they waste hours of work. The four checks \u2014 dependencies available? risks mapped? scope clear? alternatives considered? \u2014 are quick to verify but catastrophic to skip. The payment API example is a real pattern: external dependency availability is the most commonly skipped check.",
+    "wrongExplanations": {
+      "0": "CI/CD configuration is an infrastructure concern, not a pre-build gate. The gate focuses on whether the task itself is feasible and well-scoped.",
+      "1": "PR approval happens after code is written. The Pre-Build Gate happens before any code is written, to prevent wasted effort.",
+      "2": "",
+      "3": "Running existing tests is a good practice but doesn't answer the Pre-Build Gate questions about dependencies, risks, and scope."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.4 Workflow Enforcement & Handoff",
+    "difficulty": 4,
+    "question": "How does the spec granularity test work, and what happens when a spec fails it?",
+    "explanation": "A spec says: 'Implement authentication with best practices.' A subagent receives this and must decide: JWT or sessions? OAuth or password? bcrypt rounds? Every decision point means the spec isn't granular enough.",
+    "photoUrl": null,
+    "options": [
+      "The granularity test checks if the spec fits in one page",
+      "The test asks: 'Can an agent complete this without making any decisions?' If not, break it down further until every choice is pre-made",
+      "The test measures whether the spec has fewer than 50 lines",
+      "The test verifies the spec includes performance benchmarks"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "The granularity test is the quality gate for specs. If an execution agent needs to make decisions, the spec is incomplete. Every decision an agent makes is a point of divergence from the orchestrator's intent. The fix: the orchestrator makes the decision and encodes it in the spec before handing off.",
+    "wrongExplanations": {
+      "0": "Spec length is a rough heuristic (>50 lines suggests splitting), but the real test is decision-freedom, not page count. A short spec can still be ambiguous.",
+      "1": "",
+      "2": "Line count is a sizing guide, not the granularity test itself. A 30-line spec could still require the agent to make unspecified decisions.",
+      "3": "Performance benchmarks may be relevant acceptance criteria but aren't what the granularity test checks. It checks for decision-free executability."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.4 Workflow Enforcement & Handoff",
+    "difficulty": 5,
+    "question": "When should the entire pipeline be scrapped and restarted from scratch vs. incrementally patched?",
+    "explanation": "During Execute (wave 2 of 4), it becomes clear that the chosen database schema can't support a key requirement. The team debates whether to patch the schema mid-execution or go back to Plan.",
+    "photoUrl": null,
+    "options": [
+      "Always patch incrementally \u2014 restarting wastes completed work",
+      "Always restart \u2014 any mid-execution problem means the plan was wrong",
+      "Restart from Plan when something goes sideways that reveals a fundamental flaw; incremental patching leads to fragile hacks that compound",
+      "Let the subagents decide whether to patch or restart"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "The rule 'if something goes sideways: STOP and re-plan from scratch \u2014 no incremental patching' exists because mid-execution patches accumulate into fragile systems. A schema that 'sort of works with workarounds' will haunt every future feature. The sunk cost of completed waves is real but less than the cost of shipping a compromised architecture.",
+    "wrongExplanations": {
+      "0": "Always patching leads to 'duct tape architecture' where workarounds accumulate. Some problems require going back to fundamentals, not adding more patches.",
+      "1": "Not every mid-execution issue is fundamental. A minor bug in one agent's output can be fixed without restarting the entire pipeline. The key is whether the flaw is architectural.",
+      "2": "",
+      "3": "Subagents lack the full architectural context to make restart decisions. The orchestrator (or user) must decide because they understand the system-wide implications."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.4 Workflow Enforcement & Handoff",
+    "difficulty": 5,
+    "question": "How do the '5-Question Reboot Test' and session handoffs work together to maintain continuity across sessions?",
+    "explanation": "An agent resumes work after a long break. Its context from the previous session is gone. Without checking, it starts re-implementing features that were already completed, wasting hours. The team needs a protocol.",
+    "photoUrl": null,
+    "options": [
+      "The 5-Question Test replaces handoffs entirely \u2014 just ask the questions at the start of each session",
+      "Handoffs write structured state to files; the Reboot Test verifies the agent can answer 5 critical questions from those files before proceeding",
+      "The 5-Question Test is for debugging and handoffs are for deployment",
+      "Both are optional practices that teams can skip if they're experienced"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "They form a write-read pair: the handoff writes state (project, status, task, files, next steps, decisions, blockers) and the Reboot Test reads it by verifying 5 answers: Where am I? Where am I going? What's the goal? What have I learned? What have I done? If any answer is unclear, re-read task files before proceeding. This prevents the costly 're-investigation' pattern.",
+    "wrongExplanations": {
+      "0": "Without handoffs, the 5 questions have no source of truth to answer from. The agent would need to re-investigate everything, which is exactly the problem the handoff prevents.",
+      "1": "",
+      "2": "Neither tool is limited to debugging or deployment. They're general continuity mechanisms for any multi-session work.",
+      "3": "Skipping these practices leads to the exact problem described: wasted work re-doing things that were already done. Experience doesn't help if the agent literally can't remember what happened."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.5 Agent SDK Hooks",
+    "difficulty": 1,
+    "question": "What is the purpose of a PreToolUse hook in the Claude Agent SDK?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "It logs tool usage after execution completes",
+      "It runs code before a tool executes, allowing you to inspect, modify, or block the call",
+      "It pre-loads tool definitions into the system prompt",
+      "It caches the previous tool result for reuse"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "PreToolUse hooks are the agent equivalent of middleware in a web framework. They fire after Claude decides to call a tool but before execution, giving you a control plane to enforce policies like file path restrictions or parameter sanitization.",
+    "wrongExplanations": {
+      "0": "Logging after execution is what PostToolUse hooks do, not PreToolUse.",
+      "1": "",
+      "2": "Tool definitions are loaded at initialization, not through hooks. PreToolUse fires per invocation, not at setup time.",
+      "3": "Caching previous results is unrelated to hooks. PreToolUse intercepts upcoming calls, it doesn't look backward."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.5 Agent SDK Hooks",
+    "difficulty": 1,
+    "question": "When does a PostToolUse hook fire?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Before Claude decides which tool to call",
+      "After the tool executes and returns its result",
+      "When the agent session first initializes",
+      "Only when a tool call fails with an error"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "PostToolUse hooks see both the request and the response, making them ideal for logging, metrics, result transformation, or triggering side effects based on what the tool returned.",
+    "wrongExplanations": {
+      "0": "That would be a planning or routing phase, not a PostToolUse hook. Post means after execution.",
+      "1": "",
+      "2": "Session initialization is a separate lifecycle event. PostToolUse fires on every individual tool call.",
+      "3": "PostToolUse fires on all tool completions, both successes and failures, not only errors."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.5 Agent SDK Hooks",
+    "difficulty": 2,
+    "question": "How can a PreToolUse hook prevent a tool from executing?",
+    "explanation": "An enterprise team needs to block any file write operations to production directories. They have a PreToolUse hook set up but aren't sure how to actually stop the tool call.",
+    "photoUrl": null,
+    "options": [
+      "Throw an exception inside the hook to crash the agent",
+      "Return a special 'deny' or block response from the hook that halts execution",
+      "Delete the tool definition from memory during the hook",
+      "Set the tool's timeout to zero milliseconds"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "The hook returns a control signal \u2014 typically an object indicating whether to proceed, modify, or block. This keeps the agent loop intact while enforcing policy. Throwing exceptions would break the entire agent, not just skip one tool call.",
+    "wrongExplanations": {
+      "0": "Throwing an exception would crash the entire agent session, not gracefully skip one tool call. Hooks use structured return values for control flow.",
+      "1": "",
+      "2": "Dynamically removing tool definitions mid-conversation would break the agent's understanding of available tools and cause unpredictable behavior.",
+      "3": "Timeout configuration is set at tool definition time, not manipulated through hooks. Zero timeout would cause an error, not a clean block."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.5 Agent SDK Hooks",
+    "difficulty": 2,
+    "question": "What is a common use case for modifying tool results in a PostToolUse hook?",
+    "explanation": "A security-conscious team is building an agent that queries a database. Some query results contain PII (emails, phone numbers) that should never appear in Claude's context.",
+    "photoUrl": null,
+    "options": [
+      "Compressing results to save on token costs",
+      "Converting all results to XML format",
+      "Redacting sensitive data from tool results before Claude sees them",
+      "Adding emoji decorations to make results more readable"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "PostToolUse hooks that redact PII create a security boundary between your data layer and the model. Claude never sees the raw sensitive data, so it can't accidentally leak it in responses. This is a defense-in-depth pattern \u2014 even if the system prompt says 'don't share PII', the hook ensures it's structurally impossible.",
+    "wrongExplanations": {
+      "0": "While token efficiency matters, compression in a PostToolUse hook is not a standard pattern. The primary value is policy enforcement like redaction.",
+      "1": "Format conversion is rarely useful in PostToolUse hooks. Claude handles JSON natively and XML adds unnecessary verbosity.",
+      "2": "",
+      "3": "Adding decorations in hooks is not a real use case. Hooks are for policy, security, and observability \u2014 not cosmetics."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.5 Agent SDK Hooks",
+    "difficulty": 3,
+    "question": "An agent keeps calling a 'search_web' tool in an infinite loop, searching the same query repeatedly. Which hook-based solution best addresses this?",
+    "explanation": "The agent searches for 'latest stock price', gets a result, then immediately searches the same thing again, consuming tokens and time endlessly.",
+    "photoUrl": null,
+    "options": [
+      "Add a PostToolUse hook that deletes the search tool after first use",
+      "Add a PreToolUse hook that tracks recent calls and blocks duplicates within a time window",
+      "Set the tool's max_calls parameter to 1 in the tool definition",
+      "Add a system prompt instruction saying 'only search once'"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "A stateful PreToolUse hook that maintains a sliding window of recent calls is the gold standard for loop prevention. It's mechanical enforcement vs. hoping the model follows instructions. You can tune the window (e.g., block identical queries within 60 seconds) without removing the tool entirely.",
+    "wrongExplanations": {
+      "0": "Deleting the tool after one use is too aggressive \u2014 the agent might legitimately need to search for different queries later. This kills the capability entirely.",
+      "1": "",
+      "2": "Most tool definition schemas don't have a built-in max_calls parameter. Even if they did, limiting to 1 total call is too restrictive for multi-step workflows.",
+      "3": "System prompt instructions are soft guidance \u2014 Claude can and does ignore them, especially in complex agentic loops. Mechanical enforcement via hooks is far more reliable."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.5 Agent SDK Hooks",
+    "difficulty": 3,
+    "question": "What is the correct execution order when both PreToolUse and PostToolUse hooks are registered?",
+    "explanation": "A developer has registered hooks for logging, auth checks, and result sanitization. They need to understand the lifecycle to debug a timing issue where auth checks sometimes see stale tokens.",
+    "photoUrl": null,
+    "options": [
+      "PostToolUse runs first to validate, then PreToolUse, then the tool",
+      "All hooks run simultaneously in parallel",
+      "PreToolUse hook fires, then the tool executes, then PostToolUse hook fires",
+      "The tool executes first, then both hooks fire together"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "The lifecycle is strictly sequential: Pre \u2192 Execute \u2192 Post. This mirrors middleware patterns in Express/Koa. If your PreToolUse hook blocks execution, the PostToolUse hook never fires at all \u2014 the chain short-circuits.",
+    "wrongExplanations": {
+      "0": "Post hooks running before Pre hooks would defeat the entire purpose of the naming convention. Pre always means before execution.",
+      "1": "Hooks are sequential, not parallel. Running them simultaneously would create race conditions and make it impossible to block execution in PreToolUse.",
+      "2": "",
+      "3": "If the tool executed before any hooks, there would be no way to prevent or modify the call. PreToolUse must fire before execution by definition."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.5 Agent SDK Hooks",
+    "difficulty": 4,
+    "question": "An agent uses hooks to enforce a '$100 max spend' policy on a purchase tool. The PreToolUse hook checks the amount parameter. What subtle failure mode could still allow overspending?",
+    "explanation": "The hook correctly blocks any single purchase over $100, but the finance team notices the agent spent $450 in one session across multiple smaller purchases.",
+    "photoUrl": null,
+    "options": [
+      "The hook only checks individual calls, not cumulative spend across the session",
+      "PostToolUse hooks override PreToolUse decisions",
+      "The hook doesn't fire for tool calls made by sub-agents",
+      "Claude can bypass hooks by encoding the amount as a string"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "Stateless hooks that only inspect the current call are vulnerable to 'salami attacks' \u2014 many small actions that individually pass but collectively violate policy. Production guardrails need session-level state: track cumulative spend in the hook and block when the running total exceeds the limit.",
+    "wrongExplanations": {
+      "0": "",
+      "1": "PostToolUse hooks cannot override PreToolUse decisions. If Pre blocks execution, the tool never runs and Post never fires.",
+      "2": "Hook registration depends on implementation, but well-designed agent frameworks propagate hooks to sub-agents. This isn't the primary failure mode here.",
+      "3": "Parameter type coercion is handled by the schema validation layer, not hooks. A well-defined JSON schema requires amount to be a number."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.5 Agent SDK Hooks",
+    "difficulty": 4,
+    "question": "A team wants to implement human-in-the-loop approval for destructive operations (delete, overwrite) while letting read operations proceed automatically. What's the best hook architecture?",
+    "explanation": "The agent needs to read files freely but pause for human confirmation before any write or delete. The team wants this enforced mechanically, not via prompt instructions.",
+    "photoUrl": null,
+    "options": [
+      "Use two separate agents \u2014 one for reads, one for writes",
+      "Add a system prompt saying 'always ask before writing'",
+      "Use a PreToolUse hook that classifies operations and pauses for approval on destructive ones",
+      "Remove all write tools and have humans execute writes manually"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "This is the 'allow/deny/ask' pattern \u2014 PreToolUse hooks classify each call into categories and apply different policies. Read tools get auto-approved, write tools trigger a human approval flow (e.g., webhook, Slack message, CLI prompt). This gives you automation speed for safe operations and human oversight for risky ones.",
+    "wrongExplanations": {
+      "0": "Two separate agents doubles complexity and breaks context continuity. A single agent with hook-based policy is simpler and keeps the conversation coherent.",
+      "1": "System prompt instructions are suggestions, not guarantees. Claude can skip confirmation in complex reasoning chains. Mechanical enforcement via hooks is the only reliable approach.",
+      "2": "",
+      "3": "Removing write tools entirely defeats the purpose of an agent. The goal is supervised automation, not manual labor with an AI reader."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.5 Agent SDK Hooks",
+    "difficulty": 5,
+    "question": "In a multi-tenant agent platform, each tenant has different tool access policies. What hook architecture scales best?",
+    "explanation": "The platform serves 500 tenants, each with unique rules about which tools their agents can use and with what parameters. Hardcoding per-tenant logic in hooks is unmaintainable.",
+    "photoUrl": null,
+    "options": [
+      "One PreToolUse hook per tenant, dynamically loaded at session start",
+      "A single policy-engine PreToolUse hook that evaluates tenant rules from a database at runtime",
+      "Separate agent instances with different tool definitions per tenant",
+      "PostToolUse hooks that roll back unauthorized actions"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "A policy-engine hook externalizes rules from code. The hook itself is simple: load tenant rules, evaluate against the current call, return allow/deny. Rules live in a database or policy service (like OPA) and can be updated without redeploying the agent. This is the same pattern used in cloud IAM systems.",
+    "wrongExplanations": {
+      "0": "500 separate hooks would be a maintenance nightmare and couldn't be updated without code changes. Policy should be data, not code.",
+      "1": "",
+      "2": "Maintaining 500 separate agent configurations with different tool sets is operationally intractable. Tool definitions should be uniform; access control should be policy-driven.",
+      "3": "Rolling back after execution is too late for destructive operations. You can't un-send an email or un-delete a file. Prevention via PreToolUse is always better than PostToolUse remediation."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.5 Agent SDK Hooks",
+    "difficulty": 5,
+    "question": "An agent's PreToolUse hook adds latency (200ms per call) due to an external policy check. With 50+ tool calls per session, this adds 10+ seconds. What's the best optimization?",
+    "explanation": "The hook calls an external authorization service for every tool invocation. The agent feels sluggish compared to an unhoooked version.",
+    "photoUrl": null,
+    "options": [
+      "Remove the hook and rely on system prompt instructions instead",
+      "Cache policy decisions locally with TTL, only calling the external service on cache miss or policy change",
+      "Run the hook asynchronously so it doesn't block tool execution",
+      "Batch all tool calls and run one policy check for the entire batch"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Local caching with TTL is the standard pattern for high-frequency policy checks. Tenant policies rarely change mid-session, so a 5-minute cache eliminates 95%+ of external calls. You can also pre-warm the cache at session start by fetching the tenant's full policy set.",
+    "wrongExplanations": {
+      "0": "Removing mechanical enforcement for performance is a false tradeoff. Security guardrails must be structural, not prompt-based. Optimize the hook instead.",
+      "1": "",
+      "2": "Running auth checks asynchronously means the tool executes before the policy decision arrives. If the check would have denied, it's too late \u2014 the action already happened.",
+      "3": "Claude calls tools sequentially in most flows, not in pre-declared batches. You rarely know all upcoming tool calls in advance to batch-check them."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.6 Task Decomposition",
+    "difficulty": 1,
+    "question": "What is the 'spec granularity test' for task decomposition?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Can the spec be expressed in under 100 tokens?",
+      "Can an agent complete the task without making any decisions?",
+      "Does the spec compile without syntax errors?",
+      "Can two different agents produce identical output from the spec?"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "If an agent has to make decisions, the spec is under-defined. Every decision point is a place where the agent might choose differently than you intended. The goal is to push all ambiguity resolution into the planning phase so execution is purely mechanical.",
+    "wrongExplanations": {
+      "0": "Token count is irrelevant to spec quality. A 200-token spec with exact code locations is better than a vague 50-token one.",
+      "1": "",
+      "2": "Specs are written in markdown/natural language, not code. They don't 'compile.' The test is about decision-free executability.",
+      "3": "Identical output is too strict \u2014 two agents might format code slightly differently. The test is about zero decision-making, not byte-identical output."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.6 Task Decomposition",
+    "difficulty": 1,
+    "question": "What is a 'file manifest' in a task spec?",
+    "explanation": "An agent receives a task and starts modifying files that weren't part of the plan. After execution, the team can't tell which changes were intentional vs. unplanned scope creep.",
+    "photoUrl": null,
+    "options": [
+      "A git log of all files changed in the last commit",
+      "A list declaring which files will be created, modified, or deleted by the task",
+      "A backup of all project files before the task starts",
+      "A JSON manifest listing every file in the repository"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "The file manifest is your scope contract. After execution, you compare files actually touched against the manifest. Any file modified that wasn't listed is a red flag \u2014 either the spec missed a dependency, or the agent went off-script. Both need investigation.",
+    "wrongExplanations": {
+      "0": "A git log is a record of what happened, not a plan of what should happen. The file manifest is written before execution as a scope declaration.",
+      "1": "",
+      "2": "A backup is an operational safety measure, not a planning tool. The file manifest is forward-looking \u2014 it defines the intended scope.",
+      "3": "Listing every repo file would be useless noise. The manifest lists only the files this specific task will touch, categorized by action (CREATE/MODIFY/DELETE)."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.6 Task Decomposition",
+    "difficulty": 2,
+    "question": "Why must acceptance criteria in a task spec be 'testable by command'?",
+    "explanation": "A spec's acceptance criterion reads: 'The dashboard looks good and works correctly.' After the agent finishes, there's a debate about whether the task is actually done.",
+    "photoUrl": null,
+    "options": [
+      "So the CI/CD pipeline can auto-generate test files",
+      "So the criteria can be verified mechanically without subjective judgment",
+      "So the test suite runs faster",
+      "So the agent can skip manual QA entirely"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "If you can't verify a criterion by running a command (test suite, curl, type checker), it's not a criterion \u2014 it's a wish. 'npm run typecheck passes' is verifiable. 'Works correctly' is not. Vague criteria lead to endless back-and-forth about whether a task is done.",
+    "wrongExplanations": {
+      "0": "CI/CD pipelines don't auto-generate tests from acceptance criteria. The criteria are verified by running existing commands, not generating new code.",
+      "1": "",
+      "2": "Testability of criteria has nothing to do with test speed. It's about whether completion can be objectively determined.",
+      "3": "Command-testable criteria don't eliminate QA \u2014 they make QA deterministic. A human still reviews, but against clear pass/fail signals, not vibes."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.6 Task Decomposition",
+    "difficulty": 2,
+    "question": "What is 'wave execution' in multi-agent task decomposition?",
+    "explanation": "A feature requires 6 tasks. Tasks A, B, C are independent. Task D depends on A. Tasks E and F depend on B and C respectively. Running them all sequentially wastes time.",
+    "photoUrl": null,
+    "options": [
+      "Running all 6 tasks simultaneously regardless of dependencies",
+      "Grouping independent tasks into parallel batches, with dependency checks between batches",
+      "Assigning each task to a different wave of the electromagnetic spectrum for priority",
+      "Executing tasks in reverse order starting from the final deliverable"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Wave 1: A, B, C run in parallel. Verify tests pass. Wave 2: D, E, F run in parallel (their dependencies are satisfied). This maximizes parallelism while respecting dependencies. If two tasks in the same wave modify the same file, serialize them to avoid merge conflicts.",
+    "wrongExplanations": {
+      "0": "Running everything simultaneously ignores dependencies. Task D needs A's output \u2014 if they run in parallel, D operates on missing or stale data.",
+      "1": "",
+      "2": "This is a joke answer. Wave execution is a scheduling pattern, not a physics concept.",
+      "3": "Reverse execution doesn't resolve dependencies \u2014 it makes them worse. You can't build the roof before the foundation."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.6 Task Decomposition",
+    "difficulty": 3,
+    "question": "A task spec is 80 lines long. According to spec sizing guidelines, what should you do?",
+    "explanation": "A developer wrote a detailed spec for a feature that involves creating 3 new files, modifying 5 existing ones, and updating the database schema. The spec is thorough but overwhelming.",
+    "photoUrl": null,
+    "options": [
+      "It's fine \u2014 longer specs are more thorough and reduce ambiguity",
+      "Split it into multiple smaller specs, each under 50 lines",
+      "Remove the acceptance criteria to shorten it",
+      "Convert it from markdown to a more compact YAML format"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "The 50-line guideline exists because agent context windows have practical limits on how much instruction they follow reliably. A single 80-line spec means the agent might lose track of later requirements. Two 40-line specs with clear dependencies are more reliably executed.",
+    "wrongExplanations": {
+      "0": "Thoroughness is good, but a single monolithic spec overwhelms the executing agent. The issue isn't detail level \u2014 it's that one agent shouldn't handle this much scope.",
+      "1": "",
+      "2": "Removing acceptance criteria to hit a line count is exactly backwards. Criteria are the most important part. Remove scope from the task instead.",
+      "3": "YAML vs. markdown format is irrelevant. The issue is cognitive load on the executing agent, not file format efficiency."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.6 Task Decomposition",
+    "difficulty": 3,
+    "question": "Two tasks in Wave 1 both modify `src/types/index.ts`. What should you do?",
+    "explanation": "Task A adds a new UserConfig type and Task B adds a new ReportConfig type. Both are independent features but touch the same file. They're scheduled to run in parallel.",
+    "photoUrl": null,
+    "options": [
+      "Run them in parallel \u2014 git will auto-merge the changes",
+      "Serialize them: run one first, then the other, within the same wave",
+      "Merge the two tasks into a single larger task",
+      "Have both agents write to temporary files and merge manually later"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Same-file conflicts in parallel execution are insidious \u2014 even if git can technically merge non-overlapping changes, agents might add imports to the same line or restructure the file differently. Serializing within the wave is the safe default. The small time cost beats debugging merge conflicts.",
+    "wrongExplanations": {
+      "0": "Git auto-merge is unreliable when two agents independently restructure the same file. Even if changes don't overlap in lines, import reordering or formatting differences can cause conflicts.",
+      "1": "",
+      "2": "Merging independent tasks violates the 'one focused task per agent' principle. The tasks are conceptually separate \u2014 they just happen to touch the same file.",
+      "3": "Temporary files add unnecessary complexity and a manual step. Serialization is simpler and fully automated."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.6 Task Decomposition",
+    "difficulty": 4,
+    "question": "What is a 'context anchor' in a task spec, and why are they used instead of just line numbers?",
+    "explanation": "A spec says 'Add the import at line 15.' But another task in Wave 1 adds 3 lines above it, shifting the target to line 18. The agent inserts the import at the wrong location.",
+    "photoUrl": null,
+    "options": [
+      "A URL linking to the file in the GitHub repository",
+      "A code pattern near the target location that remains stable even if line numbers shift",
+      "A git commit hash that locks the file version",
+      "A CSS selector that identifies the DOM element to modify"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Context anchors like 'After the line containing import { Settings } from ./Settings' are resilient to line shifts from other changes. Line numbers are fragile in multi-agent or multi-wave execution because each completed task shifts subsequent line numbers. Always provide both: line number for quick reference, context anchor for reliability.",
+    "wrongExplanations": {
+      "0": "GitHub URLs point to file versions but don't help an agent find the exact insertion point within the file.",
+      "1": "",
+      "2": "Locking to a commit hash would prevent the agent from seeing changes made by earlier tasks in the pipeline. The file needs to be current, not frozen.",
+      "3": "CSS selectors are for web DOM manipulation. Task specs deal with source code files, not rendered HTML."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.6 Task Decomposition",
+    "difficulty": 4,
+    "question": "After wave execution completes, the post-execution scope check reveals an agent modified a file NOT in the file manifest. What's the correct response?",
+    "explanation": "The spec listed 3 files to modify. The agent modified those 3 plus a 4th file that 'seemed related.' The extra change looks correct but was unplanned.",
+    "photoUrl": null,
+    "options": [
+      "Accept it if the change looks correct \u2014 the agent was being helpful",
+      "Flag it as a deviation: either the spec missed a dependency, or the agent went off-script \u2014 both need investigation",
+      "Automatically revert the extra file change",
+      "Add the file to the manifest retroactively and move on"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Unplanned file changes are a process smell, even if they're correct. If the spec missed a real dependency, the spec process needs fixing. If the agent improvised, the no-decisions constraint wasn't enforced. Either way, something broke in the pipeline and needs a root cause fix, not just acceptance.",
+    "wrongExplanations": {
+      "0": "Accepting unplanned changes normalizes scope creep. Today it's a helpful tweak; tomorrow it's an agent rewriting your config files. The no-decisions constraint exists for a reason.",
+      "1": "",
+      "2": "Automatic reversion might break the feature if the extra change was actually necessary. You need to investigate first, then decide.",
+      "3": "Retroactively updating the manifest is papering over a process failure. The question is why the manifest was incomplete, not how to pretend it wasn't."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.6 Task Decomposition",
+    "difficulty": 5,
+    "question": "A feature requires 12 tasks across 4 waves. Wave 2 fails \u2014 one task's tests don't pass. What's the correct recovery strategy?",
+    "explanation": "Wave 1 (3 tasks) succeeded. Wave 2 has 4 tasks, one of which failed its acceptance criteria. Waves 3 and 4 haven't started yet and depend on Wave 2's output.",
+    "photoUrl": null,
+    "options": [
+      "Skip the failed task and continue with Waves 3 and 4",
+      "Retry the failed task with the same spec, hoping for a different result",
+      "Stop the pipeline, diagnose the failure, fix the spec or code, re-run the failed task, verify all Wave 2 tests pass, then resume",
+      "Roll back all of Wave 1 and start over from scratch"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "The wave model's strength is its checkpointing. Wave 1 is verified-good \u2014 don't touch it. But Waves 3-4 can't proceed on a broken foundation. Fix the Wave 2 failure, verify the entire wave is green, then continue. If the failure reveals a spec problem, you may need to re-plan Waves 3-4 as well.",
+    "wrongExplanations": {
+      "0": "Skipping a failed task propagates the failure forward. Tasks in Waves 3-4 may depend on the failed task's output, causing cascading failures.",
+      "1": "Retrying with the same spec is the definition of insanity in debugging. If the spec was wrong or the approach flawed, identical input produces identical failure.",
+      "2": "",
+      "3": "Rolling back Wave 1 throws away verified-good work. The failure is isolated to Wave 2 \u2014 there's no reason to redo completed, passing tasks."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.6 Task Decomposition",
+    "difficulty": 5,
+    "question": "When decomposing a large feature, how do you handle a task that has 'soft dependencies' \u2014 it technically CAN run without another task's output, but the output would be higher quality with it?",
+    "explanation": "Task A generates a type definition. Task B creates a component that could use any type or the specific type from A. Running B after A produces better code, but B isn't blocked by A.",
+    "photoUrl": null,
+    "options": [
+      "Always treat soft dependencies as hard dependencies to maximize quality",
+      "Ignore soft dependencies entirely \u2014 only hard blockers matter for wave ordering",
+      "Document the soft dependency in the spec so the scheduler can optimize, but don't block on it",
+      "Merge soft-dependent tasks into a single task"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "Soft dependencies are scheduling hints, not constraints. If Wave 1 has spare capacity after A finishes early, B can benefit. But B shouldn't be delayed if A is slow. The spec should note 'If Task A's types are available, use them; otherwise, define a local type and refactor later.' This gives the agent a fallback path.",
+    "wrongExplanations": {
+      "0": "Treating every soft dependency as hard creates unnecessary serialization. If A takes 10 minutes and B could start immediately, you waste 10 minutes of parallelism for marginal quality gain.",
+      "1": "Completely ignoring soft dependencies means you miss easy optimization opportunities. When the scheduler can co-locate them cheaply, it should.",
+      "2": "",
+      "3": "Merging tasks violates the single-responsibility principle. The tasks are conceptually distinct \u2014 one generates types, the other builds a component. Coupling them increases spec complexity."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.7 Session State & Resumption",
+    "difficulty": 1,
+    "question": "What is CLAUDE.md used for in an agentic workflow?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "It's a changelog of all Claude-generated code",
+      "It's a map of project instructions and conventions that Claude reads at session start",
+      "It's a configuration file for the Claude API key",
+      "It's an auto-generated summary of the codebase"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "CLAUDE.md is the agent's entry point to understanding your project. It should be a concise map \u2014 pointing to deeper sources of truth (design docs, lessons files, task plans) \u2014 not an encyclopedia. When everything is in CLAUDE.md, nothing stands out. Progressive disclosure: start small, teach the agent where to look next.",
+    "wrongExplanations": {
+      "0": "CLAUDE.md is not a changelog. It's persistent instructions and project context, not a log of past changes.",
+      "1": "",
+      "2": "API keys should never be in a version-controlled file. CLAUDE.md contains instructions and conventions, not secrets.",
+      "3": "CLAUDE.md is human-authored, not auto-generated. It encodes decisions, preferences, and project-specific rules that can't be inferred from code alone."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.7 Session State & Resumption",
+    "difficulty": 1,
+    "question": "Why doesn't Claude automatically remember what happened in a previous session?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Claude deletes memories for privacy after each session",
+      "Each session starts with a fresh context window \u2014 there's no built-in cross-session memory",
+      "The developer needs to pay for the memory add-on",
+      "Claude remembers but pretends not to for legal reasons"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "This is why the memory system (CLAUDE.md, MEMORY.md, session handoffs) exists \u2014 it's an external persistence layer that compensates for the stateless nature of LLM sessions. Without explicit state files, every session starts from zero. The handoff template reduces ramp-up from minutes to seconds.",
+    "wrongExplanations": {
+      "0": "There's no active deletion. Sessions are stateless by architecture \u2014 there's nothing to delete because nothing persists between API calls by default.",
+      "1": "",
+      "2": "Memory isn't a paid add-on. Cross-session state is an architectural characteristic of LLMs that you work around with external files and context.",
+      "3": "This is not a legal or policy issue. LLM sessions are stateless by design \u2014 the model genuinely has no access to previous conversation data."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.7 Session State & Resumption",
+    "difficulty": 2,
+    "question": "What is the purpose of the '5-Question Reboot Test'?",
+    "explanation": "An agent has been running for 2 hours on a complex feature. The developer suspects the agent may have lost track of the overall goal and is working on tangential improvements.",
+    "photoUrl": null,
+    "options": [
+      "It tests whether the agent can answer 5 trivia questions to prove it's not hallucinating",
+      "It verifies the agent can still answer: Where am I? Where am I going? What's the goal? What have I learned? What have I done?",
+      "It checks if the agent responds within 5 seconds to prove context isn't overloaded",
+      "It asks 5 users to independently verify the agent's work"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "The 5-Question Reboot Test is a context staleness detector. If the agent can't clearly answer any of these questions, it's operating on degraded context and should re-read task files before proceeding. It's especially important after long sessions or when resuming after a break.",
+    "wrongExplanations": {
+      "0": "It's not a hallucination test. It's a context orientation check \u2014 verifying the agent knows its current position in the workflow.",
+      "1": "",
+      "2": "Response time has nothing to do with context quality. An agent can respond quickly with wrong context. The test checks content accuracy, not speed.",
+      "3": "This is a self-assessment for the agent, not a crowd-sourced review. The '5' refers to questions, not people."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.7 Session State & Resumption",
+    "difficulty": 2,
+    "question": "Where should project-specific lessons be stored vs. cross-project patterns?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Both go in the project's README.md",
+      "Project-specific in `<project>/tasks/lessons.md`, cross-project in `~/.claude/tasks/lessons-global.md`",
+      "All lessons go in CLAUDE.md regardless of scope",
+      "Cross-project patterns go in a shared Slack channel"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "The two-tier system prevents lessons from cluttering the wrong context. The --no-cache flag is useless noise in other projects. The Supabase cold start insight helps everywhere. Agents read the global file plus the project-specific one, getting both universal and local knowledge.",
+    "wrongExplanations": {
+      "0": "README.md is for human developers and users. Lessons files are specifically for agent context \u2014 they use different formats and serve different audiences.",
+      "1": "",
+      "2": "Dumping everything into CLAUDE.md violates the 'map, not encyclopedia' principle. CLAUDE.md should point to lessons files, not contain all lessons inline.",
+      "3": "Slack messages are invisible to agents. If it's not in a versioned file in the repository, it doesn't exist to the agent."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.7 Session State & Resumption",
+    "difficulty": 3,
+    "question": "What should a session handoff template include when a session is ending?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Just the git diff of all changes made",
+      "Project name/path, status, current task, files modified, next 3 steps, key decisions, and blockers",
+      "A full transcript of the entire session",
+      "Only the list of files that were opened during the session"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "The handoff template is optimized for scan-ability. A new session can read it in seconds and know exactly where to resume. The 'next 3 steps' field is critical \u2014 it eliminates the re-planning phase that would otherwise eat 10-15 minutes of the new session. Key decisions prevent re-litigating settled architectural choices.",
+    "wrongExplanations": {
+      "0": "A git diff shows what changed but not why, what decisions were made, or what's next. The new session needs context, not just code changes.",
+      "1": "",
+      "2": "A full transcript is far too long for context. The handoff template distills hours of work into a scannable summary. The goal is seconds to resume, not minutes of reading.",
+      "3": "Which files were opened tells you almost nothing about progress, decisions, or next steps. It's the least useful information for resumption."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.7 Session State & Resumption",
+    "difficulty": 3,
+    "question": "What does the '2-Action Rule' prevent in multi-modal agent sessions?",
+    "explanation": "An agent browses 5 web pages, views 3 screenshots, then tries to summarize findings. The summary is missing details from the first 3 pages and gets image descriptions wrong.",
+    "photoUrl": null,
+    "options": [
+      "API rate limiting from too many rapid requests",
+      "Context window overflow from too many tokens",
+      "Loss of visual and multimodal content that doesn't persist well in context",
+      "Browser session timeouts from inactivity"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "Visual content (screenshots, images, rendered web pages) degrades in context much faster than text. The 2-Action Rule forces the agent to write down key findings every 2 browser/search operations. It's the note-taking discipline that prevents 'I saw it but forgot the details' failures.",
+    "wrongExplanations": {
+      "0": "Rate limiting is a separate concern handled by retry logic, not by how often you save findings. The 2-Action Rule is about memory, not API limits.",
+      "1": "Context overflow is a real concern but happens at the token level. The 2-Action Rule specifically targets multimodal content loss, which happens well before the window fills.",
+      "2": "",
+      "3": "Browser timeouts are an infrastructure issue, not a cognitive one. The 2-Action Rule addresses information loss in the agent's reasoning, not connection management."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.7 Session State & Resumption",
+    "difficulty": 4,
+    "question": "A CLAUDE.md file has grown to 500 lines with accumulated instructions. What principle does this violate and what's the fix?",
+    "explanation": "Over 6 months, developers kept adding rules, preferences, and lessons directly to CLAUDE.md. New sessions take noticeably longer as Claude processes all of it, and some instructions contradict each other.",
+    "photoUrl": null,
+    "options": [
+      "It violates the token limit \u2014 split into multiple CLAUDE.md files in subdirectories",
+      "It violates 'map not encyclopedia' \u2014 refactor into a concise CLAUDE.md that points to deeper source files",
+      "It's fine \u2014 more instructions means better agent behavior",
+      "Delete it and start fresh \u2014 old instructions are always stale"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "CLAUDE.md should be a table of contents with pointers, not the encyclopedia itself. A 500-line file means everything competes for attention and nothing stands out. Refactor: keep the 20 most critical rules in CLAUDE.md, move domain-specific guidance to lessons files, design docs, and task plans that are loaded on-demand.",
+    "wrongExplanations": {
+      "0": "Multiple CLAUDE.md files in subdirectories adds complexity without reducing the total instruction volume. The fix is curating content, not distributing the bloat.",
+      "1": "",
+      "2": "More instructions does not mean better behavior. Past a threshold, additional instructions dilute the important ones. Agent attention is a finite resource, just like human attention.",
+      "3": "Deleting everything throws away hard-won institutional knowledge. The fix is organization and curation, not destruction."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.7 Session State & Resumption",
+    "difficulty": 4,
+    "question": "An agent fails the same way three times in a row. According to the 3-Strike Error Protocol, what should happen after the third failure?",
+    "explanation": "The agent tries to deploy a function, gets a permissions error, retries with the same command, fails again, tweaks a parameter, fails a third time.",
+    "photoUrl": null,
+    "options": [
+      "Retry 3 more times with exponential backoff",
+      "Escalate to the user with a summary of all three attempts and what was tried",
+      "Switch to a different AI model that might handle it better",
+      "Delete the failing code and start the task over"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "The protocol is: Strike 1 = targeted fix, Strike 2 = different approach (never repeat the same action), Strike 3 = broader rethink + search for solutions. After 3 strikes, escalate. The critical rule is 'if action failed, next action != same action.' Retrying identical commands is the most common agent anti-pattern.",
+    "wrongExplanations": {
+      "0": "Exponential backoff helps with transient errors (rate limits, network blips), not persistent failures. A permissions error won't resolve by waiting longer.",
+      "1": "",
+      "2": "Switching models is not part of the error protocol. The issue is likely environmental (wrong permissions, missing config), not model capability.",
+      "3": "Deleting and restarting throws away diagnostic information. The three failed attempts contain clues about the root cause that should be analyzed, not discarded."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.7 Session State & Resumption",
+    "difficulty": 5,
+    "question": "In a long-running agentic workflow spanning multiple sessions, what's the biggest risk of relying solely on MEMORY.md for state persistence?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "MEMORY.md could get corrupted by concurrent writes",
+      "The file grows large and recent entries overwrite or contradict earlier context that the agent stops reading carefully",
+      "MEMORY.md is automatically deleted after 7 days",
+      "The agent can't read markdown files larger than 1000 lines"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Single-file state accumulation suffers from attention decay \u2014 the agent pays more attention to recent entries and may not reconcile them with earlier ones. The fix is structured state: separate files for decisions (immutable once made), progress tracking (mutable), and lessons (append-only). Contradictions are caught by keeping decisions in their own file that's always read in full.",
+    "wrongExplanations": {
+      "0": "Concurrent write corruption is a real filesystem concern but unlikely in practice since sessions are sequential. The real risk is semantic, not mechanical.",
+      "1": "",
+      "2": "MEMORY.md is a regular file \u2014 it's not auto-deleted on any schedule. It persists until manually removed.",
+      "3": "There's no hard line limit on markdown file reading. The issue is attention quality degradation as files grow, not a technical read limit."
+    }
+  },
+  {
+    "category": "Agentic Architecture",
+    "subtopic": "1.7 Session State & Resumption",
+    "difficulty": 5,
+    "question": "How should an agentic system handle the case where CLAUDE.md instructions conflict with the user's live request?",
+    "explanation": "CLAUDE.md says 'always use TypeScript strict mode.' The user says 'add this JavaScript file without type checking, I need it quick.' The agent is stuck between two authorities.",
+    "photoUrl": null,
+    "options": [
+      "CLAUDE.md always takes priority \u2014 it represents the team's long-term decisions",
+      "The user's live request always wins \u2014 they're the authority in the current session",
+      "The agent should refuse to act until the conflict is resolved in CLAUDE.md",
+      "Follow the user's request but flag the deviation from CLAUDE.md so it can be reconciled later"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "Live user intent trumps static configuration, but deviations should be visible, not silent. Flagging creates an audit trail: the user made a conscious exception vs. the agent quietly ignoring established rules. The user might then update CLAUDE.md to allow JS files, or they might confirm it was a one-time exception. Either way, the system learns.",
+    "wrongExplanations": {
+      "0": "Rigidly following CLAUDE.md over explicit user requests makes the agent frustrating to work with. The user is present and conscious \u2014 they can override standing rules intentionally.",
+      "1": "Silently following the user without flagging the conflict means CLAUDE.md gradually becomes unreliable. No one knows which rules are still enforced and which have been casually overridden.",
+      "2": "Refusing to act creates a deadlock. The user wants something done now. The agent should be helpful while maintaining transparency, not blocking work on procedural grounds.",
+      "3": ""
+    }
+  }
+]

@@ -1,0 +1,1293 @@
+[
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.1 Explicit Criteria",
+    "difficulty": 1,
+    "question": "Why should prompts to Claude Code include explicit success criteria?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "To reduce the number of API calls Claude makes",
+      "So Claude can decide which criteria to prioritize on its own",
+      "To eliminate ambiguity so Claude knows exactly what 'done' looks like",
+      "Because Claude refuses to work without explicit criteria"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "Explicit criteria act as a contract between you and Claude. Without them, Claude fills in gaps with its own judgment \u2014 which may not match yours. The best criteria are testable: 'npm run typecheck passes' beats 'code is clean.'",
+    "wrongExplanations": {
+      "0": "Criteria don't reduce API calls \u2014 they reduce wasted iterations from misunderstood intent.",
+      "1": "The whole point is removing Claude's need to prioritize. You define what matters, not Claude.",
+      "2": "",
+      "3": "Claude will attempt any task even without criteria. It just might deliver something you didn't want."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.1 Explicit Criteria",
+    "difficulty": 1,
+    "question": "Which of these is the best example of a measurable success criterion?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "The form should feel intuitive to users",
+      "Validation should be comprehensive and robust",
+      "The code should follow best practices",
+      "`npm test -- validation.test.ts` passes with all 12 assertions green"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "The testability rule: if a criterion can't be verified by running a command or checking a specific behavior, rewrite it until it can. 'Feels intuitive' is subjective \u2014 different people will disagree. A passing test suite is binary: it works or it doesn't.",
+    "wrongExplanations": {
+      "0": "'Feels intuitive' is subjective \u2014 two people will disagree on what that means. Claude has no way to verify this.",
+      "1": "'Comprehensive and robust' is vague. How does Claude know when it's robust enough? There's no finish line.",
+      "2": "'Best practices' varies by team, language, and era. It gives Claude too much room for interpretation.",
+      "3": ""
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.1 Explicit Criteria",
+    "difficulty": 2,
+    "question": "What does the 'no-decisions constraint' mean when writing task specs for Claude Code?",
+    "explanation": "A lead engineer is training their team on writing specs that subagents will execute. They emphasize that execution agents should 'make zero decisions.'",
+    "photoUrl": null,
+    "options": [
+      "Claude should never choose between two libraries \u2014 always use the first one alphabetically",
+      "The spec should be detailed enough that Claude can complete the task without making judgment calls",
+      "Claude must ask the user before every single file edit",
+      "Claude should skip any task that requires a decision"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "The no-decisions test: 'Can an agent complete this task without making any decisions?' If not, the spec needs more detail. Ambiguity in specs leads to agents guessing \u2014 and guesses compound into bugs. When something is ambiguous, the agent should STOP and report, not improvise.",
+    "wrongExplanations": {
+      "0": "This is an absurd heuristic, not a real constraint. The point is that the spec should pre-make all decisions so Claude doesn't have to.",
+      "1": "",
+      "2": "Asking before every edit would destroy productivity. The spec should pre-answer questions, not create a confirmation loop.",
+      "3": "Skipping tasks defeats the purpose. The spec author makes the decisions upfront so the executor doesn't have to."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.1 Explicit Criteria",
+    "difficulty": 2,
+    "question": "A developer writes this criterion: 'The page loads quickly.' How should they improve it?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Change it to 'The page loads quickly on Chrome and Firefox'",
+      "Change it to 'The page loads in under 2 seconds with Lighthouse performance score above 90'",
+      "Remove it \u2014 performance isn't a valid criterion",
+      "Change it to 'The page loads as fast as possible'"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Good criteria have numbers. 'Under 2 seconds' and 'Lighthouse > 90' are both verifiable by running a command. A criterion without a threshold is just a wish \u2014 Claude has no way to know when it's been achieved.",
+    "wrongExplanations": {
+      "0": "Adding browsers doesn't fix the core problem \u2014 'quickly' is still undefined. What counts as quick? 1 second? 10 seconds?",
+      "1": "",
+      "2": "Performance is absolutely valid \u2014 it just needs to be measurable. Removing it means nobody checks performance at all.",
+      "3": "'As fast as possible' is even worse \u2014 it's an infinite optimization loop with no stopping point."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.1 Explicit Criteria",
+    "difficulty": 3,
+    "question": "Why should a task spec include both a 'File Manifest' and 'Acceptance Criteria'?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "The file manifest is just for documentation \u2014 only acceptance criteria matter",
+      "The manifest enables scope checking (flagging unexpected file changes) while criteria verify behavior",
+      "Both serve the same purpose \u2014 having both is redundant but conventional",
+      "The file manifest tells Claude which files to read, and criteria tell it which to write"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "After execution, you compare files actually touched against the manifest. If Claude modified files NOT in the spec, that's a red flag \u2014 it made a decision you didn't authorize. Criteria verify the output works; the manifest verifies the scope was respected. Together they catch both behavioral bugs and scope creep.",
+    "wrongExplanations": {
+      "0": "The manifest is actively used for post-execution scope checks, not just documentation. Files modified outside the manifest get flagged.",
+      "1": "",
+      "2": "They serve different purposes: manifest controls scope, criteria control behavior. Removing either creates a blind spot.",
+      "3": "The manifest lists files to CREATE, MODIFY, or DELETE \u2014 not read vs. write. Claude reads whatever it needs for context."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.1 Explicit Criteria",
+    "difficulty": 3,
+    "question": "When is it acceptable for an execution agent to deviate from the spec?",
+    "explanation": "A subagent executing a task spec encounters an edge case the spec didn't cover. It decides to add an extra validation function not mentioned in the spec.",
+    "photoUrl": null,
+    "options": [
+      "When the agent identifies an obvious improvement",
+      "When the deviation is small (under 10 lines of code)",
+      "Never \u2014 the agent should stop and report the ambiguity instead of guessing",
+      "When the agent has high confidence the change is correct"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "The execution rule is strict: 'Follow the specification EXACTLY. Do not add anything not specified. If something is ambiguous, STOP and report \u2014 do not guess.' Even well-intentioned additions compound into unpredictable behavior when multiple agents are working in parallel.",
+    "wrongExplanations": {
+      "0": "Obvious improvements are subjective. What seems obvious to Claude might break an assumption the spec author was relying on.",
+      "1": "Size doesn't determine safety. A 2-line change in the wrong place can break everything. The spec boundary is absolute.",
+      "2": "",
+      "3": "Confidence doesn't matter \u2014 the agent's job is execution, not decision-making. High-confidence guesses are still guesses."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.1 Explicit Criteria",
+    "difficulty": 4,
+    "question": "A spec has this criterion: 'No console errors on page load.' Why is this actually a well-formed criterion despite seeming vague?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "It's not well-formed \u2014 it should specify which console errors are acceptable",
+      "It's verifiable by a concrete action: open the page, check the console, count errors \u2014 the answer is binary",
+      "It's well-formed because console errors are always critical bugs",
+      "It's well-formed because Claude can automatically suppress all console errors"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "The test: can you verify it by running a command or checking a specific behavior? Open DevTools, load the page, check the console \u2014 zero errors means pass, any error means fail. It's binary and observable, which makes it testable despite the simple language.",
+    "wrongExplanations": {
+      "0": "The criterion says 'no errors' \u2014 that IS specific. Zero is an unambiguous number. There's no room for interpretation about which errors are okay.",
+      "1": "",
+      "2": "Not all console errors are critical (deprecation warnings, third-party script noise), but the criterion says NO errors \u2014 that's what makes it clear, not the severity.",
+      "3": "Suppressing errors hides problems rather than fixing them. The criterion demands zero errors, not hidden errors."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.1 Explicit Criteria",
+    "difficulty": 4,
+    "question": "In a multi-agent wave execution, why must acceptance criteria be verified between waves?",
+    "explanation": "A team runs Wave 1 (3 parallel tasks) then immediately starts Wave 2. Wave 2 agents encounter broken imports because a Wave 1 agent created a file with the wrong export name.",
+    "photoUrl": null,
+    "options": [
+      "To give the developer time to review code quality between waves",
+      "Because each wave's output becomes the foundation for the next \u2014 broken foundations cascade",
+      "To limit the number of concurrent subagents for performance reasons",
+      "Because Claude's context window resets between waves"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Waves are like building floors: you can't build the third floor on a broken second floor. Verifying criteria between waves catches errors before they propagate. One broken export in Wave 1 can silently break 5 tasks in Wave 2 \u2014 and debugging the compound failure is 10x harder than catching it early.",
+    "wrongExplanations": {
+      "0": "Code review is valuable but the primary purpose is catching functional breaks before dependent tasks build on them.",
+      "1": "",
+      "2": "Inter-wave verification is about correctness, not performance. You could run 100 agents \u2014 they'd still need correct inputs.",
+      "3": "Context doesn't reset between waves. The issue is code correctness \u2014 Wave 2 agents import files Wave 1 created."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.1 Explicit Criteria",
+    "difficulty": 5,
+    "question": "A spec says: 'MODIFY `Dashboard.tsx` \u2014 after the line containing `import { Settings }`, add the new import.' Why use a context anchor instead of a line number?",
+    "explanation": "Two agents are working in parallel. Agent A modifies Dashboard.tsx in Wave 1, shifting all line numbers. Agent B's spec references line 14 for its insertion point.",
+    "photoUrl": null,
+    "options": [
+      "Context anchors are easier for humans to read during spec review",
+      "Line numbers are more reliable because they're absolute positions",
+      "Context anchors survive concurrent edits \u2014 line numbers shift when other agents modify the same file",
+      "Context anchors let Claude search the file, which is slower but more thorough"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "In parallel execution, line numbers are fragile: any insertion or deletion shifts every subsequent line. Context anchors ('after the line containing X') are resilient because they match by content, not position. This is why specs should include BOTH line numbers (for quick reference) and context anchors (for reliable execution).",
+    "wrongExplanations": {
+      "0": "Readability is a nice side effect but not the primary reason. The real issue is correctness under concurrent modification.",
+      "1": "The opposite is true in multi-agent scenarios. Line numbers are the most fragile reference because any edit shifts them.",
+      "2": "",
+      "3": "Speed isn't the concern. Context anchors are about correctness \u2014 finding the right location even after the file has been modified by other agents."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.1 Explicit Criteria",
+    "difficulty": 5,
+    "question": "What's the spec granularity test for determining if a task spec needs to be split?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "If the spec takes more than 5 minutes to read, split it",
+      "If the spec touches more than 3 files, split it",
+      "If an agent would need to make any decisions to complete it, the spec needs more detail or splitting",
+      "If the spec has more than 2 acceptance criteria, split it"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "The granularity test is: 'Can an agent complete this task without making any decisions?' If the answer is no, either add more detail or split into smaller tasks. Additionally, if a task spec exceeds ~50 lines, it's likely trying to cover too much and should be split. The 70-line spec covering API + migration + frontend is three distinct tasks.",
+    "wrongExplanations": {
+      "0": "Reading time is subjective and depends on the reader. The test is about decision-making, not length alone.",
+      "1": "File count is a rough heuristic but not the real test. A 3-file change with clear specs needs no splitting; a 1-file change with ambiguous logic does.",
+      "2": "",
+      "3": "Multiple criteria are normal and expected. A well-scoped task often has 3-5 criteria. The issue is decision-making burden, not criteria count."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.2 Few-Shot Prompting",
+    "difficulty": 1,
+    "question": "What is 'few-shot prompting'?",
+    "explanation": "A developer wants Claude Code to rename variables following a specific convention. Instead of explaining the rules, their colleague suggests 'just show it a few examples.'",
+    "photoUrl": null,
+    "options": [
+      "Giving Claude a few attempts to get the answer right",
+      "Providing example input-output pairs in the prompt so Claude learns the desired pattern",
+      "Limiting Claude to only a few tokens of output",
+      "Running Claude multiple times and picking the best result"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Few-shot prompting is one of the most powerful techniques in prompt engineering. Instead of describing rules abstractly, you show Claude 2-3 concrete examples of input and desired output. Claude infers the pattern from the examples \u2014 often more accurately than from verbose instructions.",
+    "wrongExplanations": {
+      "0": "Few-shot refers to examples provided upfront, not multiple attempts. Claude processes the prompt once.",
+      "1": "",
+      "2": "Token limits are controlled by max_tokens in the API, not by the prompting technique.",
+      "3": "Running Claude multiple times is called 'sampling' or 'best-of-N.' Few-shot is about the prompt content, not execution strategy."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.2 Few-Shot Prompting",
+    "difficulty": 1,
+    "question": "What does 'zero-shot' mean compared to 'few-shot'?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Zero-shot means Claude has never been trained on this task type",
+      "Zero-shot means providing no examples \u2014 relying only on instructions or Claude's training",
+      "Zero-shot means the prompt has zero words",
+      "Zero-shot means Claude will produce zero errors"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Zero-shot = instructions only, no examples. One-shot = one example. Few-shot = 2-3 examples. For well-understood tasks (CSV to JSON), zero-shot often works fine. For tasks with nuanced formatting or custom conventions, few-shot dramatically improves accuracy.",
+    "wrongExplanations": {
+      "0": "Claude has been trained on virtually all common task types. Zero-shot refers to the prompt technique, not training coverage.",
+      "1": "",
+      "2": "Zero-shot prompts still contain instructions or questions \u2014 'zero' refers to the number of examples, not the word count.",
+      "3": "Zero-shot says nothing about error rates. It just means no examples were provided in the prompt."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.2 Few-Shot Prompting",
+    "difficulty": 2,
+    "question": "When is few-shot prompting most valuable compared to zero-shot?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "When the task is simple and well-known (like sorting a list)",
+      "When you need Claude to follow a custom format or convention that differs from common patterns",
+      "When you want Claude to write longer responses",
+      "When you're using the Claude API but not Claude Code"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Few-shot shines when the desired output has idiosyncratic formatting or follows conventions Claude hasn't seen much in training. Showing 2-3 examples of your exact commit format teaches the pattern faster and more reliably than describing the rules in prose.",
+    "wrongExplanations": {
+      "0": "Simple, well-known tasks are where zero-shot already works well. You don't need examples for 'sort this list.'",
+      "1": "",
+      "2": "Response length is controlled by instructions like 'write a detailed explanation,' not by providing examples.",
+      "3": "Few-shot works identically in Claude Code and the API. The technique is about prompt content, not the interface."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.2 Few-Shot Prompting",
+    "difficulty": 2,
+    "question": "How many examples are typically optimal for few-shot prompting?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "At least 10 examples for statistical significance",
+      "Exactly 1 example \u2014 more is wasteful",
+      "2-3 examples typically hit the sweet spot of clarity vs. context usage",
+      "As many as possible to maximize accuracy"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "Research and practice show that 2-3 well-chosen examples capture the pattern while conserving context window tokens. Beyond 3, you get diminishing returns and waste tokens that could hold actual task content. The key is example quality, not quantity \u2014 pick examples that cover the main variations.",
+    "wrongExplanations": {
+      "0": "This isn't statistics \u2014 Claude infers patterns, not distributions. 10 examples waste context tokens with minimal accuracy gain over 3.",
+      "1": "One example helps but can be ambiguous \u2014 Claude might fixate on incidental details. Two examples let it triangulate the actual pattern.",
+      "2": "",
+      "3": "More examples consume context tokens that could hold the actual code or task content. There's a real cost to stuffing the prompt."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.2 Few-Shot Prompting",
+    "difficulty": 3,
+    "question": "What's the risk of providing examples that are too similar to each other in few-shot prompting?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Claude will memorize the examples instead of learning the pattern",
+      "Claude may infer an overly narrow pattern that doesn't cover edge cases or variations",
+      "Too-similar examples cause Claude to respond more slowly",
+      "Claude will refuse to process duplicate-looking examples"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Examples implicitly define scope. If all 3 examples show flat objects, Claude infers the task is about flat objects. Include at least one example with the 'hard' variation (nested types, arrays, optional fields) to show Claude the full range of expected input.",
+    "wrongExplanations": {
+      "0": "Claude doesn't memorize \u2014 it infers patterns. The issue isn't memorization but pattern inference from a non-representative sample.",
+      "1": "",
+      "2": "Example similarity has no effect on processing speed. The token count matters, not the content diversity.",
+      "3": "Claude doesn't reject similar examples. It processes them and infers whatever pattern they collectively suggest."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.2 Few-Shot Prompting",
+    "difficulty": 3,
+    "question": "A developer wants Claude to generate API error responses in a specific format. Which few-shot approach is best?",
+    "explanation": "The team's API returns errors in a custom format with status codes, error codes, and user-friendly messages. Plain instructions produce inconsistent results.",
+    "photoUrl": null,
+    "options": [
+      "Show 3 examples of successful API responses only",
+      "Show 10 examples covering every possible error code",
+      "Show 2-3 examples covering different error types (validation, auth, not-found) with the exact desired format",
+      "Describe the format rules in detail and skip examples entirely"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "Effective few-shot examples are diverse and representative. Showing one validation error, one auth error, and one not-found error teaches both the format AND the variation range. Claude generalizes from these to handle other error types in the same format.",
+    "wrongExplanations": {
+      "0": "Showing only success responses teaches the success format but gives Claude no guidance on how errors should look.",
+      "1": "10 examples is excessive and wastes context. 2-3 diverse examples convey the same pattern with less token cost.",
+      "2": "",
+      "3": "The premise of the question is that plain instructions already produced inconsistent results. Examples are more reliable for format-sensitive tasks."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.2 Few-Shot Prompting",
+    "difficulty": 4,
+    "question": "In Claude Code, where is the most effective place to put few-shot examples for a recurring task?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "In a comment at the top of every source file",
+      "In the system prompt via CLAUDE.md so they persist across all sessions",
+      "In environment variables that Claude reads at startup",
+      "In a separate LLM that Claude consults for formatting"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "CLAUDE.md is loaded at conversation start and survives context compression. Placing few-shot examples there means every session gets the examples automatically \u2014 no manual pasting. Keep them concise to respect the 'map not encyclopedia' principle.",
+    "wrongExplanations": {
+      "0": "Source file comments are for human developers reading that file. Claude doesn't scan all files at startup \u2014 it reads them on demand.",
+      "1": "",
+      "2": "Claude Code doesn't read environment variables for prompt content. Environment variables are for secrets and configuration, not examples.",
+      "3": "There's no multi-LLM consultation system. Claude Code uses a single model with its own context window."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.2 Few-Shot Prompting",
+    "difficulty": 4,
+    "question": "Why might few-shot examples be LESS effective for a task Claude already handles well zero-shot?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Examples confuse Claude when it already knows the task",
+      "The examples consume context tokens that could hold more actual code, with zero accuracy benefit",
+      "Claude ignores examples for tasks it's been trained on",
+      "Few-shot only works for creative tasks, not technical ones"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Context window tokens are a finite resource. If Claude already handles TS-to-JS conversion perfectly, those example tokens are pure waste \u2014 they could instead hold more of the actual codebase. Apply few-shot only where zero-shot falls short: custom formats, unusual conventions, or ambiguous tasks.",
+    "wrongExplanations": {
+      "0": "Examples don't confuse Claude \u2014 they just don't help when the task is already clear. The issue is wasted context, not confusion.",
+      "1": "",
+      "2": "Claude doesn't ignore examples. It always processes them and tries to match the pattern \u2014 which is why irrelevant examples can sometimes be mildly harmful.",
+      "3": "Few-shot works for both creative and technical tasks. The criterion is whether Claude needs guidance, not the task category."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.2 Few-Shot Prompting",
+    "difficulty": 5,
+    "question": "A developer's few-shot examples accidentally include a subtle bug (wrong date format in one example). What's the likely impact?",
+    "explanation": "Three examples show ISO dates, but one example uses MM/DD/YYYY. Claude's output inconsistently mixes both formats.",
+    "photoUrl": null,
+    "options": [
+      "Claude will detect the inconsistency and ask for clarification",
+      "Claude may reproduce the inconsistency, learning the mixed pattern as intentional variation",
+      "Claude will always follow the majority format and ignore the outlier",
+      "The buggy example will be filtered out by Claude's training"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Claude treats examples as ground truth \u2014 it assumes you meant every detail. An inconsistent example teaches Claude that variation is acceptable. This is why example quality matters more than quantity. Always review examples for accidental inconsistencies before adding them to prompts or CLAUDE.md.",
+    "wrongExplanations": {
+      "0": "Claude rarely flags inconsistencies in few-shot examples. It assumes the examples are intentional and tries to learn the pattern \u2014 including the variation.",
+      "1": "",
+      "2": "Claude doesn't do majority voting on examples. It tries to learn a pattern that explains ALL examples \u2014 including the outlier.",
+      "3": "Claude's training doesn't filter your prompt content. Examples in your prompt are processed as-is, bugs and all."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.2 Few-Shot Prompting",
+    "difficulty": 5,
+    "question": "How can few-shot examples and explicit criteria work together for maximum effectiveness?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Use examples for the common cases and criteria for the edge cases and constraints",
+      "Use criteria only \u2014 examples are redundant if the rules are clear enough",
+      "Use examples only \u2014 criteria are redundant if the examples are good enough",
+      "Alternate between examples and criteria in the prompt for variety"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "Examples teach format and style intuitively \u2014 'make it look like this.' Criteria enforce boundaries and edge cases explicitly \u2014 'never use var, always handle null.' Together, examples show the happy path while criteria catch the edge cases that examples can't cover. This combination is how production-grade specs work.",
+    "wrongExplanations": {
+      "0": "",
+      "1": "Rules alone often produce technically correct but stylistically wrong output. Examples anchor the style that rules can't fully describe.",
+      "2": "Examples can't cover every edge case. Without explicit criteria, Claude may handle rare cases inconsistently.",
+      "3": "Alternating for variety has no benefit. The structure should be logical (examples first to show the pattern, then criteria for constraints), not varied for its own sake."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.3 Structured Output with tool_use",
+    "difficulty": 1,
+    "question": "What is the primary advantage of using tool_use to get structured output from Claude?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Tool use makes Claude respond faster",
+      "Tool use forces Claude to return data matching a defined JSON schema, eliminating parsing issues",
+      "Tool use gives Claude access to the internet for real-time data",
+      "Tool use is required for Claude to output any JSON at all"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "When you define a tool with a JSON schema, Claude's output is guaranteed to conform to that schema \u2014 correct types, required fields present, no extra prose mixed in. This replaces fragile regex parsing with reliable structured data.",
+    "wrongExplanations": {
+      "0": "Tool use doesn't affect response speed. It affects the format and structure of the output, not performance.",
+      "1": "",
+      "2": "Tool use defines input/output schemas \u2014 it doesn't grant internet access. Web access requires separate tools like WebFetch.",
+      "3": "Claude can output JSON in plain text responses. Tool use just guarantees the JSON matches a specific schema."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.3 Structured Output with tool_use",
+    "difficulty": 1,
+    "question": "What is a 'tool definition' in the context of Claude's API?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "A plugin that gives Claude the ability to run code on a server",
+      "A JSON schema describing a function's name, description, and expected input parameters",
+      "A configuration file that sets Claude's temperature and max tokens",
+      "A pre-trained model fine-tuned for a specific task"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "A tool definition tells Claude: 'Here is a function you can call. It's named X, it does Y, and it expects these parameters with these types.' Claude then generates a structured tool_use response with arguments matching the schema \u2014 no free-form text, just clean structured data.",
+    "wrongExplanations": {
+      "0": "Tool definitions describe schemas \u2014 they don't execute code. The application code that runs when Claude calls the tool is separate.",
+      "1": "",
+      "2": "Temperature and max_tokens are set in the API request parameters, not in tool definitions.",
+      "3": "Tool definitions are runtime schemas, not trained models. They're passed with each API call, not pre-trained."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.3 Structured Output with tool_use",
+    "difficulty": 2,
+    "question": "How does Claude Code use tool_use internally for operations like file editing?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Claude Code sends prose instructions to a separate AI that structures them",
+      "Each operation (Edit, Read, Bash) is defined as a tool with a JSON schema, and Claude calls them with structured arguments",
+      "Claude Code uses regex to extract file paths and changes from Claude's text responses",
+      "The Edit tool is hardcoded \u2014 Claude just triggers it with a keyword"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Every Claude Code operation \u2014 Read, Edit, Write, Bash, Grep, Glob \u2014 is a tool definition with a precise JSON schema. When Claude wants to edit a file, it emits a tool_use block with file_path, old_string, and new_string as structured parameters. This is why edits are reliable: the schema enforces the format.",
+    "wrongExplanations": {
+      "0": "There's no secondary AI. Claude itself generates the structured tool calls based on the tool definitions it receives.",
+      "1": "",
+      "2": "Regex parsing of prose would be fragile and error-prone. Tool use provides guaranteed structure without parsing.",
+      "3": "Tools are schema-driven, not keyword-triggered. Claude generates structured JSON arguments, not trigger words."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.3 Structured Output with tool_use",
+    "difficulty": 2,
+    "question": "A developer defines a tool to extract product info. Which schema approach ensures Claude returns the correct data shape?",
+    "explanation": "They need Claude to always return {name: string, price: number, inStock: boolean} \u2014 no exceptions.",
+    "photoUrl": null,
+    "options": [
+      "Ask Claude nicely in the system prompt to return those three fields",
+      "Define the tool with required properties, explicit types, and no additionalProperties",
+      "Parse Claude's response and fix any missing fields manually",
+      "Use few-shot examples of the JSON shape and hope Claude follows them"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "JSON Schema enforcement through tool definitions is deterministic: required fields must appear, types must match. This is fundamentally more reliable than prompt-based approaches because the structure is enforced at the generation level, not by post-processing.",
+    "wrongExplanations": {
+      "0": "Prompt instructions are best-effort \u2014 Claude usually follows them but can deviate. Schema enforcement is guaranteed.",
+      "1": "",
+      "2": "Fixing responses after the fact is fragile and adds latency. Schema enforcement prevents malformed responses from being generated at all.",
+      "3": "Few-shot examples improve consistency but don't guarantee it. A schema is a hard constraint; an example is a soft suggestion."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.3 Structured Output with tool_use",
+    "difficulty": 3,
+    "question": "What happens when you define a tool that Claude should 'call' but you never actually execute it server-side?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Claude will detect the tool isn't real and refuse to call it",
+      "The API will throw an error because unexecuted tools are invalid",
+      "This is a valid pattern \u2014 tool definitions can be used purely for structured output without actual execution",
+      "Claude will call the tool but include a warning that it can't verify the results"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "Using tool definitions purely for structured extraction is a well-known pattern. Claude generates the tool_use response with schema-compliant arguments, and your code simply reads those arguments as structured data. No server-side function needs to exist. Anthropic's documentation explicitly supports this pattern.",
+    "wrongExplanations": {
+      "0": "Claude has no way to know whether a tool is real. It generates the call based on the schema; execution is the application's concern.",
+      "1": "The API only requires that tool definitions are valid schemas. Whether you execute the tool call is entirely up to your application.",
+      "2": "",
+      "3": "Claude doesn't add meta-commentary about tool execution. It generates the structured call and moves on."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.3 Structured Output with tool_use",
+    "difficulty": 3,
+    "question": "Why might a developer use `tool_choice: {type: 'tool', name: 'extract_data'}` in their API call?",
+    "explanation": "A developer's extraction pipeline needs Claude to ALWAYS return structured data via the tool, never a text response. Sometimes Claude responds with prose instead of calling the tool.",
+    "photoUrl": null,
+    "options": [
+      "To make Claude call the tool faster",
+      "To force Claude to use that specific tool, guaranteeing structured output instead of a text response",
+      "To prevent Claude from using any other tools in the conversation",
+      "To let Claude choose the best tool from a list"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "By default (tool_choice: 'auto'), Claude decides whether to call a tool or respond with text. Setting tool_choice to a specific tool forces Claude to always call that tool \u2014 guaranteeing you get structured output. This is essential for pipelines where every response must be parseable.",
+    "wrongExplanations": {
+      "0": "tool_choice doesn't affect speed \u2014 it affects whether Claude uses the tool at all vs. responding with text.",
+      "1": "",
+      "2": "tool_choice with a specific tool forces that ONE tool but doesn't prevent Claude from also calling others if multiple are defined.",
+      "3": "That's what tool_choice: 'auto' does. Specifying a name does the opposite \u2014 it removes Claude's choice."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.3 Structured Output with tool_use",
+    "difficulty": 4,
+    "question": "A developer defines a tool with an `enum` constraint: `status: {type: 'string', enum: ['active', 'inactive', 'pending']}`. What does this enforce?",
+    "explanation": "They need Claude to classify items into exactly one of three categories, with no creative alternatives like 'partially active' or 'unknown.'",
+    "photoUrl": null,
+    "options": [
+      "Claude will include all three values in every response",
+      "Claude is constrained to output only one of those three exact strings for that field",
+      "Claude will ask the user which status to choose",
+      "The enum is just a suggestion \u2014 Claude can still output other values"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "JSON Schema enums in tool definitions are hard constraints. Claude's generation is restricted to exactly those values \u2014 it cannot output 'partially active' or any variant. This is why tool_use is superior to prompt instructions for classification: the output space is literally bounded by the schema.",
+    "wrongExplanations": {
+      "0": "The field holds ONE value, not all values. The enum defines the allowed set; Claude picks one.",
+      "1": "",
+      "2": "Claude doesn't interactively ask about tool parameters. It selects the most appropriate value based on context.",
+      "3": "Enums in JSON Schema tool definitions are enforced, not advisory. Claude cannot generate a value outside the enum list."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.3 Structured Output with tool_use",
+    "difficulty": 4,
+    "question": "How should a developer handle nested structured output (e.g., an order with multiple line items, each having their own fields)?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Define separate tools for orders and line items, then stitch them together",
+      "Use a single tool definition with nested object schemas and array types in the JSON Schema",
+      "Ask Claude to return the nested data as a formatted string and parse it manually",
+      "Flatten all fields into a single level \u2014 nested schemas aren't supported"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "JSON Schema supports full nesting: objects within objects, arrays of objects, arrays of arrays. A single tool definition can describe arbitrarily complex structures with `properties`, `items`, and `$ref`. Claude will generate compliant nested JSON in a single tool call.",
+    "wrongExplanations": {
+      "0": "Multiple tools add unnecessary complexity. A single tool with a nested schema handles this cleanly in one call.",
+      "1": "",
+      "2": "String parsing defeats the purpose of tool_use. The whole point is avoiding manual parsing by getting schema-validated structured data.",
+      "3": "Nested schemas are fully supported. JSON Schema's type system handles objects, arrays, and arbitrary nesting depth."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.3 Structured Output with tool_use",
+    "difficulty": 5,
+    "question": "A developer notices Claude sometimes fills a tool's optional `notes` field with hallucinated information. What's the best mitigation?",
+    "explanation": "The tool schema has an optional `notes` string field. When the source text doesn't contain relevant notes, Claude invents plausible-sounding but incorrect ones rather than omitting the field.",
+    "photoUrl": null,
+    "options": [
+      "Make the notes field required with a default value",
+      "Add a description to the field like 'Only populate if explicitly stated in the source. Use null if not found' and consider making it nullable",
+      "Remove the notes field entirely \u2014 optional fields always cause hallucination",
+      "Increase temperature so Claude is more creative with the notes"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Tool parameter descriptions act as micro-instructions. Adding 'only populate if explicitly stated in source text, otherwise null' gives Claude clear criteria for when to fill vs. skip the field. Making the field nullable (`anyOf: [{type: 'string'}, {type: 'null'}]`) gives Claude a structured way to express absence rather than forcing it to generate a string.",
+    "wrongExplanations": {
+      "0": "Making it required with a default forces Claude to always fill it, which is the opposite of what you want for information that may not exist.",
+      "1": "",
+      "2": "Optional fields are valuable \u2014 removing them loses legitimate data. The fix is guiding Claude on when to use them, not eliminating them.",
+      "3": "Higher temperature increases randomness, making hallucination more likely, not less. This is the opposite of the right direction."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.3 Structured Output with tool_use",
+    "difficulty": 5,
+    "question": "When building an agentic pipeline, why is combining tool_use with explicit criteria in the tool description more robust than either approach alone?",
+    "explanation": "A pipeline uses Claude to triage support tickets. The tool schema enforces the output structure, but Claude still miscategorizes tickets. Adding criteria to the tool descriptions improves accuracy.",
+    "photoUrl": null,
+    "options": [
+      "Tool descriptions are weighted more heavily than system prompts in Claude's attention",
+      "The schema enforces structure (correct types, required fields) while the description enforces semantics (what values MEAN and when to use them)",
+      "Combining both makes Claude process the request twice for double accuracy",
+      "Tool descriptions override Claude's training data, preventing all errors"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Schema and description solve different problems. The schema guarantees `priority` is one of ['low','medium','high'] \u2014 a structural constraint. The description says 'high = customer data at risk or service down; medium = feature broken with workaround' \u2014 a semantic constraint. Without the description, Claude picks structurally valid but semantically wrong values. This is the tool_use equivalent of combining few-shot examples with explicit criteria.",
+    "wrongExplanations": {
+      "0": "There's no documented 'attention weight' difference. Both are processed as part of the prompt. The value is that they constrain different dimensions (structure vs. meaning).",
+      "1": "",
+      "2": "Claude doesn't double-process. It processes the entire prompt (schema + description) once. The benefit is richer constraints, not repeated processing.",
+      "3": "Nothing overrides training data entirely. Tool descriptions provide task-specific guidance that steers Claude's judgment, but they don't eliminate all errors."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.4 Validation-Retry Loops",
+    "difficulty": 1,
+    "question": "What is the basic structure of a validation-retry loop in Claude Code?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Generate output, then validate, then fix errors, then re-validate",
+      "Generate output once and submit immediately",
+      "Ask the user to manually check every output",
+      "Run the same prompt three times and pick the longest response"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "The generate-validate-fix-revalidate loop is the core self-correction pattern. Claude generates output, checks it against criteria, fixes any issues, and confirms the fix. This mirrors how a senior developer writes code then reviews their own work before submitting.",
+    "wrongExplanations": {
+      "0": "",
+      "1": "Single-shot generation with no validation is error-prone. The whole point of the loop is to catch and fix mistakes before presenting to the user.",
+      "2": "Manual checking defeats the purpose of automation. Self-validation lets Claude catch common issues without human intervention.",
+      "3": "Repeating the same prompt without validation criteria doesn't improve quality \u2014 it just wastes tokens. Validation needs defined success criteria."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.4 Validation-Retry Loops",
+    "difficulty": 1,
+    "question": "Why should you define explicit acceptance criteria before asking Claude to self-validate?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Claude cannot run any validation without a numbered list",
+      "It reduces token usage by 50%",
+      "Without clear criteria, validation becomes subjective and unreliable",
+      "Acceptance criteria are only needed for unit tests, not prompts"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "Vague criteria like 'make sure it's good' give Claude nothing concrete to check against. Testable criteria like 'npm run typecheck passes' or 'response contains exactly 5 items' make validation mechanical and reliable. If a criterion can't be verified by running a command, rewrite it.",
+    "wrongExplanations": {
+      "0": "Claude can validate without numbered lists. The issue is about specificity of what to check, not the formatting of the criteria.",
+      "1": "Explicit criteria don't inherently reduce tokens \u2014 they actually add tokens. The benefit is correctness, not efficiency.",
+      "3": "Acceptance criteria apply to any output that needs verification. Prompt-level validation is just as important as test-level validation."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.4 Validation-Retry Loops",
+    "difficulty": 2,
+    "question": "What is the 3-Strike Error Protocol in the context of retry loops?",
+    "explanation": "Claude has attempted to fix a failing test twice with the same approach and it still fails. What should happen next according to best practices?",
+    "photoUrl": null,
+    "options": [
+      "Retry the exact same fix a third time with more tokens",
+      "Skip the test and move on",
+      "Strike 1: targeted fix, Strike 2: different approach, Strike 3: broader rethink, then escalate",
+      "Delete the failing test and write a new one"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "The critical rule is: if action_failed, next_action != same_action. Each retry must mutate the approach. After 3 strikes, escalate to the user with a summary of what was tried. This prevents infinite loops of the same failing fix.",
+    "wrongExplanations": {
+      "0": "Repeating the exact same approach violates the core rule: never repeat the same failing action. More tokens won't fix a wrong approach.",
+      "1": "Skipping failures silently creates hidden bugs. The point is to escalate, not ignore.",
+      "3": "Deleting tests to make the suite pass is masking problems, not solving them. The test may be catching a real bug."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.4 Validation-Retry Loops",
+    "difficulty": 2,
+    "question": "Which self-validation pattern is most effective for code generation?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Ask Claude if the code 'looks right' after generating it",
+      "Generate code, then run typecheck and tests as validation steps",
+      "Generate the code twice and compare the two versions",
+      "Only validate if the user explicitly requests it"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "The strongest validation is mechanical \u2014 running actual commands like typecheck, linter, and test suite. Claude's self-assessment ('looks right') is subjective and unreliable. Real tools give binary pass/fail signals that can't be hallucinated.",
+    "wrongExplanations": {
+      "0": "Self-assessment without running tools is unreliable. Claude can't catch runtime errors by reading code \u2014 it needs to execute validation commands.",
+      "2": "Two generations of the same prompt may both have the same bug. Comparison doesn't verify correctness, only consistency.",
+      "3": "Waiting for user requests to validate wastes the user's time. Proactive validation catches issues before the user even sees them."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.4 Validation-Retry Loops",
+    "difficulty": 3,
+    "question": "In a generate-validate loop, what should happen when validation reveals the ENTIRE approach is wrong, not just a small bug?",
+    "explanation": "Claude generated a caching system using localStorage, but validation reveals the app runs server-side where localStorage doesn't exist. The fix isn't a tweak \u2014 it's a redesign.",
+    "photoUrl": null,
+    "options": [
+      "Patch localStorage with a polyfill and continue",
+      "Add a try-catch around localStorage calls",
+      "Stop and re-plan from scratch \u2014 no incremental patching",
+      "Increase the retry count to 10 and keep trying"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "When something goes sideways at any phase: STOP and re-plan from scratch. Incremental patching of a fundamentally wrong approach creates fragile code. A localStorage polyfill on the server is a band-aid that creates tech debt. Replan with the correct constraint (server-side) from the start.",
+    "wrongExplanations": {
+      "0": "Polyfilling a browser API on the server is a hack that creates maintenance burden and potential bugs. The approach itself is wrong.",
+      "1": "Wrapping errors doesn't fix the architectural mismatch. The caching strategy needs to use a server-compatible store like Redis or in-memory cache.",
+      "3": "More retries of the same wrong approach will never produce a correct result. When the foundation is wrong, start over."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.4 Validation-Retry Loops",
+    "difficulty": 3,
+    "question": "How should validation criteria differ between a 'quick fix' task and a 'new feature' task?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Quick fixes need MORE validation because they're riskier",
+      "Quick fixes: run tests + typecheck. New features: tests + typecheck + spec compliance + scope check + edge cases",
+      "Both should use identical validation \u2014 consistency matters most",
+      "New features don't need validation because they have specs"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Validation depth should scale with task complexity. A one-liner fix needs basic regression checks. A multi-file feature needs spec compliance (do files match the manifest?), scope checks (were unexpected files modified?), and all acceptance criteria verified. Over-validating trivial changes wastes tokens; under-validating complex changes misses bugs.",
+    "wrongExplanations": {
+      "0": "Quick fixes are lower risk precisely because they touch less code. They need less validation, not more. The risk scales with scope.",
+      "2": "Identical validation regardless of scope is wasteful for small tasks and insufficient for large ones. Scale validation to match complexity.",
+      "3": "Having a spec doesn't eliminate bugs \u2014 it gives you criteria to validate against. Specs are the input to validation, not a replacement for it."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.4 Validation-Retry Loops",
+    "difficulty": 4,
+    "question": "What is the danger of validation loops that check syntax but not semantics?",
+    "explanation": "A team's retry loop checks that generated code compiles and passes typecheck, but users keep reporting that the feature doesn't actually do what was requested.",
+    "photoUrl": null,
+    "options": [
+      "Syntax-only validation is fine \u2014 semantic bugs are the user's responsibility",
+      "The code passes all machine checks but doesn't match the user's intent \u2014 validation must include behavioral assertions",
+      "Adding more syntax checks will eventually catch semantic bugs too",
+      "Semantic validation is impossible for AI systems"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Code that compiles and type-checks can still be completely wrong functionally. Validation must include behavioral checks: does the output match what the user asked for? Does navigating to /feature show the expected element? Does the API return the correct data shape? The 3 Critical Questions include: 'Does the output match what the user asked for?'",
+    "wrongExplanations": {
+      "0": "Shifting blame to the user defeats the purpose of self-validation. The whole point is catching issues before the user sees them.",
+      "2": "Syntax and semantics are orthogonal concerns. You can add infinite syntax checks and still never verify that a function returns the right business logic.",
+      "3": "Semantic validation is very possible \u2014 run the feature, check the output, compare to expected behavior. It just requires behavioral tests, not just static analysis."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.4 Validation-Retry Loops",
+    "difficulty": 4,
+    "question": "When implementing the 5 Whys technique in a validation-retry loop, what determines when to stop drilling down?",
+    "explanation": "Claude found that a test fails because state is stale. It asks 'why is state stale?' and gets another answer. How deep should this go?",
+    "photoUrl": null,
+    "options": [
+      "Always stop at exactly 5 whys \u2014 no more, no less",
+      "Stop when you reach a cause that can be fixed with a code change at the architectural level",
+      "Stop after the first why \u2014 deeper analysis wastes tokens",
+      "Keep going indefinitely until no more causes can be found"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "The '5' in 5 Whys is a guideline, not a strict count. You stop when you hit bedrock \u2014 a root cause that explains the entire chain and can be addressed with a concrete fix. Example: 'Should use useRef for mutable value in async callback' is bedrock. 'State was stale' is a symptom, not a root cause.",
+    "wrongExplanations": {
+      "0": "The number 5 is a heuristic. Some bugs have shallow root causes (2 whys), others go deeper. The goal is bedrock, not a fixed count.",
+      "2": "Stopping at the first symptom means you'll fix the symptom, not the cause. The bug will resurface in a different form.",
+      "3": "Infinite drilling hits philosophical territory ('why does JavaScript exist?'). Stop at the level where a code change prevents recurrence."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.4 Validation-Retry Loops",
+    "difficulty": 5,
+    "question": "How do you prevent a validation-retry loop from becoming an infinite loop when the validation criteria themselves are flawed?",
+    "explanation": "A team's prompt instructs Claude to retry until all tests pass, but one test has a bug that makes it always fail. Claude is stuck in an infinite retry cycle.",
+    "photoUrl": null,
+    "options": [
+      "Set a maximum retry count and escalate to the user after exhausting retries with a summary of attempts",
+      "Disable the failing test automatically",
+      "Increase the model's temperature to generate more creative fixes",
+      "Add more retry loops around the outer retry loop"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "The 3-Strike Protocol is specifically designed for this. After 3 fundamentally different attempts, escalate with a summary of what was tried. This catches cases where the problem isn't in the generated code but in the test, environment, or criteria. Never auto-disable tests \u2014 that masks real issues. The human decides what to do with persistent failures.",
+    "wrongExplanations": {
+      "1": "Auto-disabling tests is dangerous \u2014 the test might be correct and the code might be wrong. Only a human should decide to skip a test.",
+      "2": "Higher temperature produces more random output, not better output. If the approach is wrong, randomness won't help.",
+      "3": "Nested retry loops compound the problem. If the inner loop can't solve it, an outer loop running the same inner loop won't either."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.4 Validation-Retry Loops",
+    "difficulty": 5,
+    "question": "In a complex pipeline, how should validation-retry loops handle cascading failures where fixing one issue breaks a previously-passing check?",
+    "explanation": "Claude fixes a type error, which causes a previously-passing integration test to fail. Fixing that test breaks the original type check again. It's a whack-a-mole scenario.",
+    "photoUrl": null,
+    "options": [
+      "Keep alternating fixes \u2014 eventually both will pass simultaneously",
+      "Fix only the most recent failure and ignore regressions",
+      "Recognize the circular dependency as a signal to re-plan the approach from scratch rather than patching incrementally",
+      "Run both fixes in parallel so they don't conflict"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "Cascading failures that form cycles indicate an architectural issue, not a series of independent bugs. The rule is: if something goes sideways, STOP and re-plan from scratch. The type system and integration test are likely conflicting because of a design flaw (e.g., wrong type definition, wrong abstraction boundary). Incremental patches will never converge.",
+    "wrongExplanations": {
+      "0": "Alternating between conflicting fixes is the definition of an infinite loop. If fix A breaks B and fix B breaks A, they'll never converge without a redesign.",
+      "1": "Ignoring regressions means shipping broken code. Every fix must maintain all previously-passing checks.",
+      "3": "Parallel execution doesn't resolve logical conflicts. If two changes are mutually incompatible, running them simultaneously will still produce failures."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.5 Batch Processing",
+    "difficulty": 1,
+    "question": "Why would you break a large list of items into chunks when processing with Claude?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Chunking is only for aesthetic purposes \u2014 it makes logs look cleaner",
+      "To stay within context window limits and maintain output quality",
+      "Claude processes chunks slower than single large inputs",
+      "Chunking is only needed for images, not text"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Context windows have finite capacity. Sending 200 files at once may exceed the window or degrade quality as attention spreads thin. Chunking keeps each batch within limits and lets Claude focus deeply on fewer items. It also provides natural checkpoints for progress tracking.",
+    "wrongExplanations": {
+      "0": "Chunking has real functional benefits beyond aesthetics \u2014 it prevents context overflow and maintains quality per batch.",
+      "2": "Chunks are typically processed faster and more accurately because Claude can focus on a manageable set. Large inputs risk degraded attention.",
+      "3": "Chunking applies to any content type \u2014 text, code, data. Any input that exceeds context limits needs chunking regardless of format."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.5 Batch Processing",
+    "difficulty": 1,
+    "question": "What is the key difference between processing items individually vs. in a batch?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Individual processing always produces better results",
+      "Batch processing always produces better results",
+      "Individual gives more focus per item but costs more tokens; batch is efficient but may lose detail",
+      "There is no difference in outcome between the two approaches"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "Individual processing gives Claude full attention per item \u2014 better for complex analysis. Batch processing amortizes the system prompt and instructions across items \u2014 better for simple, repetitive tasks. The tradeoff is quality vs. efficiency. Choose based on how much reasoning each item needs.",
+    "wrongExplanations": {
+      "0": "Individual processing isn't universally better. For simple tasks like formatting or classification, batch processing is equally accurate and much more efficient.",
+      "1": "Batch processing can lose detail on complex items when attention is spread across many inputs. It's a tradeoff, not a universal win.",
+      "3": "There are measurable differences. Individual processing allocates more reasoning tokens per item, which matters for complex analysis."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.5 Batch Processing",
+    "difficulty": 2,
+    "question": "When chunking data for batch processing, what determines the optimal chunk size?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Always use chunks of exactly 10 items regardless of content",
+      "Balance between context window capacity, output quality, and the complexity of per-item processing",
+      "Use the largest possible chunk to minimize API calls",
+      "Always process one item at a time for maximum accuracy"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Optimal chunk size depends on: (1) how much context each item needs, (2) how much output is expected per item, (3) the total context window available, and (4) quality requirements. Simple classifications can batch 50+ items. Complex analyses may need 5-10 per chunk. Always leave room for the output in the context window.",
+    "wrongExplanations": {
+      "0": "Fixed chunk sizes ignore the variability in item complexity and size. A 10-item chunk of short strings is very different from 10 items of full documents.",
+      "2": "Maximizing chunk size risks exceeding the context window or degrading quality. Efficiency must be balanced against output accuracy.",
+      "3": "One-at-a-time processing is wasteful for simple tasks. If each item needs minimal reasoning, batching is far more efficient without quality loss."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.5 Batch Processing",
+    "difficulty": 2,
+    "question": "What is a common pitfall when batch-processing items that have dependencies on each other?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Dependencies between items don't affect batch processing",
+      "Items with cross-dependencies may be split across chunks, causing each chunk to miss inter-item context",
+      "Batch processing automatically detects dependencies",
+      "This only happens with files larger than 1000 lines"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "When items reference each other (e.g., a component importing from a utility file), splitting them into separate chunks means neither chunk sees the full picture. Group dependent items into the same chunk, or provide shared context (type definitions, interfaces) in every chunk. This is why wave execution serializes tasks that touch the same file.",
+    "wrongExplanations": {
+      "0": "Dependencies are the #1 concern in chunking strategy. Ignoring them leads to missed bugs at boundaries between chunks.",
+      "2": "Claude doesn't auto-detect dependencies between items in a batch. You must structure chunks to keep related items together.",
+      "3": "File size is irrelevant. Even small files can have tight dependencies (a 5-line type definition imported by 20 other files)."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.5 Batch Processing",
+    "difficulty": 3,
+    "question": "How should you handle partial failures in a batch processing pipeline?",
+    "explanation": "Claude successfully processes 8 out of 10 items in a chunk, but fails on 2. The developer needs to decide what to do with the batch.",
+    "photoUrl": null,
+    "options": [
+      "Discard the entire batch and retry all 10 items",
+      "Accept the 8 successes and ignore the 2 failures",
+      "Keep the 8 successes, extract the 2 failures, and retry only the failed items individually",
+      "Reduce chunk size to 1 and reprocess everything"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "Idempotent retry of only failed items is the most efficient approach. It avoids re-processing successful items (saving tokens) and gives failed items individual attention that may resolve the issue. Track which items succeeded vs. failed, and implement exponential backoff or different strategies for persistent failures.",
+    "wrongExplanations": {
+      "0": "Discarding successful results wastes tokens and time. The 8 good outputs are perfectly valid and should be kept.",
+      "1": "Silently dropping failures means incomplete results. In production, missing data can cause downstream issues.",
+      "3": "Reprocessing everything at chunk size 1 is extremely wasteful. Only the 2 failures need retry, and they may not even need individual processing."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.5 Batch Processing",
+    "difficulty": 3,
+    "question": "What is the most token-efficient way to apply the same transformation to 100 similar items?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Send all 100 items in a single prompt with one instruction block",
+      "Send each item individually with full instructions repeated each time",
+      "Provide 2-3 examples in the system prompt, then send items in batches with minimal per-batch instructions",
+      "Ask Claude to write a script that does the conversion, then run the script"
+    ],
+    "correctIndex": 3,
+    "deeperKnowledge": "For deterministic transformations with clear rules, the most token-efficient approach is to have Claude generate a script (Python, jq, etc.) and execute it. This uses tokens only for code generation, not per-item processing. Reserve LLM batch processing for tasks requiring judgment, not mechanical transformation.",
+    "wrongExplanations": {
+      "0": "100 items in one prompt likely exceeds context limits and the instruction block only saves marginal tokens vs. the massive input payload.",
+      "1": "Repeating full instructions 100 times is the least efficient approach. Each call includes the entire system prompt and instructions overhead.",
+      "2": "Few-shot batching is better than individual processing but still uses LLM tokens per item. For mechanical transformations, a script is far cheaper."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.5 Batch Processing",
+    "difficulty": 4,
+    "question": "When using subagents for parallel batch processing, how should you handle shared state?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Give all subagents write access and let them resolve conflicts naturally",
+      "Group items that touch shared state into the same chunk; serialize chunks that modify the same files",
+      "Use a locking mechanism so subagents wait for each other",
+      "Shared state isn't a concern with subagents since they run in isolation"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Wave execution requires that tasks modifying the same file are serialized, not parallelized. If two tasks in the same wave modify the same file, move one to the next wave. This prevents merge conflicts and race conditions. Each wave should be independently safe to execute in parallel.",
+    "wrongExplanations": {
+      "0": "Unsynchronized writes to shared files cause race conditions and data loss. Conflicts don't 'resolve naturally' \u2014 they corrupt state.",
+      "2": "Claude Code subagents don't have a built-in locking mechanism. The solution is architectural: structure waves so parallel tasks don't overlap on files.",
+      "3": "Subagents DO run in isolation, which is exactly the problem \u2014 they can't see each other's changes. Without coordination, parallel writes to the same file will conflict."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.5 Batch Processing",
+    "difficulty": 4,
+    "question": "What is the 2-Action Rule and how does it relate to batch processing?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "The 2-Action Rule says to never run more than 2 batch items at once",
+      "After every 2 browser/search/image operations, save key findings to a file before continuing",
+      "It means you should always use exactly 2 subagents for batch work",
+      "The rule limits batch size to 2 items per chunk"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Visual and multimodal content doesn't persist reliably in context. The 2-Action Rule forces periodic checkpointing: search, search, WRITE findings, continue. Without this, early results get compressed away in long batch operations. This applies to any batch workflow involving ephemeral content like web pages, images, or API responses.",
+    "wrongExplanations": {
+      "0": "The rule isn't about concurrency limits \u2014 it's about persisting intermediate results before context compression loses them.",
+      "2": "The number 2 refers to how many operations to run before saving, not the number of subagents to use.",
+      "3": "Chunk size is a separate concern. The 2-Action Rule is about saving progress during processing, regardless of chunk size."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.5 Batch Processing",
+    "difficulty": 5,
+    "question": "How would you design a batch processing pipeline that handles heterogeneous items requiring different processing strategies?",
+    "explanation": "A pipeline receives mixed input: some items need simple classification, some need deep analysis, and some need code generation. Using the same strategy for all wastes resources.",
+    "photoUrl": null,
+    "options": [
+      "Process everything with the most expensive strategy to ensure quality",
+      "Use the cheapest strategy for everything to save tokens",
+      "Pre-classify items by complexity, then route each class to an appropriate batch strategy with matching chunk sizes and validation depth",
+      "Randomly assign items to different strategies for load balancing"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "Adaptive batching routes items to the right processing tier. Simple classifications batch 50+ per chunk with minimal validation. Deep analysis runs 5-10 per chunk with full validation loops. Code generation runs individually with typecheck and test validation. The pre-classification step itself can be a cheap batch operation. This mirrors the 3-tier pipeline structure: execute-only for simple, spec+execute for medium, full pipeline for complex.",
+    "wrongExplanations": {
+      "0": "Over-processing simple items wastes tokens and time. A classification task doesn't need the same depth as code generation.",
+      "1": "Under-processing complex items produces low-quality results. Deep analysis needs more context and validation than simple classification.",
+      "3": "Random assignment ignores item characteristics. A code generation task needs individual attention; a classification task can be batched efficiently."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.5 Batch Processing",
+    "difficulty": 5,
+    "question": "When processing a large dataset in batches, how do you ensure consistency of output format across all chunks?",
+    "explanation": "A team processes 500 items in 50 chunks of 10. The first chunks return JSON with 'name' field, but later chunks start using 'title' instead. Results are inconsistent.",
+    "photoUrl": null,
+    "options": [
+      "Manually review all outputs and fix inconsistencies afterward",
+      "Include a strict output schema with an example in every chunk's prompt, and add a validation step that rejects non-conforming outputs",
+      "Process everything in a single chunk to avoid the problem",
+      "Use different models for different chunks to get variety"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Schema drift across chunks is a common batch processing bug. Each chunk must receive the identical output schema and at least one concrete example. Post-processing validation should parse each output against the schema and reject/retry non-conforming items. This is a generate-validate loop applied at the batch level \u2014 every chunk's output gets schema-validated before being accepted.",
+    "wrongExplanations": {
+      "0": "Manual post-hoc cleanup doesn't scale. With 500 items, manual review is expensive and error-prone. Prevent the problem upfront.",
+      "2": "500 items in one chunk will exceed context limits and degrade quality. Chunking is necessary; the fix is consistent prompting, not avoiding chunking.",
+      "3": "Different models for different chunks makes inconsistency worse, not better. Consistency requires identical instructions, not variety."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.6 Multi-Instance Review",
+    "difficulty": 1,
+    "question": "What is the basic concept behind multi-instance review with Claude?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Running Claude on multiple computers simultaneously",
+      "Having separate Claude instances independently review the same work, then comparing their findings",
+      "Using Claude to review its own output in the same conversation",
+      "Connecting Claude to multiple external review tools"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Multi-instance review leverages the fact that independent reviewers catch different issues. Each Claude instance starts fresh without seeing other reviews, preventing groupthink. Their findings are then aggregated. This mirrors how code review works in teams \u2014 multiple perspectives catch more bugs than a single reviewer.",
+    "wrongExplanations": {
+      "0": "Multi-instance isn't about hardware \u2014 it's about separate conversation contexts. The instances can run on the same machine.",
+      "2": "Self-review in the same conversation is a validation loop, not multi-instance review. The key difference is independent contexts that prevent blind spots.",
+      "3": "External tools aren't involved. Multi-instance review uses multiple Claude conversations, each providing an independent perspective."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.6 Multi-Instance Review",
+    "difficulty": 1,
+    "question": "Why is independent context important in multi-instance review?",
+    "explanation": "A developer considers having Claude review its own code in the same conversation thread instead of spawning a separate instance.",
+    "photoUrl": null,
+    "options": [
+      "Same-thread review is always better because Claude has full context",
+      "Independent contexts prevent anchoring bias \u2014 a fresh instance won't rationalize decisions made during generation",
+      "Independent contexts use fewer tokens",
+      "There's no difference between same-thread and separate-instance review"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "When Claude reviews its own work in the same thread, it's biased toward justifying its prior decisions. A fresh instance sees the code without the reasoning that led to it, making it more likely to spot issues objectively. This is the same principle behind why code authors shouldn't be the sole reviewer of their own PRs.",
+    "wrongExplanations": {
+      "0": "Full context includes the decision-making process, which creates anchoring bias. The reviewer rationalizes choices instead of questioning them.",
+      "2": "Independent contexts actually use MORE tokens (each instance loads the full codebase context). The benefit is quality, not efficiency.",
+      "3": "There's a measurable difference. Fresh instances find issues that same-thread review misses due to confirmation bias."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.6 Multi-Instance Review",
+    "difficulty": 2,
+    "question": "What is the /review-parallel pattern?",
+    "explanation": "A team's CLAUDE.md mentions that every card must pass '/review-parallel' before advancing. A new team member wants to understand what this means.",
+    "photoUrl": null,
+    "options": [
+      "A pattern where multiple specialized Claude subagents review code in parallel, each focusing on a different aspect",
+      "A git command that runs reviews on parallel branches",
+      "A CI/CD pipeline stage that runs tests in parallel",
+      "A pattern where one Claude instance reviews code line by line in parallel with the developer"
+    ],
+    "correctIndex": 0,
+    "deeperKnowledge": "The /review-parallel pattern spawns multiple specialized subagents simultaneously \u2014 each with a different review focus (spec compliance, architecture, security, DevOps). They run independently and report findings. This is mandatory before moving cards from AI Testing to Awaiting Human QA. Any Critical findings block advancement.",
+    "wrongExplanations": {
+      "1": "This isn't a git command. It's a Claude Code workflow pattern involving multiple AI reviewers working simultaneously.",
+      "2": "While it involves parallel execution, it's not a CI/CD stage. It's an AI review pattern where Claude instances provide different expert perspectives.",
+      "3": "It's not one instance working alongside a developer. It's multiple instances working simultaneously, each with a specialized focus area."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.6 Multi-Instance Review",
+    "difficulty": 2,
+    "question": "What are the four specialized reviewer roles commonly used in multi-instance review?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Frontend, Backend, Database, DevOps",
+      "Junior, Mid, Senior, Principal engineer perspectives",
+      "Spec Compliance, DevOps/Infrastructure, CTO/Architecture, Cyber/Security",
+      "Speed, Readability, Performance, Cost"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "Each role catches different issues: Spec Compliance verifies plan vs. reality and checks for files outside the manifest. DevOps checks DB schema, edge functions, and performance. CTO evaluates code patterns, type safety, and tech debt. Cyber checks input validation, data exposure, and access control. Together they provide comprehensive coverage.",
+    "wrongExplanations": {
+      "0": "These are technology layers, not review perspectives. A good review checks cross-cutting concerns like security and spec compliance, not just stack layers.",
+      "1": "Seniority-based perspectives are too vague. Specialized roles with clear checklists (security, architecture, compliance) produce more actionable findings.",
+      "3": "These are quality attributes, not reviewer roles. A reviewer needs a clear scope and checklist, not just a single metric to optimize."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.6 Multi-Instance Review",
+    "difficulty": 3,
+    "question": "How should findings from multiple review instances be prioritized and acted upon?",
+    "explanation": "Four reviewer subagents return their findings. The Spec Compliance agent found 2 issues, the CTO agent found 5, and the Security agent found 1 Critical issue. How should these be handled?",
+    "photoUrl": null,
+    "options": [
+      "Fix all findings in the order they were reported",
+      "Fix only the majority-agreed findings and ignore the rest",
+      "Critical findings from ANY reviewer block advancement; High findings are fixed before merge; Low findings are tracked for later",
+      "Average the severity scores and only fix items above the average"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "Severity-based triage is essential. A single Critical finding from the Security agent trumps five Low findings from the CTO agent. The rule is: any Critical finding keeps the card in AI Testing until fixed and re-reviewed. This prevents the 'majority rules' fallacy where important security issues get outvoted by cosmetic concerns.",
+    "wrongExplanations": {
+      "0": "Chronological ordering ignores severity. A Critical security issue found last is more urgent than a Low style issue found first.",
+      "1": "Majority voting is dangerous for specialized findings. A security vulnerability might only be caught by the security reviewer \u2014 it shouldn't be dismissed because other reviewers didn't flag it.",
+      "3": "Averaging severity scores dilutes critical findings. One Critical + five Lows averages to Medium, but the Critical still needs immediate attention."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.6 Multi-Instance Review",
+    "difficulty": 3,
+    "question": "What is the key constraint for subagents used in review (as opposed to execution)?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Review subagents should have full read-write access to fix issues they find",
+      "Review subagents should be read-only \u2014 they observe and report but never modify code",
+      "Review subagents don't need access to the codebase at all",
+      "Review subagents should only have access to test files"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "Research/review agents use subagent_type 'Explore' and are strictly read-only. They should never have edit tools. This separation of concerns prevents a reviewer from silently 'fixing' code without going through the proper execution pipeline. Their job is to identify and report issues, not to implement fixes.",
+    "wrongExplanations": {
+      "0": "Giving reviewers write access blurs the line between review and execution. A reviewer who fixes code bypasses the spec-execute pipeline and may introduce new issues.",
+      "2": "Reviewers need to read the actual code to provide meaningful feedback. Without codebase access, they can only review in the abstract.",
+      "3": "Reviewers need access to all relevant code, not just tests. Security issues, architectural problems, and spec deviations exist in source code, not just test files."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.6 Multi-Instance Review",
+    "difficulty": 4,
+    "question": "How do the 3 Critical Questions serve as a gate in the multi-instance review pipeline?",
+    "explanation": "A team has automated multi-instance review but still ships features that don't match what the user actually wanted. Something is missing from their process.",
+    "photoUrl": null,
+    "options": [
+      "The 3 Critical Questions are optional nice-to-haves for thorough teams",
+      "They replace the need for multi-instance review entirely",
+      "They serve as a human-intent gate: Does output match what the USER wanted? Would you stake reputation on it? What's the simplest thing that could go wrong?",
+      "They are three automated test commands that must pass"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "Multi-instance review catches technical issues but can miss intent mismatches. The 3 Critical Questions add a human-intent layer: (1) Does output match what the user asked for \u2014 not what the spec says? (2) Would you stake the user's reputation on this? (3) What's the simplest untested failure? If any answer is 'no' or 'I don't know,' the card stays in AI Testing. This catches the gap between 'technically correct' and 'actually useful.'",
+    "wrongExplanations": {
+      "0": "The questions are mandatory, not optional. They're the gate between AI Testing and Human QA. Skipping them is how intent mismatches slip through.",
+      "1": "They complement multi-instance review, not replace it. Technical review catches code bugs; the 3 Questions catch intent mismatches.",
+      "3": "These are judgment questions, not automated tests. They require reasoning about user intent, reputation, and untested scenarios \u2014 things that can't be reduced to pass/fail commands."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.6 Multi-Instance Review",
+    "difficulty": 4,
+    "question": "What is the standard report format each review subagent should produce?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "A simple pass/fail boolean",
+      "A free-form paragraph of observations",
+      "Status, files created/modified, tests run, acceptance criteria with commands, issues encountered, and timestamp",
+      "Just a list of line numbers that need changes"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "Structured reports enable automated triage and tracking. Each agent reports: Status (Pass/Fail/Partial), Files Created, Files Modified (with what changed), Tests Run (commands and results), Acceptance Criteria (checkboxes with verification commands), Issues Encountered, and Completion Timestamp. This format makes it easy to aggregate findings, track which criteria passed, and identify blockers.",
+    "wrongExplanations": {
+      "0": "Pass/fail gives no context on what was checked or what failed. It's useless for debugging or understanding the review's coverage.",
+      "1": "Free-form text is hard to parse, aggregate, and track. Structured fields enable automated processing and consistent comparison across reviewers.",
+      "3": "Line numbers alone miss the context: what's wrong, how severe, what was checked, what the fix should be. Reviews need full context for actionability."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.6 Multi-Instance Review",
+    "difficulty": 5,
+    "question": "How do you prevent multi-instance review from becoming a bottleneck that slows delivery without proportionally improving quality?",
+    "explanation": "",
+    "photoUrl": null,
+    "options": [
+      "Remove multi-instance review entirely since it's too slow",
+      "Scale review depth to task complexity: one-liner fixes get basic validation only; multi-file features get full parallel review; reserve 4-agent review for architectural changes",
+      "Run all 4 agents but set a 30-second timeout so they don't take too long",
+      "Only review code that the user explicitly asks to review"
+    ],
+    "correctIndex": 1,
+    "deeperKnowledge": "This mirrors the pipeline tiers: execute-only for simple changes, spec+execute for medium, full pipeline for complex. A one-liner fix needs typecheck and tests, not four specialized reviewers. Full /review-parallel is mandatory for cards moving through the board, but the depth should match the scope. Over-reviewing trivial changes wastes resources and creates fatigue that causes teams to skip reviews on important changes.",
+    "wrongExplanations": {
+      "0": "Removing review entirely throws away its benefits for complex changes where it catches real bugs. The fix is scaling, not elimination.",
+      "2": "Arbitrary timeouts cause reviewers to report incomplete findings. A 30-second review that misses a security issue is worse than no review. Adjust scope, not time.",
+      "3": "User-triggered-only review means most code goes unreviewed. The point of the process is systematic quality \u2014 it shouldn't depend on the user remembering to ask."
+    }
+  },
+  {
+    "category": "Prompt Engineering",
+    "subtopic": "4.6 Multi-Instance Review",
+    "difficulty": 5,
+    "question": "In a multi-instance review pipeline, how should you handle contradictory findings between reviewers?",
+    "explanation": "The CTO reviewer says 'this abstraction is over-engineered, simplify it.' The Security reviewer says 'this needs more layers of validation, add defensive checks.' Both make valid points but their recommendations conflict.",
+    "photoUrl": null,
+    "options": [
+      "Always prioritize the Security reviewer since security is most important",
+      "Average the recommendations and implement a middle-ground solution",
+      "Escalate the contradiction to the human with both perspectives and let them make the tradeoff decision",
+      "Implement both recommendations in separate branches and A/B test them"
+    ],
+    "correctIndex": 2,
+    "deeperKnowledge": "Contradictory findings between specialized reviewers represent genuine engineering tradeoffs, not errors. Security wants defense in depth; architecture wants simplicity. Both are valid. The system should surface these tensions to the human decision-maker with clear context from each perspective. This is a product/architecture decision, not a technical one \u2014 agents should present tradeoffs, not make them.",
+    "wrongExplanations": {
+      "0": "Blindly prioritizing one domain over another ignores context. Sometimes the security concern is minor and over-engineering is the bigger risk. Tradeoffs need human judgment.",
+      "1": "Averaging contradictory advice often produces the worst of both worlds: not simple enough AND not secure enough. Binary tradeoffs need a decision, not a compromise.",
+      "3": "A/B testing code architecture is impractical. This is a design decision that needs to be made once based on the specific context, not empirically tested."
+    }
+  }
+]
