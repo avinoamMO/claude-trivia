@@ -133,8 +133,8 @@ export default function MainPage({ sessionId, name, onLogout }: MainPageProps) {
             </div>
           </div>
 
-          {/* Chat — 30% bigger */}
-          <div className="flex-1 min-h-0">
+          {/* Chat */}
+          <div className="flex-1 min-h-0 overflow-hidden">
             <Chat sessionId={sessionId} name={name} />
           </div>
         </aside>
