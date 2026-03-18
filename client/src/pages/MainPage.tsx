@@ -93,9 +93,9 @@ export default function MainPage({ sessionId, name, onLogout }: MainPageProps) {
         </main>
 
         {/* Right sidebar — Controls + Chat */}
-        <aside className="w-80 border-l border-[#333] flex flex-col">
+        <aside className="w-80 border-l border-[#333] flex flex-col overflow-hidden">
           {/* Category selector — 20% bigger */}
-          <div className="p-4 pb-5 border-b border-[#333]">
+          <div className="p-4 pb-5 border-b border-[#333] shrink-0">
             <h4 className="text-[10px] font-semibold text-zinc-500 mb-3 uppercase tracking-wide">Category</h4>
             <div className="flex flex-wrap gap-2">
               <button onClick={() => setSelectedCategory("")} className={`px-3 py-2 rounded-full text-xs font-medium transition-colors cursor-pointer ${selectedCategory === "" ? "bg-[#D97757] text-white" : "bg-[#2a2a2a] text-zinc-400 hover:text-white"}`}>All</button>
@@ -106,7 +106,7 @@ export default function MainPage({ sessionId, name, onLogout }: MainPageProps) {
           </div>
 
           {/* Difficulty selector — visually distinct with active indicator */}
-          <div className="p-4 border-b border-[#333] bg-[#1e1e1e]">
+          <div className="p-4 border-b border-[#333] bg-[#1e1e1e] shrink-0">
             <div className="flex items-center justify-between mb-3">
               <h4 className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wide">Difficulty</h4>
               <span className="text-[10px] text-zinc-500">
