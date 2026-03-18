@@ -93,7 +93,7 @@ export default function MainPage({ sessionId, name, onLogout }: MainPageProps) {
         </main>
 
         {/* Right sidebar — Controls + Chat */}
-        <aside className="w-80 border-l border-[#333] flex flex-col overflow-hidden">
+        <aside className="w-80 border-l border-[#333] flex flex-col overflow-y-auto">
           {/* Category selector — 20% bigger */}
           <div className="p-4 pb-5 border-b border-[#333] shrink-0">
             <h4 className="text-[10px] font-semibold text-zinc-500 mb-3 uppercase tracking-wide">Category</h4>
@@ -133,8 +133,8 @@ export default function MainPage({ sessionId, name, onLogout }: MainPageProps) {
             </div>
           </div>
 
-          {/* Chat */}
-          <div className="flex-1 min-h-0 overflow-hidden">
+          {/* Chat — fixed height to prevent expansion */}
+          <div className="h-64 shrink-0">
             <Chat sessionId={sessionId} name={name} />
           </div>
         </aside>
