@@ -16,7 +16,7 @@ function countryFlag(code?: string) {
 }
 
 export default function Scoreboard({ sessionId }: ScoreboardProps) {
-  const [period, setPeriod] = useState<Period>("daily");
+  const [period, setPeriod] = useState<Period>("allTime");
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
 

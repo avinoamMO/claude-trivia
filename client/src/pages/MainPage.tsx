@@ -71,7 +71,7 @@ export default function MainPage({ sessionId, name, onLogout }: MainPageProps) {
             <p className="text-zinc-600 text-[10px] leading-relaxed">
               Not affiliated with Anthropic.
               {" "}Open source by{" "}
-              <a href="https://x.com/avinoamoltchik" target="_blank" rel="noopener noreferrer" className="text-[#D97757]/60 hover:text-[#D97757]">Avinoam Oltchik</a>
+              <a href="https://www.linkedin.com/in/avinoam" target="_blank" rel="noopener noreferrer" className="text-[#D97757]/60 hover:text-[#D97757]">Avinoam Oltchik</a>
               {" "}&middot;{" "}
               <a href="https://github.com/avinoamMO/claude-trivia" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-0.5 text-[#D97757]/60 hover:text-[#D97757]">
                 <Github className="w-2.5 h-2.5" /> GitHub
@@ -93,30 +93,39 @@ export default function MainPage({ sessionId, name, onLogout }: MainPageProps) {
         </main>
 
         {/* Right sidebar — Controls + Chat */}
-        <aside className="w-80 border-l border-[#333] flex flex-col overflow-y-auto">
+        <aside className="w-80 border-l border-[#333] flex flex-col">
           {/* Category selector */}
           <div className="p-4 border-b border-[#333]">
             <h4 className="text-[10px] font-semibold text-zinc-500 mb-3 uppercase tracking-wide">Category</h4>
             <div className="flex flex-wrap gap-1.5">
-              <button onClick={() => setSelectedCategory("")} className={`px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors cursor-pointer ${selectedCategory === "" ? "bg-[#D97757] text-white" : "bg-[#2a2a2a] text-zinc-400 hover:text-white"}`}>All</button>
+              <button onClick={() => setSelectedCategory("")} className={`px-2.5 py-1.5 rounded-full text-[11px] font-medium transition-colors cursor-pointer ${selectedCategory === "" ? "bg-[#D97757] text-white" : "bg-[#2a2a2a] text-zinc-400 hover:text-white"}`}>All</button>
               {categories.map((cat) => (
-                <button key={cat} onClick={() => setSelectedCategory(cat)} className={`px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors cursor-pointer ${selectedCategory === cat ? "bg-[#D97757] text-white" : "bg-[#2a2a2a] text-zinc-400 hover:text-white"}`}>{cat}</button>
+                <button key={cat} onClick={() => setSelectedCategory(cat)} className={`px-2.5 py-1.5 rounded-full text-[11px] font-medium transition-colors cursor-pointer ${selectedCategory === cat ? "bg-[#D97757] text-white" : "bg-[#2a2a2a] text-zinc-400 hover:text-white"}`}>{cat}</button>
               ))}
             </div>
           </div>
 
-          {/* Difficulty selector */}
-          <div className="p-4 border-b border-[#333]">
-            <h4 className="text-[10px] font-semibold text-zinc-500 mb-3 uppercase tracking-wide">Difficulty</h4>
-            <div className="flex gap-1.5">
+          {/* Difficulty selector — visually distinct */}
+          <div className="p-4 border-b border-[#333] bg-[#1e1e1e]">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wide">Difficulty</h4>
+              <span className="text-[10px] text-zinc-500">
+                {selectedDifficulty ? (
+                  <>Level <span className="text-[#D97757] font-bold">{selectedDifficulty}</span></>
+                ) : (
+                  <span className="text-zinc-600">All levels</span>
+                )}
+              </span>
+            </div>
+            <div className="flex gap-1">
               {[
-                { d: 1, label: "Basics", color: "text-emerald-400" },
-                { d: 2, label: "How?", color: "text-sky-400" },
-                { d: 3, label: "Debug", color: "text-yellow-400" },
-                { d: 4, label: "Why?", color: "text-orange-400" },
-                { d: 5, label: "Architect", color: "text-red-400" },
-              ].map(({ d, label, color }) => (
-                <button key={d} onClick={() => setSelectedDifficulty(selectedDifficulty === d ? undefined : d)} className={`flex-1 py-2 rounded-lg text-center transition-all cursor-pointer ${selectedDifficulty === d ? `${color} bg-white/10 ring-1 ring-current` : "text-zinc-600 hover:text-zinc-400 hover:bg-white/5"}`}>
+                { d: 1, label: "Basics", color: "text-emerald-400", bg: "bg-emerald-400/15" },
+                { d: 2, label: "How?", color: "text-sky-400", bg: "bg-sky-400/15" },
+                { d: 3, label: "Debug", color: "text-yellow-400", bg: "bg-yellow-400/15" },
+                { d: 4, label: "Why?", color: "text-orange-400", bg: "bg-orange-400/15" },
+                { d: 5, label: "Architect", color: "text-red-400", bg: "bg-red-400/15" },
+              ].map(({ d, label, color, bg }) => (
+                <button key={d} onClick={() => setSelectedDifficulty(selectedDifficulty === d ? undefined : d)} className={`flex-1 py-2.5 rounded-lg text-center transition-all cursor-pointer ${selectedDifficulty === d ? `${color} ${bg} ring-1 ring-current` : "text-zinc-600 hover:text-zinc-400 hover:bg-white/5"}`}>
                   <span className="text-sm font-bold block">{d}</span>
                   <span className="text-[9px] block mt-0.5">{label}</span>
                 </button>
@@ -124,8 +133,8 @@ export default function MainPage({ sessionId, name, onLogout }: MainPageProps) {
             </div>
           </div>
 
-          {/* Chat */}
-          <div className="flex-1 min-h-0">
+          {/* Chat — compact */}
+          <div className="flex-1 min-h-0 max-h-48">
             <Chat sessionId={sessionId} name={name} />
           </div>
         </aside>

@@ -164,12 +164,12 @@ export default function Quiz({ sessionId, selectedCategory, selectedDifficulty, 
       </div>
 
       {/* Question card */}
-      <div className="bg-[#232323] border border-[#333] rounded-xl p-6 mb-4">
-        <h2 className="text-2xl font-semibold text-white mb-3">
+      <div className="bg-[#232323] border border-[#333] rounded-xl p-8 mb-4">
+        <h2 className="text-2xl font-semibold text-white mb-4">
           <GlossaryText text={question.question} />
         </h2>
         {question.explanation && (
-          <p className="text-zinc-400 text-sm leading-relaxed mb-5">
+          <p className="text-zinc-400 text-base leading-relaxed mb-6">
             <GlossaryText text={question.explanation} />
           </p>
         )}
@@ -200,13 +200,13 @@ export default function Quiz({ sessionId, selectedCategory, selectedDifficulty, 
                 <button
                   onClick={() => handleAnswer(idx)}
                   disabled={result !== null || submitting}
-                  className={`w-full text-left px-5 py-4 rounded-xl border transition-all duration-200 cursor-pointer disabled:cursor-default ${style}`}
+                  className={`w-full text-center px-6 py-5 rounded-xl border transition-all duration-200 cursor-pointer disabled:cursor-default ${style}`}
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="shrink-0 w-7 h-7 rounded-lg bg-[#2a2a2a] flex items-center justify-center text-xs font-mono font-medium">
+                  <div className="flex items-center gap-4">
+                    <span className="shrink-0 w-8 h-8 rounded-lg bg-[#2a2a2a] flex items-center justify-center text-sm font-mono font-bold">
                       {String.fromCharCode(65 + idx)}
                     </span>
-                    <span className="flex-1 text-sm"><GlossaryText text={option} /></span>
+                    <span className="flex-1 text-base text-left"><GlossaryText text={option} /></span>
                     {result && idx === result.correctIndex && <Check className="w-5 h-5 text-emerald-400 shrink-0" />}
                     {result && idx === picked && !result.correct && idx !== result.correctIndex && <X className="w-5 h-5 text-red-400 shrink-0" />}
                   </div>
