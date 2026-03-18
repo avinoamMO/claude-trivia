@@ -64,7 +64,7 @@ export default function Chat({ sessionId, name }: ChatProps) {
   };
 
   return (
-    <div className="bg-[#232323] border border-[#333] rounded-xl flex flex-col h-full overflow-hidden">
+    <div className="bg-[#232323] border border-[#333] rounded-xl flex flex-col h-0 flex-1 overflow-hidden">
       <div className="flex items-center gap-2 px-4 py-3 border-b border-[#333] shrink-0">
         <MessageCircle className="w-4 h-4 text-[#D97757]" />
         <h3 className="text-sm font-semibold text-white">Chat</h3>
